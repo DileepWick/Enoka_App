@@ -31,7 +31,7 @@ const gasketSchema = new mongoose.Schema({
   material_type: {
     type: String,
     required: [true, 'Material type is required'],
-    enum: ['Metal', 'Rubber', 'Composite'], // Add predefined material types
+    enum: ['steel', 'hellite', 'wog'], // Add predefined material types
     trim: true
   },
   packing_type: {

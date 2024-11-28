@@ -5,6 +5,7 @@ import gasketRoutes from './routes/gasketRoutes.js';
 import vendorRoutes from './routes/vendorRoutes.js';
 import engineRoutes from './routes/engineRoutes.js';
 import brandRoutes from './routes/brandRoutes.js';
+import cors from 'cors'
 
 //Create the app
 const app = express();
@@ -12,6 +13,8 @@ const app = express();
 //Middlewares
 app.use(express.json());
 
+//CORS
+app.use(cors())
 
 //Configure app to run in port
 app.listen(PORT, () =>

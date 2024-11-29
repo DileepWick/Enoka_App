@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Select from "react-select";
 import Modal from "react-modal";
+import { Button ,Input} from "@nextui-org/react";
 
 Modal.setAppElement("#root");
 
@@ -248,13 +249,13 @@ export default function AddItemForm() {
                 classNamePrefix="react-select"
               />
             </div>
-            <button 
+            <Button 
               type="button" 
               onClick={() => openModal('engine')}
               className="ml-2 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             >
               +
-            </button>
+            </Button>
           </div>
 
           <div className="flex items-end">
@@ -271,13 +272,13 @@ export default function AddItemForm() {
                 classNamePrefix="react-select"
               />
             </div>
-            <button 
+            <Button 
               type="button" 
               onClick={() => openModal('brand')}
               className="ml-2 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             >
               +
-            </button>
+            </Button>
           </div>
 
           <div className="flex items-end">
@@ -294,19 +295,19 @@ export default function AddItemForm() {
                 classNamePrefix="react-select"
               />
             </div>
-            <button 
+            <Button 
               type="button" 
               onClick={() => openModal('vendor')}
               className="ml-2 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             >
               +
-            </button>
+            </Button>
           </div>
         </div>
 
-        <button type="submit" className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+        <Button type="submit" className="w-full" variant="ghost" color="primary" size="lg">
           Submit
-        </button>
+        </Button>
       </form>
 
       <Modal

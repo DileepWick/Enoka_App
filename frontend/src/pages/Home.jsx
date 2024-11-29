@@ -4,7 +4,6 @@ import AddItemForm from "./Add_gasket";
 const Home = () => {
   return (
     <>
-      <div>Enoka Motors</div>
       <AddItemForm />
       
     </>

@@ -14,9 +14,10 @@ export default function AddItemForm() {
     year: "",
     material_type: "",
     packing_type: "",
-    engine_id: "",
-    brand_id: "",
-    vendor_id: "",
+    engine: "",
+    brand: "",
+    vendor: "",
+    added_by: "Admin"
   });
 
   const [vendors, setVendors] = useState([]);
@@ -26,11 +27,9 @@ export default function AddItemForm() {
   const [error, setError] = useState(null);
   const [submitStatus, setSubmitStatus] = useState(null);
 
-  const [isAdding, setIsAdding] = useState(false); // To track the loading state
-  const [modalStatus, setModalStatus] = useState(null); // To display server-side status
-
-  const [modalType, setModalType] = useState(null);
-  const [newEntry, setNewEntry] = useState("");
+  const [currentModal, setCurrentModal] = useState(null);
+  const [newItemName, setNewItemName] = useState("");
+  const [isAddingItem, setIsAddingItem] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,69 +55,41 @@ export default function AddItemForm() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  const handleSelectChange = (field, selected) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [field]: selected.value,
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const openModal = (type) => {
-    setModalType(type);
-    setNewEntry(""); // Clear input field
-    setModalStatus(null); // Clear status messages
-    setIsAdding(false); // Reset loading state
+    setCurrentModal(type);
+    setNewItemName("");
+    setIsAddingItem(false);
   };
-
-  
 
   const closeModal = () => {
-    setModalType(null);
-    setNewEntry(""); // Clear input field
-    setModalStatus(null); // Clear status messages
-    setIsAdding(false); // Reset loading state
+    setCurrentModal(null);
+    setNewItemName("");
+    setIsAddingItem(false);
   };
-  
 
   const handleAddNew = async () => {
-    setIsAdding(true);
-    setModalStatus(null);
+    setIsAddingItem(true);
     try {
-      const endpoint =
-        modalType === "engine"
-          ? "engines"
-          : modalType === "brand"
-            ? "brands"
-            : "vendors";
-      const nameJson =
-        modalType === "engine"
-          ? "engine_name"
-          : modalType === "brand"
-            ? "brand_name"
-            : "vendor_name";
-      const response = await axios.post(`http://localhost:8098/api/${endpoint}`, {
-        [nameJson]: newEntry,
+      const endpoints = {
+        engine: { url: "engines", key: "engine_name", setter: setEngines },
+        brand: { url: "brands", key: "brand_name", setter: setBrands },
+        vendor: { url: "vendors", key: "vendor_name", setter: setVendors }
+      };
+
+      const { url, key, setter } = endpoints[currentModal];
+      const response = await axios.post(`http://localhost:8098/api/${url}`, {
+        [key]: newItemName
       });
 
-      if (modalType === "engine") setEngines((prev) => [...prev, response.data]);
-      if (modalType === "brand") setBrands((prev) => [...prev, response.data]);
-      if (modalType === "vendor") setVendors((prev) => [...prev, response.data]);
-
-      setModalStatus({ type: "success", message: "Item added successfully!" });
-      setNewEntry("");
+      setter(prev => [...prev, response.data]);
+      closeModal();
     } catch (err) {
-      setModalStatus({
-        type: "error",
-        message: err.response?.data?.message || "Failed to add item.",
-      });
+      alert(err.response?.data?.message || "Failed to add item");
     } finally {
-      setIsAdding(false);
+      setIsAddingItem(false);
     }
   };
 
@@ -126,11 +97,7 @@ export default function AddItemForm() {
     e.preventDefault();
     setSubmitStatus(null);
     try {
-      const response = await axios.post("http://localhost:8098/api/gaskets", {
-        ...formData,
-        added_by: "User",
-      });
-
+      const response = await axios.post("http://localhost:8098/api/gaskets", formData);
       setSubmitStatus({ type: "success", message: response.data.message });
       setFormData({
         part_number: "",
@@ -140,27 +107,28 @@ export default function AddItemForm() {
         year: "",
         material_type: "",
         packing_type: "",
-        engine_id: "",
-        brand_id: "",
-        vendor_id: "",
+        engine: "",
+        brand: "",
+        vendor: "",
+        added_by: "Admin"
       });
     } catch (err) {
       setSubmitStatus({
         type: "error",
-        message: err.response?.data?.error || "Failed to create gasket",
+        message: err.response?.data?.error || "Failed to create gasket"
       });
     }
   };
 
-  if (isLoading) return <div className="text-center p-4">Loading...</div>;
-  if (error) return <div className="text-center p-4 text-red-500">Error: {error}</div>;
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
+    <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6 text-center">Add New Gasket</h1>
 
       {submitStatus && (
-        <div className={`mb-6 p-4 rounded-md ${submitStatus.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+        <div className={`mb-6 p-4 rounded-md ${submitStatus.type === "success" ? "bg-green-100" : "bg-red-100"}`}>
           {submitStatus.message}
         </div>
       )}
@@ -266,140 +234,113 @@ export default function AddItemForm() {
             </select>
           </div>
 
-          <div>
-            <label htmlFor="engine_id" className="block text-sm font-medium text-gray-700 mb-1">Engine</label>
-            <Select
-              id="engine_id"
-              name="engine_id"
-              value={formData.engine_id ? { value: formData.engine_id, label: engines.find(e => e.engine_id === formData.engine_id)?.engine_name } : null}
-              onChange={(selected) => selected.value === "add" ? openModal("engine") : handleSelectChange("engine_id", selected)}
-              options={[
-                ...engines.map((engine) => ({
-                  value: engine.engine_id,
-                  label: engine.engine_name,
-                })),
-                { value: "add", label: "Add new engine" },
-              ]}
-              onMenuOpen={() => {
-                if (engines.length === 0) {
-                  openModal("engine");
-                }
-              }}
-              className="react-select-container"
-              classNamePrefix="react-select"
-            />
+          <div className="flex items-end">
+            <div className="flex-grow">
+              <label htmlFor="engine" className="block text-sm font-medium text-gray-700 mb-1">Engine</label>
+              <Select
+                name="engine"
+                value={engines.find(e => e._id === formData.engine)}
+                onChange={(selected) => setFormData(prev => ({ ...prev, engine: selected._id }))}
+                options={engines}
+                getOptionLabel={option => option.engine_name}
+                getOptionValue={option => option._id}
+                className="react-select-container"
+                classNamePrefix="react-select"
+              />
+            </div>
+            <button 
+              type="button" 
+              onClick={() => openModal('engine')}
+              className="ml-2 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              +
+            </button>
           </div>
 
-          <div>
-            <label htmlFor="brand_id" className="block text-sm font-medium text-gray-700 mb-1">Brand</label>
-            <Select
-              id="brand_id"
-              name="brand_id"
-              value={formData.brand_id ? { value: formData.brand_id, label: brands.find(b => b.brand_id === formData.brand_id)?.brand_name } : null}
-              onChange={(selected) => selected.value === "add" ? openModal("brand") : handleSelectChange("brand_id", selected)}
-              options={[
-                ...brands.map((brand) => ({
-                  value: brand.brand_id,
-                  label: brand.brand_name,
-                })),
-                { value: "add", label: "Add new brand" },
-              ]}
-              onMenuOpen={() => {
-                if (brands.length === 0) {
-                  openModal("brand");
-                }
-              }}
-              className="react-select-container"
-              classNamePrefix="react-select"
-            />
+          <div className="flex items-end">
+            <div className="flex-grow">
+              <label htmlFor="brand" className="block text-sm font-medium text-gray-700 mb-1">Brand</label>
+              <Select
+                name="brand"
+                value={brands.find(b => b._id === formData.brand)}
+                onChange={(selected) => setFormData(prev => ({ ...prev, brand: selected._id }))}
+                options={brands}
+                getOptionLabel={option => option.brand_name}
+                getOptionValue={option => option.brand_id}
+                className="react-select-container"
+                classNamePrefix="react-select"
+              />
+            </div>
+            <button 
+              type="button" 
+              onClick={() => openModal('brand')}
+              className="ml-2 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              +
+            </button>
           </div>
 
-          <div>
-            <label htmlFor="vendor_id" className="block text-sm font-medium text-gray-700 mb-1">Vendor</label>
-            <Select
-              id="vendor_id"
-              name="vendor_id"
-              value={formData.vendor_id ? { value: formData.vendor_id, label: vendors.find(v => v.vendor_id === formData.vendor_id)?.vendor_name } : null}
-              onChange={(selected) =>
-                selected.value === "add" ? openModal("vendor") : handleSelectChange("vendor_id", selected)}
-              options={[
-                ...vendors.map((vendor) => ({
-                  value: vendor.vendor_id,
-                  label: vendor.vendor_name,
-                })),
-                { value: "add", label: "Add new vendor" },
-              ]}
-              onMenuOpen={() => {
-                if (vendors.length === 0) {
-                  openModal("vendor");
-                }
-              }}
-              className="react-select-container"
-              classNamePrefix="react-select"
-            />
+          <div className="flex items-end">
+            <div className="flex-grow">
+              <label htmlFor="vendor" className="block text-sm font-medium text-gray-700 mb-1">Vendor</label>
+              <Select
+                name="vendor"
+                value={vendors.find(v => v._id === formData.vendor)}
+                onChange={(selected) => setFormData(prev => ({ ...prev, vendor: selected._id }))}
+                options={vendors}
+                getOptionLabel={option => option.vendor_name}
+                getOptionValue={option => option._id}
+                className="react-select-container"
+                classNamePrefix="react-select"
+              />
+            </div>
+            <button 
+              type="button" 
+              onClick={() => openModal('vendor')}
+              className="ml-2 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              +
+            </button>
           </div>
         </div>
 
-        <button type="submit" className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+        <button type="submit" className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
           Submit
         </button>
       </form>
 
       <Modal
-        isOpen={!!modalType}
+        isOpen={!!currentModal}
         onRequestClose={closeModal}
         className="fixed inset-0 flex items-center justify-center"
         overlayClassName="fixed inset-0 bg-black bg-opacity-50"
       >
-        <div className="bg-white p-6 rounded-lg shadow-xl w-96">
-          <h2 className="text-xl font-semibold mb-4">Add New {modalType}</h2>
-
-          {/* Input field */}
+        <div className="bg-white p-6 rounded-lg w-96">
+          <h2 className="text-xl font-semibold mb-4">Add New {currentModal}</h2>
           <input
             type="text"
-            value={newEntry}
-            onChange={(e) => setNewEntry(e.target.value)}
-            placeholder={`Enter new ${modalType}`}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+            value={newItemName}
+            onChange={(e) => setNewItemName(e.target.value)}
+            placeholder={`Enter new ${currentModal} name`}
+            className="w-full px-3 py-2 border rounded mb-4"
           />
-
-          {/* Status Message */}
-          {modalStatus && (
-            <div
-              className={`mb-4 px-4 py-2 rounded-md text-sm ${modalStatus.type === "success"
-                  ? "bg-green-100 text-green-800"
-                  : "bg-red-100 text-red-800"
-                }`}
-            >
-              {modalStatus.message}
-            </div>
-          )}
-
-          {/* Loading Indicator */}
-          {isAdding && <div className="text-center text-blue-500 mb-4">Adding...</div>}
-
-          {/* Action Buttons */}
           <div className="flex justify-end space-x-2">
-            <button
-              onClick={closeModal}
-              disabled={isAdding}
-              className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50"
+            <button 
+              onClick={closeModal} 
+              className="px-4 py-2 border rounded"
             >
               Cancel
             </button>
-            <button
-              onClick={handleAddNew}
-              disabled={isAdding}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            <button 
+              onClick={handleAddNew} 
+              disabled={isAddingItem}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
             >
-              Add
+              {isAddingItem ? 'Adding...' : 'Add'}
             </button>
           </div>
         </div>
       </Modal>
-
-
     </div>
   );
 }
-

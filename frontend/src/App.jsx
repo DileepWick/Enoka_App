@@ -7,7 +7,6 @@ import Home from "./pages/Home";
 import Header from "./pages/Header";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import DeliverySystem from "./pages/delivery_system";
 
 const App = () => {
   return (
@@ -17,7 +16,6 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/delivery_system" element={<DeliverySystem />} />
       </Routes>
     </AuthProvider>
   );

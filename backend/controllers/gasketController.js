@@ -6,14 +6,15 @@ import Vendor from "../models/Vendor.js";
 export const getAllGaskets = async (req, res) => {
   try {
     const gaskets = await Gasket.find()
-      .populate("engine_id")
-      .populate("brand_id")
-      .populate("vendor_id");
+      .populate("engine")
+      .populate("brand")
+      .populate("vendor");
     res.json(gaskets);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 export const createGasket = async (req, res) => {
   try {
@@ -21,9 +22,9 @@ export const createGasket = async (req, res) => {
       part_number,
       material_type,
       packing_type,
-      engine_id,
-      brand_id,
-      vendor_id,
+      engine,
+      brand,
+      vendor,
       description,
       stock,
       minstock,
@@ -31,36 +32,36 @@ export const createGasket = async (req, res) => {
       added_by,
     } = req.body;
 
-    // Validate references
-    const vendorExists = await Vendor.findOne({ vendor_id });
+    // Validate references (check if vendor, engine, and brand exist by their ObjectIds)
+    const vendorExists = await Vendor.findById(vendor);
     if (!vendorExists) {
       return res
         .status(400)
-        .json({ error: `Vendor ID ${vendor_id} does not exist.` });
+        .json({ error: `Vendor with ID ${vendor} does not exist.` });
     }
 
-    const engineExists = await Engine.findOne({ engine_id });
+    const engineExists = await Engine.findById(engine);
     if (!engineExists) {
       return res
         .status(400)
-        .json({ error: `Engine ID ${engine_id} does not exist.` });
+        .json({ error: `Engine with ID ${engine} does not exist.` });
     }
 
-    const brandExists = await Brand.findOne({ brand_id });
+    const brandExists = await Brand.findById(brand);
     if (!brandExists) {
       return res
         .status(400)
-        .json({ error: `Brand ID ${brand_id} does not exist.` });
+        .json({ error: `Brand with ID ${brand} does not exist.` });
     }
 
-    // Create the Gasket document
+    // Create the Gasket document with ObjectId references
     const gasket = new Gasket({
       part_number,
       material_type,
       packing_type,
-      engine_id,
-      brand_id,
-      vendor_id,
+      engine,  // Reference to Engine
+      brand,   // Reference to Brand
+      vendor,  // Reference to Vendor
       description,
       stock,
       minstock,
@@ -68,7 +69,7 @@ export const createGasket = async (req, res) => {
       added_by,
     });
 
-    // Save to database
+    // Save the gasket to the database
     const savedGasket = await gasket.save();
 
     // Return success response
@@ -88,6 +89,7 @@ export const createGasket = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 export const updateGasket = async (req, res) => {
   try {

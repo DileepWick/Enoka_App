@@ -26,6 +26,7 @@ const gasketSchema = new mongoose.Schema({
   part_number: {
     type: String,
     required: [true, 'Part number is required'], // Add custom error message
+    unique: true,
     trim: true // Remove unnecessary spaces
   },
   material_type: {
@@ -39,17 +40,20 @@ const gasketSchema = new mongoose.Schema({
     required: [true, 'Packing type is required'],
     trim: true
   },
-  engine_id: {
-    type: String,
-    required: true,
+  engine: {
+    type: mongoose.Schema.Types.ObjectId, // Use ObjectId reference
+    ref: 'Engine', // Reference to the Engine model
+    required: true
   },
-  brand_id: {
-    type: String,
-    required: true,
+  brand: {
+    type: mongoose.Schema.Types.ObjectId, // Use ObjectId reference
+    ref: 'Brand', // Reference to the Brand model
+    required: true
   },
-  vendor_id: {
-    type: String,
-    required: true,
+  vendor: {
+    type: mongoose.Schema.Types.ObjectId, // Use ObjectId reference
+    ref: 'Vendor', // Reference to the Vendor model
+    required: true
   },
   description: {
     type: String,

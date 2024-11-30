@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, Button } from "@mui/material";
+import axios from "axios";
 
 const GasketTable = ({ addToDeliveryList }) => {
   const [gaskets, setGaskets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Fetch gaskets data
+  // Fetch gaskets data from the backend
   useEffect(() => {
     const fetchGaskets = async () => {
       try {
@@ -20,7 +20,7 @@ const GasketTable = ({ addToDeliveryList }) => {
     fetchGaskets();
   }, []);
 
-  // Filtered gaskets based on search term across all relevant columns
+  // Filter gaskets based on search term
   const filteredGaskets = gaskets.filter((gasket) => {
     const search = searchTerm.toLowerCase();
     return (
@@ -55,9 +55,9 @@ const GasketTable = ({ addToDeliveryList }) => {
               <TableCell>Description</TableCell>
               <TableCell>Material Type</TableCell>
               <TableCell>Packing Type</TableCell>
-              <TableCell>Engine</TableCell> 
-              <TableCell>Brand</TableCell> 
-              <TableCell>Vendor</TableCell> 
+              <TableCell>Engine</TableCell>
+              <TableCell>Brand</TableCell>
+              <TableCell>Vendor</TableCell>
               <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
@@ -68,14 +68,19 @@ const GasketTable = ({ addToDeliveryList }) => {
                 <TableCell>{gasket.description}</TableCell>
                 <TableCell>{gasket.material_type}</TableCell>
                 <TableCell>{gasket.packing_type}</TableCell>
-                <TableCell>{gasket.engine.engine_name}</TableCell> 
-                <TableCell>{gasket.brand.brand_name}</TableCell> 
+                <TableCell>{gasket.engine.engine_name}</TableCell>
+                <TableCell>{gasket.brand.brand_name}</TableCell>
                 <TableCell>{gasket.vendor.vendor_name}</TableCell>
                 <TableCell>
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => addToDeliveryList(gasket, prompt("Enter Quantity:"))}
+                    onClick={() => {
+                      const quantity = prompt("Enter Quantity:");
+                      if (quantity) {
+                        addToDeliveryList(gasket, quantity);
+                      }
+                    }}
                   >
                     Add to Delivery
                   </Button>

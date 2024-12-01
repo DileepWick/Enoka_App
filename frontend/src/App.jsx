@@ -10,6 +10,9 @@ import Header from "./pages/Header";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
+
+import DeliverySystem from "./pages/delivery_system";
+
 const App = () => {
   return (
     <AuthProvider>
@@ -18,17 +21,9 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/delivery_system" element={<DeliverySystem />} />
       </Routes>
     </AuthProvider>
-
-import DeliverySystem from "./pages/delivery_system";
-
-const App = () => {
-  return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/delivery_system" element={<DeliverySystem />} />
-    </Routes>
 
   );
 };

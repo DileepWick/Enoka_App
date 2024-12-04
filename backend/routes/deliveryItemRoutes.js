@@ -1,5 +1,5 @@
 import express from 'express';
-import { createDeliveryItem ,getAllDeliveryItems ,getDeliveryItemsByDeliveryId} from '../controllers/deliveryItemController.js';
+import { createDeliveryItem ,getAllDeliveryItems ,getDeliveryItemsByDeliveryId ,editDeliveryItemQuantity ,deleteDeliveryItem} from '../controllers/deliveryItemController.js';
 
 const router = express.Router();
 
@@ -7,6 +7,8 @@ const router = express.Router();
 router.post('/createDeliveryItem', createDeliveryItem);
 router.get('/', getAllDeliveryItems);
 router.get('/getDeliveryItemsByDeliveryId/:deliveryId', getDeliveryItemsByDeliveryId);
+router.put('/editDeliveryItemQuantity/:deliveryItemId', editDeliveryItemQuantity);
+router.delete('/deleteDeliveryItem/:deliveryItemId', deleteDeliveryItem);
 
 
 export default router;

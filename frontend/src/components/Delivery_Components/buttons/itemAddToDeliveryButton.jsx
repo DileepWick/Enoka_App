@@ -5,13 +5,14 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Chip,
   Button,
   useDisclosure,
   Input,
 } from "@nextui-org/react";
 import axios from "axios";
 
-const ItemAddToDeliveryButton = ({ item_id, delivery_id }) => {
+const ItemAddToDeliveryButton = ({ item_id, delivery_id ,item_description }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [quantity, setQuantity] = useState("");
   const [error, setError] = useState("");
@@ -42,7 +43,7 @@ const ItemAddToDeliveryButton = ({ item_id, delivery_id }) => {
         setError(""); // Clear error message if the request is successful
         setQuantity(""); // Clear the quantity field after success
         onOpenChange(false);
-        window.location.reload();
+      
       }
     } catch (error) {
       console.error("Error creating delivery item:", error.message);
@@ -60,26 +61,28 @@ const ItemAddToDeliveryButton = ({ item_id, delivery_id }) => {
 
   return (
     <>
-      <Button onPress={onOpen}>Add to Delivery</Button>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} onClose={handleClose}>
+      <Button onPress={onOpen}>Add + </Button>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} onClose={handleClose} size="lg">
         <ModalContent>
-          <ModalHeader className="flex flex-col gap-1">
-            Add Item to Delivery
+          <ModalHeader className="flex flex-col gap-1 font-f1">
+             {item_description}
           </ModalHeader>
           <ModalBody>
             <form onSubmit={handleSubmit}>
               <Input
                 type="number"
+                size="lg"
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
-                labelPlaceholder="Quantity"
+                className="font-f1"
+                label="Quantity" placeholder="Enter your quantity"
                 required
               />
               {error && <p className="text-red-500">{error}</p>}
               {successMessage && (
                 <p className="text-green-500">{successMessage}</p>
               )}
-              <Button type="submit" className="mt-8">Add Item</Button>
+              <Button type="submit" className="mt-8 mb-8 font-f1 bg-black text-white">Add Item</Button>
             </form>
           </ModalBody>
         </ModalContent>

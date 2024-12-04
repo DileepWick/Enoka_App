@@ -1,10 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { fetchGaskets } from "../../services/inventoryServices";
 import axios from "axios";
-import ItemAddToDeliveryButton from "./itemAddToDeliveryButton";
-import {Spinner} from "@nextui-org/react";
+import ItemAddToDeliveryButton from "./buttons/itemAddToDeliveryButton";
+import { Spinner } from "@nextui-org/react";
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Input
+} from "@nextui-org/react";
 
-const GasketList = ({ triggerFetch }) => {
+const GasketList = () => {
   const [gaskets, setGaskets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -12,6 +21,17 @@ const GasketList = ({ triggerFetch }) => {
   const [filteredGaskets, setFilteredGaskets] = useState([]);
   const [delivery, setDelivery] = useState(null);
 
+  // Pagination
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 5;
+
+  const items = useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    return filteredGaskets.slice(start, end);
+  }, [page, filteredGaskets]);
+
+  // Fetch the latest pending delivery
   useEffect(() => {
     const fetchLatestDelivery = async () => {
       try {
@@ -31,8 +51,9 @@ const GasketList = ({ triggerFetch }) => {
     };
 
     fetchLatestDelivery();
-  }, [triggerFetch]);
+  }, []);
 
+  // Fetch the gaskets
   useEffect(() => {
     const getGaskets = async () => {
       try {
@@ -47,94 +68,129 @@ const GasketList = ({ triggerFetch }) => {
     };
 
     getGaskets();
-  }, [triggerFetch]);
+  }, []);
+
+  // Search logic to filter gaskets based on the search term
+  useEffect(() => {
+    const filterGaskets = () => {
+      if (searchTerm) {
+        const filtered = gaskets.filter(
+          (gasket) =>
+            gasket.part_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            gasket.material_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            gasket.packing_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            gasket.engine?.engine_name
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase()) ||
+            gasket.brand?.brand_name
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase()) ||
+            gasket.vendor?.vendor_name
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase())
+        );
+        setFilteredGaskets(filtered);
+      } else {
+        setFilteredGaskets(gaskets);
+      }
+    };
+
+    filterGaskets();
+  }, [searchTerm, gaskets]);
 
   const handleSearch = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-
-    if (value) {
-      const filtered = gaskets.filter(
-        (gasket) =>
-          gasket.part_number.toLowerCase().includes(value.toLowerCase()) ||
-          gasket.material_type.toLowerCase().includes(value.toLowerCase()) ||
-          gasket.packing_type.toLowerCase().includes(value.toLowerCase()) ||
-          gasket.engine?.engine_name
-            .toLowerCase()
-            .includes(value.toLowerCase()) ||
-          gasket.brand?.brand_name
-            .toLowerCase()
-            .includes(value.toLowerCase()) ||
-          gasket.Vendor?.vendor_name.toLowerCase().includes(value.toLowerCase())
-      );
-      setFilteredGaskets(filtered);
-    } else {
-      setFilteredGaskets(gaskets);
-    }
+    setSearchTerm(e.target.value);
   };
 
   if (loading) return <Spinner />;
-  if (error)
-    return <div className="text-center py-4 text-red-500">{error}</div>;
+  if (error) return <div className="text-center py-4 text-red-500">{error}</div>;
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 font-f1">
       {delivery ? (
         <>
-          <h1 className="text-xl sm:text-2xl font-bold mb-4">Gasket List for {delivery._id}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold mb-4">Gaskets</h1>
 
-          <input
+          <Input
             type="text"
+            size="lg"
             placeholder="Search gaskets"
             value={searchTerm}
             onChange={handleSearch}
-            className="w-full border p-2 mb-4 rounded"
+            className="  p-2 mb-4 "
+            variant="bordered"
           />
 
+          {/* Scrollable Table */}
           <div className="overflow-x-auto">
-            <table className="min-w-full bg-white">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="p-2 text-left">Part Number</th>
-                  <th className="p-2 text-left hidden sm:table-cell">Material Type</th>
-                  <th className="p-2 text-left hidden md:table-cell">Packing Type</th>
-                  <th className="p-2 text-left hidden lg:table-cell">Engine</th>
-                  <th className="p-2 text-left hidden lg:table-cell">Brand</th>
-                  <th className="p-2 text-left hidden xl:table-cell">Vendor</th>
-                  <th className="p-2 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredGaskets.map((gasket) => (
-                  <tr key={gasket._id} className="border-b">
-                    <td className="p-2">{gasket.part_number}</td>
-                    <td className="p-2 hidden sm:table-cell">{gasket.material_type}</td>
-                    <td className="p-2 hidden md:table-cell">{gasket.packing_type}</td>
-                    <td className="p-2 hidden lg:table-cell">{gasket.engine?.engine_name}</td>
-                    <td className="p-2 hidden lg:table-cell">{gasket.brand?.brand_name}</td>
-                    <td className="p-2 hidden xl:table-cell">{gasket.vendor?.vendor_name}</td>
-                    <td className="p-2">
-                      <ItemAddToDeliveryButton
-                        item_id={gasket._id}
-                        delivery_id={delivery._id}
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div
+              className="max-h-64 overflow-y-auto rounded border border-gray-300"
+              style={{
+                scrollbarWidth: "thin",
+              }}
+            >
+              <Table
+                aria-label="Example table with client-side pagination"
+                className="font-f1"
+              >
+                <TableHeader className="border border-gray-300">
+                  <TableColumn>Part Number</TableColumn>
+                  <TableColumn>Material Type</TableColumn>
+                  <TableColumn>Packing Type</TableColumn>
+                  <TableColumn>Engine</TableColumn>
+                  <TableColumn>Brand</TableColumn>
+                  <TableColumn>Vendor</TableColumn>
+                  <TableColumn>Actions</TableColumn>
+                </TableHeader>
+                <TableBody className="border border-gray-300">
+                  {items.map((gasket) => (
+                    <TableRow key={gasket._id}>
+                      <TableCell>{gasket.part_number}</TableCell>
+                      <TableCell>{gasket.material_type}</TableCell>
+                      <TableCell>{gasket.packing_type}</TableCell>
+                      <TableCell>{gasket.engine?.engine_name}</TableCell>
+                      <TableCell>{gasket.brand?.brand_name}</TableCell>
+                      <TableCell>{gasket.vendor?.vendor_name}</TableCell>
+                      <TableCell>
+                        <ItemAddToDeliveryButton
+                          item_id={gasket._id}
+                          delivery_id={delivery._id}
+                          item_description={gasket.description}
+                          className="w-full mt-2"
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
 
-          {/* Mobile view for detailed information */}
+          {/* Mobile View */}
           <div className="sm:hidden mt-4 space-y-4">
-            {filteredGaskets.map((gasket) => (
+            {items.map((gasket) => (
               <div key={gasket._id} className="bg-white p-4 rounded shadow">
                 <h3 className="font-bold text-lg mb-2">{gasket.part_number}</h3>
-                <p className="mb-1"><span className="font-semibold">Material:</span> {gasket.material_type}</p>
-                <p className="mb-1"><span className="font-semibold">Packing:</span> {gasket.packing_type}</p>
-                <p className="mb-1"><span className="font-semibold">Engine:</span> {gasket.engine?.engine_name}</p>
-                <p className="mb-1"><span className="font-semibold">Brand:</span> {gasket.brand?.brand_name}</p>
-                <p className="mb-1"><span className="font-semibold">Vendor:</span> {gasket.vendor?.vendor_name}</p>
+                <p className="mb-1">
+                  <span className="font-semibold">Material - </span>
+                  {gasket.material_type}
+                </p>
+                <p className="mb-1">
+                  <span className="font-semibold">Packing - </span>
+                  {gasket.packing_type}
+                </p>
+                <p className="mb-1">
+                  <span className="font-semibold">Engine - </span>
+                  {gasket.engine?.engine_name}
+                </p>
+                <p className="mb-1">
+                  <span className="font-semibold">Brand - </span>
+                  {gasket.brand?.brand_name}
+                </p>
+                <p className="mb-1">
+                  <span className="font-semibold">Vendor - </span>
+                  {gasket.vendor?.vendor_name}
+                </p>
                 <ItemAddToDeliveryButton
                   item_id={gasket._id}
                   delivery_id={delivery._id}
@@ -145,13 +201,10 @@ const GasketList = ({ triggerFetch }) => {
           </div>
         </>
       ) : (
-        <div className="text-center py-4">
-          
-          Waiting for delivery creation</div>
+        <div className="text-center py-4">Waiting for delivery creation</div>
       )}
     </div>
   );
 };
 
 export default GasketList;
-

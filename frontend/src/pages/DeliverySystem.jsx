@@ -1,34 +1,24 @@
-import React, { useState } from 'react';
-import CreateDeliveryForm from '@/components/Delivery_Components/createDelivery';
-import GasketList from '@/components/Delivery_Components/gaskets';
-import { Spinner } from '@nextui-org/react';
+import React, { useState } from "react";
+import CreateDeliveryForm from "@/components/Delivery_Components/createDelivery";
+import GasketList from "@/components/Delivery_Components/gaskets";
+import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
 
 const DeliverySystem = () => {
-  // State to trigger re-fetch of gaskets
-  const [triggerGasketFetch, setTriggerGasketFetch] = useState(false);
-  // State to manage the loading state
-  const [loading, setLoading] = useState(false);
-
-  // Function to handle the API call success in CreateDeliveryForm
-  const handleDeliveryCreated = () => {
-    // Trigger the re-fetch in GasketList
-    setTriggerGasketFetch((prev) => !prev);  // Toggle the state to trigger re-fetch
-  };
-
-  // Function to simulate loading state (in a real case, you would set loading based on API response)
-  const handleGasketFetch = (isLoading) => {
-    setLoading(isLoading);
-  };
-
   return (
     <div>
-      <h2>Delivery System</h2>
-      <CreateDeliveryForm onDeliveryCreated={handleDeliveryCreated} />
-      {loading ? (
-        <Spinner size="lg" />
-      ) : (
-        <GasketList triggerFetch={triggerGasketFetch} setLoading={handleGasketFetch} />
-      )}
+      <CreateDeliveryForm />
+
+      <Tabs aria-label="Items" className="font-f1 ml-4" size="lg">
+        <Tab key="gaskets" title="Gaskets">
+          <GasketList />
+        </Tab>
+        <Tab key="pistons" title="Pistons">
+          No Data
+        </Tab>
+        <Tab key="razors" title="Razors">
+          No Data
+        </Tab>
+      </Tabs>
     </div>
   );
 };

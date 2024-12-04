@@ -4,12 +4,18 @@ import {
   ModalContent,
   Input,
   Button,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
   useDisclosure,
 } from "@nextui-org/react";
 import axios from "axios";
 
+// Emmiter
+import emitter from "../../../../util/emitter.js";
+
 const DeliveryItemQuantityEditBtn = ({ deliveryItemId }) => {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   // State to store the quantity input and error message
   const [quantity, setQuantity] = useState("");
@@ -22,7 +28,7 @@ const DeliveryItemQuantityEditBtn = ({ deliveryItemId }) => {
   };
 
   // Handle edit quantity action
-  const handleEditQuantity = async (onClose) => {
+  const handleEditQuantity = async () => {
     // Validate quantity input
     if (!quantity || isNaN(quantity) || quantity <= 0) {
       setError("Please provide a valid quantity.");
@@ -39,7 +45,7 @@ const DeliveryItemQuantityEditBtn = ({ deliveryItemId }) => {
 
       // Check if the update was successful
       if (response.status === 200) {
-        setSuccessMessage("Quantity updated successfully!");
+        emitter.emit("deliveryItemQuantityUpdated");
         setError(""); // Clear error message if the request is successful
         setQuantity(""); // Clear the quantity field after success
         onClose(); // Close the modal after successful update
@@ -52,40 +58,51 @@ const DeliveryItemQuantityEditBtn = ({ deliveryItemId }) => {
     }
   };
 
+  const handleClose = () => {
+    setQuantity(""); // Reset quantity
+    setError(""); // Reset error message
+    setSuccessMessage(""); // Reset success message
+  };
+
   return (
     <>
       <Button onPress={onOpen}>Change Quantity</Button>
-
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal isOpen={isOpen} onOpenChange={onClose} size="lg">
         <ModalContent>
-          {(onClose) => (
-            <>
-              <h3>Edit Delivery Item Quantity</h3>
-
-              {/* Display success message */}
-              {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
-
-              {/* Display error message */}
-              {error && <p style={{ color: "red" }}>{error}</p>}
-
-              {/* Input field for quantity */}
+          <ModalHeader className="flex flex-col gap-1 font-f1">
+            <h1 className="text-2xl font-bold">Edit Quantity</h1>
+          </ModalHeader>
+          <ModalBody>
+            <form onSubmit={(e) => {
+              e.preventDefault();  // Prevent default form submission
+              handleEditQuantity();
+            }}>
               <Input
-                placeholder="Quantity"
+                type="number"
+                size="lg"
                 value={quantity}
                 onChange={handleQuantityChange}
-                type="number"
-                min="1"
+                className="font-f1"
+                label="Enter New Quantity"
+                required
               />
-
-              {/* Update Button */}
-              <Button onPress={() => handleEditQuantity(onClose)}>Update Quantity</Button>
-
-              {/* Close Button */}
-              <Button onPress={onClose} variant="ghost" style={{ marginTop: "10px" }}>
-                Close
+              {error && <p className="text-red-500">{error}</p>}
+              {successMessage && (
+                <p className="text-green-500">{successMessage}</p>
+              )}
+              <Button
+                type="submit"
+                className="mt-8 mb-8 font-f1 bg-black text-white"
+              >
+                Update Quantity
               </Button>
-            </>
-          )}
+            </form>
+          </ModalBody>
+          <ModalFooter>
+            <Button auto flat color="error" onPress={handleClose}>
+              Close
+            </Button>
+          </ModalFooter>
         </ModalContent>
       </Modal>
     </>

@@ -12,6 +12,10 @@ import {
 } from "@nextui-org/react";
 import axios from "axios";
 
+
+//Emmiter
+import emitter from "../../../../util/emitter.js";
+
 const ItemAddToDeliveryButton = ({ item_id, delivery_id ,item_description }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [quantity, setQuantity] = useState("");
@@ -39,16 +43,17 @@ const ItemAddToDeliveryButton = ({ item_id, delivery_id ,item_description }) => 
 
       // Check if the delivery item creation was successful
       if (response.status === 201) {
-        setSuccessMessage("Delivery item added successfully!");
         setError(""); // Clear error message if the request is successful
         setQuantity(""); // Clear the quantity field after success
         onOpenChange(false);
+
+        // Emit an event to notify the parent component that the delivery item was added
+        emitter.emit("deliveryItemAdded");
       
       }
     } catch (error) {
       console.error("Error creating delivery item:", error.message);
       setError("Failed to add item to delivery. Please try again.");
-      setSuccessMessage(""); // Clear success message if there's an error
     }
   };
 

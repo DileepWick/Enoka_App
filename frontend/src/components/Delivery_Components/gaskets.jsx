@@ -10,10 +10,14 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Input
+  Input,
 } from "@nextui-org/react";
 
-const GasketList = () => {
+//Util
+import emitter from "../../../util/emitter.js";
+
+const GasketList = ({}) => {
+  // State variables
   const [gaskets, setGaskets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,7 +32,7 @@ const GasketList = () => {
   const items = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
-    return filteredGaskets.slice(start, end);
+    return Array.isArray(filteredGaskets) ? filteredGaskets.slice(start, end) : [];
   }, [page, filteredGaskets]);
 
   // Fetch the latest pending delivery
@@ -43,18 +47,13 @@ const GasketList = () => {
         if (fetchedDeliveryData) {
           setDelivery(fetchedDeliveryData);
         } else {
-          alert("No pending delivery found");
+          //alert("No pending delivery found");//
         }
       } catch (error) {
         console.error("Error fetching the latest pending delivery:", error);
       }
     };
 
-    fetchLatestDelivery();
-  }, []);
-
-  // Fetch the gaskets
-  useEffect(() => {
     const getGaskets = async () => {
       try {
         const data = await fetchGaskets();
@@ -67,8 +66,46 @@ const GasketList = () => {
       }
     };
 
+ 
     getGaskets();
+    
+
+    // Fetch the delivery initially
+    fetchLatestDelivery();
+
+    // Delivery created event handler
+    const handleDeliveryCreated = () => {
+      console.log(
+        "Delivery created event received! Fetching latest delivery in gaskets...."
+      );
+      fetchLatestDelivery();
+      getGaskets();
+    };
+
+    // Delivery removed event handler
+    const handleDeliveryRemoved = () => {
+      console.log(
+        "Delivery removed event received! Fetching latest delivery in gaskets..."
+      );
+      setDelivery(null);
+      fetchLatestDelivery();
+      getGaskets();
+      
+    };
+
+    // Subscribe to both events
+    emitter.on("deliveryCreated", handleDeliveryCreated);
+    emitter.on("deliveryRemoved", handleDeliveryRemoved);
+    emitter.on("deliveryStarted", handleDeliveryRemoved);
+
+    // Cleanup listeners on unmount
+    return () => {
+      emitter.off("deliveryCreated", handleDeliveryCreated);
+      emitter.off("deliveryRemoved", handleDeliveryRemoved);
+    };
   }, []);
+
+
 
   // Search logic to filter gaskets based on the search term
   useEffect(() => {
@@ -76,9 +113,15 @@ const GasketList = () => {
       if (searchTerm) {
         const filtered = gaskets.filter(
           (gasket) =>
-            gasket.part_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            gasket.material_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            gasket.packing_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            gasket.part_number
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase()) ||
+            gasket.material_type
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase()) ||
+            gasket.packing_type
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase()) ||
             gasket.engine?.engine_name
               .toLowerCase()
               .includes(searchTerm.toLowerCase()) ||
@@ -103,7 +146,8 @@ const GasketList = () => {
   };
 
   if (loading) return <Spinner />;
-  if (error) return <div className="text-center py-4 text-red-500">{error}</div>;
+  if (error)
+    return <div className="text-center py-4 text-red-500">{error}</div>;
 
   return (
     <div className="container mx-auto px-4 py-8 font-f1">

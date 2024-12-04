@@ -3,6 +3,9 @@ import { createDelivery } from "../../services/deliveryServices.jsx";
 import { Select, SelectItem, Button } from "@nextui-org/react";
 import CurrentDelivery from "../Delivery_Components/currentDelivery.jsx";
 
+//Util
+import emitter from "../../../util/emitter.js";
+
 const ResponsiveDeliveryForm = () => {
   // State variables
   const [senderBranch, setSenderBranch] = useState("");
@@ -14,18 +17,14 @@ const ResponsiveDeliveryForm = () => {
     try {
       const deliveryData = await createDelivery(senderBranch, receiverBranch); // Create a new delivery
       console.log("Delivery created:", deliveryData);
-      callCurrentDeliveryApi();
+
+      // Emit the event to notify GasketList
+      emitter.emit("deliveryCreated");
+
     } catch (error) {
       console.error("Error creating delivery:", error.message);
     }
   };
-
-    // Notify CurrentDelivery to fetch new delivery data
-    const callCurrentDeliveryApi = () => {
-      // This triggers the update in the CurrentDelivery component
-      // It can be a state change or a prop change
-      // Since `CurrentDelivery` already listens to prop change, no need to do anything here.
-    };
 
   // Branch options
   const branches = [
@@ -83,7 +82,7 @@ const ResponsiveDeliveryForm = () => {
 
         {/* Current delivery details */}
         <div className="w-full lg:w-6/8">
-          <CurrentDelivery onNewPendingDeliveryCreation={callCurrentDeliveryApi}/>
+          <CurrentDelivery  />
         </div>
       </div>
     </div>

@@ -3,19 +3,16 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { removeDelivery } from "@/services/deliveryServices";
-import {
-  Button,
-  Checkbox,
-  Chip,
-  Divider,
-  Progress
-} from "@nextui-org/react";
+import { Button, Checkbox, Chip, Divider, Progress } from "@nextui-org/react";
+
 
 //Components
 import EditQtyBtn from "./buttons/deliveryItemQuantityEditBtn";
 
-const CurrentDelivery = ({onNewPendingDeliveryCreation}) => {
+//Emitter
+import emitter from "../../../util/emitter.js";
 
+const CurrentDelivery = () => {
   //States
   const [newDelivery, setNewDelivery] = useState(null);
   const [deliveryItems, setDeliveryItems] = useState([]);
@@ -26,10 +23,11 @@ const CurrentDelivery = ({onNewPendingDeliveryCreation}) => {
     if (newDelivery) {
       try {
         await removeDelivery(newDelivery._id);
-        alert("Delivery removed successfully.");
         setNewDelivery(null);
         setDeliveryItems([]);
         setCheckedItems({});
+        // Emit the event to notify GasketList
+        emitter.emit("deliveryRemoved");
 
       } catch (error) {
         console.error("Error removing delivery:", error.message);
@@ -37,14 +35,13 @@ const CurrentDelivery = ({onNewPendingDeliveryCreation}) => {
     }
   };
 
-  //Fetch Pending Delivery
   useEffect(() => {
     const fetchLatestPendingDelivery = async () => {
       try {
         const response = await axios.get(
           "http://localhost:8098/api/delivery/deliveries/latest"
         );
-
+  
         const delivery = response.data.data;
         if (delivery) {
           setNewDelivery(delivery);
@@ -58,9 +55,37 @@ const CurrentDelivery = ({onNewPendingDeliveryCreation}) => {
         console.error("Error fetching latest pending delivery:", error.message);
       }
     };
-
+  
     fetchLatestPendingDelivery();
-  }, [onNewPendingDeliveryCreation]);
+  
+    // Listen for the deliveryCreated event
+    const handleDeliveryCreated = () => {
+      console.log(
+        "Delivery created event received! Fetching latest delivery in current delivery..."
+      );
+      fetchLatestPendingDelivery();
+    };
+  
+    // Listen for the delivery item creation
+    const handleDeliveryItemCreated = () => {
+      console.log(
+        "Delivery item created event received! Fetching latest delivery in current delivery..."
+      );
+      fetchLatestPendingDelivery();
+    };
+  
+    // Subscribe to the events
+    emitter.on("deliveryCreated", handleDeliveryCreated);
+    emitter.on("deliveryItemAdded", handleDeliveryItemCreated);
+    emitter.on("deliveryItemQuantityUpdated", handleDeliveryItemCreated);
+  
+    // Cleanup listeners on unmount
+    return () => {
+      emitter.off("deliveryCreated", handleDeliveryCreated);
+      emitter.off("deliveryItemAdded", handleDeliveryItemCreated);
+    };
+  }, []);
+  
 
   //Fetch Delivery Items
   const fetchDeliveryItems = async (deliveryId) => {
@@ -79,6 +104,7 @@ const CurrentDelivery = ({onNewPendingDeliveryCreation}) => {
       console.error("Error fetching delivery items:", error.message);
     }
   };
+
 
   //Check Box Change
   const handleCheckboxChange = (itemId) => {
@@ -116,10 +142,12 @@ const CurrentDelivery = ({onNewPendingDeliveryCreation}) => {
         { status: "on delivery" }
       );
       alert("Delivery started successfully.");
+      emitter.emit("deliveryStarted");
       setNewDelivery(null);
       setDeliveryItems([]);
       setCheckedItems({});
-      window.location.reload();
+      
+
     } catch (error) {
       console.error("Error starting delivery:", error.message);
     }

@@ -5,13 +5,18 @@ import {
   getAllDeliveries,
   updateDeliveryStatus,
   deleteDelivery,
-  getLatestPendingDeliveries
+  getOnDeliveryDeliveries,
+  getLatestPendingDeliveries,
+  getReceivedDelivery
 } from '../controllers/deliveryController.js';
 
 const router = express.Router();
 
 // Create a new delivery
 router.post('/', createDelivery);
+
+// Update delivery status
+router.put('/updateDeliveryStatus/:id', updateDeliveryStatus);
 
 // Get a specific delivery by ID
 router.get('/:id', getDeliveryById);
@@ -27,5 +32,11 @@ router.delete('/:id', deleteDelivery);
 
 //Get latest pending delivery
 router.get('/deliveries/latest', getLatestPendingDeliveries);
+
+//Get on delivery deliveries
+router.get('/deliveries/on-delivery', getOnDeliveryDeliveries);
+
+//Get received deliveries
+router.get('/deliveries/received', getReceivedDelivery);
 
 export default router;

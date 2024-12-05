@@ -91,7 +91,6 @@ export const deleteDelivery = async (req, res) => {
   }
 };
 
-
 // Get the latest pending delivery
 export const getLatestPendingDeliveries = async (req, res) => {
   try {
@@ -111,6 +110,51 @@ export const getLatestPendingDeliveries = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to fetch pending deliveries.",
+      error: error.message,
+    });
+  }
+};
+
+// Get deliveries with status "on delivery"
+export const getOnDeliveryDeliveries = async (req, res) => {
+  try {
+    // Query the database to fetch deliveries with status "on delivery"
+    const deliveries = await Delivery.find({ status: "on delivery" });
+
+    // Respond with the fetched deliveries
+    res.status(200).json({
+      success: true,
+      data: deliveries,
+    });
+  } catch (error) {
+    // Handle any errors
+    console.error("Error fetching on delivery deliveries:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while fetching deliveries.",
+      error: error.message,
+    });
+  }
+};
+
+
+// Get deliveries with status "on delivery"
+export const getReceivedDelivery = async (req, res) => {
+  try {
+    // Query the database to fetch deliveries with status "on delivery"
+    const deliveries = await Delivery.find({ status: "received" });
+
+    // Respond with the fetched deliveries
+    res.status(200).json({
+      success: true,
+      data: deliveries,
+    });
+  } catch (error) {
+    // Handle any errors
+    console.error("Error fetching received deliveries:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while fetching deliveries.",
       error: error.message,
     });
   }

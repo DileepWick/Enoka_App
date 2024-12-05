@@ -33,9 +33,42 @@ export const getLatestPendingDelivery = async () => {
 export const getDeliveryItemsByDeliveryId = async (deliveryId) => {
   try {
     const response = await axios.get(`${API_URL}/deliveryItems/getDeliveryItemsByDeliveryId/${deliveryId}`);
-    return response.data.items;  // Access the 'items' array correctly
+    return response;
   } catch (error) {
     console.error("Error fetching delivery items:", error);
+    throw error;
+  }
+};
+
+//Get ondelivery deliveries
+export const getOnDeliveryDeliveries = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/delivery/deliveries/on-delivery`);
+    return response; 
+  } catch (error) {
+    console.error("Error fetching on delivery deliveries:", error);
+    throw error;
+  }
+};
+
+//Get received deliveries
+export const getReceivedDeliveries = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/delivery/deliveries/received`);
+    return response;
+  } catch (error) {
+    console.error("Error fetching received deliveries:", error);
+    throw error;
+  }
+};
+
+//Change status of delivery
+export const changeDeliveryStatus = async (deliveryId, status) => {
+  try {
+    const response = await axios.put(`${API_URL}/deliveryItems/updateStatusOfDeliveryItem/${deliveryId}`, { status: status });
+    return response;
+  } catch (error) {
+    console.error("Error changing delivery status:", error);
     throw error;
   }
 };

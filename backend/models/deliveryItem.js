@@ -21,6 +21,10 @@ const deliveryItemSchema = new mongoose.Schema({
     default: 'Pending', 
     required: true 
   },
+  markedBy: { 
+    type: String, 
+    default: 'Not Marked',  // Set default value as 'Staff'
+  },
   deliveryId: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Delivery', // Reference to the Delivery model
@@ -28,6 +32,14 @@ const deliveryItemSchema = new mongoose.Schema({
   }
 }, {
   timestamps: true
+});
+
+// Middleware to set 'markedBy' to 'Staff' when status changes to 'Received'
+deliveryItemSchema.pre('save', function (next) {
+  if (this.status === 'Received') {
+    this.markedBy = 'Staff'; // Hardcode to "Staff" when status is "Received"
+  }
+  next();
 });
 
 const DeliveryItem = mongoose.model('DeliveryItem', deliveryItemSchema);

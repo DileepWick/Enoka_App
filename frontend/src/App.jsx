@@ -4,11 +4,11 @@ import { AuthProvider } from "./contexts/authContext";
 
 // Pages
 import Home from "./pages/Home";
-import Header from "./pages/Header";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import DeliverySystem from "./pages/DeliverySystem";
-import { Dashboard } from "./pages/Dashboard";
+
+//Sections
+import { DeliveryManagement } from "./pages/DeliveryManagementSection";
 
 
 const App = () => {
@@ -18,8 +18,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/deliverySystem" element={<DeliverySystem />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/deliveryManagement" element={<DeliveryManagement />} />
       </Routes>
     </AuthProvider>
   );

@@ -169,3 +169,31 @@ export const deleteDeliveryItem = async (req, res) => {
   }
 };
 
+
+// Update the status of a delivery item
+export const updateStatusOfDeliveryItem = async (req, res) => {
+  const { id } = req.params;  // DeliveryItem ID from request parameters
+  const { status } = req.body;  // New status from request body
+
+  try {
+    // Find and update the delivery item by its ID
+    const updatedItem = await DeliveryItem.findByIdAndUpdate(
+      id, 
+      { status },
+      { new: true }  // Return the updated document
+    );
+
+    if (!updatedItem) {
+      return res.status(404).json({ message: "Delivery item not found" });
+    }
+
+    res.status(200).json({
+      message: 'Delivery item status updated successfully',
+      updatedItem
+    });
+  } catch (error) {
+    console.error("Error updating delivery item status:", error.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+

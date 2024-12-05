@@ -1,7 +1,26 @@
 import mongoose from "mongoose";
 
+
+// Function to generate a unique delivery ID
+const generateDeliveryId = async () => {
+  const randomNumber = Math.floor(1000 + Math.random() * 9000); // Generate a 4-digit random number
+  const deliveryId = `DL${randomNumber}`;
+
+  // Ensure the generated ID is unique
+  const existingDelivery = await Delivery.findOne({ deliveryId });
+  if (existingDelivery) {
+    return await generateDeliveryId(); // Retry if the ID already exists
+  }
+
+  return deliveryId;
+};
+
 const deliverySchema = new mongoose.Schema(
   {
+    deliveryId: {
+      type: String,
+      unique: true,
+    },
     senderBranch: {
       type: String,
       required: true,
@@ -31,9 +50,13 @@ const deliverySchema = new mongoose.Schema(
   { timestamps: true } // Mongoose will automatically manage createdAt and updatedAt
 );
 
-// Middleware to update `updatedAt` when the status is changed or any field is modified
-deliverySchema.pre('save', function (next) {
+// Middleware to assign a unique delivery ID before saving
+deliverySchema.pre('save', async function (next) {
+  if (!this.deliveryId) {
+    this.deliveryId = await generateDeliveryId();
+  }
   this.updatedAt = Date.now();
+
   if (this.status === "received" && !this.receivedAt) {
     this.receivedAt = Date.now();
   }

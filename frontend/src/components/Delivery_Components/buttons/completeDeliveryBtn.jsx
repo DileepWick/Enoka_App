@@ -44,7 +44,7 @@ const CompleteDeliveryBtn = ({ deliveryId }) => {
 
   return (
     <div>
-      <Button onPress={handleConfirm}>Complete Delivery</Button>
+      <Button onPress={handleConfirm} className="bg-black text-white">Complete Delivery</Button>
       {isConfirmed && (
         <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
           <ModalContent>

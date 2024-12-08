@@ -1,5 +1,18 @@
 {
-  "dependencies": {
-    "vite": "^6.0.1"
+  "name": "my-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npm run start:backend",
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm run preview",
+    "build": "npm run build:frontend",
+    "build:frontend": "cd frontend && npm run build",
+    "heroku-postbuild": "npm run build"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": "16.x",
+    "npm": "8.x"
   }
 }

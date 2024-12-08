@@ -1,6 +1,18 @@
 import express from "express";
 import { PORT ,mongoDBURL} from "./config.js";
 import mongoose from "mongoose";
+import path from 'path';
+
+
+// Serve static files from the React app
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, 'frontend/build')));
+
+  // For any requests, serve the React frontend's index.html
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'));
+  });
+}
 
 
 //CORS

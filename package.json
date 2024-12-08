@@ -1,5 +1,9 @@
 {
   "dependencies": {
     "vite": "^6.0.1"
+  },
+  "scripts": {
+    "start": "npm install concurrently && concurrently \"npm start --prefix backend\" \"npm start --prefix frontend\"",
+    "dev": "concurrently \"npm run dev --prefix backend\" \"npm start --prefix frontend\""
   }
 }

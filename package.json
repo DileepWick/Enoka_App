@@ -1,11 +1,13 @@
 {
   "scripts": {
-    "start": "concurrently \"npm run frontend\" \"npm run backend\"",
+    "start": "npm install concurrently --save-dev && concurrently \"npm run frontend\" \"npm run backend\"",
     "frontend": "cd frontend && npm run dev",
     "backend": "cd backend && npm run dev"
   },
   "dependencies": {
-    "vite": "^6.0.1",
+    "vite": "^6.0.1"
+  },
+  "devDependencies": {
     "concurrently": "^9.1.0"
   }
 }

@@ -1,4 +1,14 @@
 {
+
+  "name": "ENOKA-MOTORS",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "npm run start-backend",
+    "start-backend": "cd backend && npm start",
+    "start-frontend": "cd frontend && npm start",
+    "build-frontend": "cd frontend && npm run build",
+    "heroku-postbuild": "npm run build-frontend && cp -r frontend/build backend/"
+  },
   "dependencies": {
     "vite": "^6.0.1"
   }

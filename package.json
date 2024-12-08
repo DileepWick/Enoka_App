@@ -1,20 +1,5 @@
 {
-  "name": "my-app",
-  "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "start": "npm install concurrently && concurrently \"npm run start:backend\" \"npm run start:frontend\"",
-    "start:backend": "cd backend && npm start",
-    "start:frontend": "cd frontend && npm run preview",
-    "build": "npm run build:frontend",
-    "build:frontend": "cd frontend && npm run build",
-    "heroku-postbuild": "npm run build"
-  },
   "dependencies": {
-    "concurrently": "^7.0.0"
-  },
-  "engines": {
-    "node": "16.x", 
-    "npm": "8.x"
+    "vite": "^6.0.1"
   }
 }

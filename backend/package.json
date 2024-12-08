@@ -5,19 +5,16 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js",
-    "heroku-postbuild": "cd ../frontend && npm install && npm run build"
-
+    "dev": "nodemon index.js"
   },
-  "engines": {
-    "node": "16.x"
-  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.21.1",
-    "mongoose": "^8.8.3"
-  },
-  "devDependencies": {
+    "mongoose": "^8.8.3",
     "nodemon": "^3.1.7"
   }
 }

@@ -8,7 +8,10 @@ import Home from "./pages/Home";
 
 import Header from "./pages/Header";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
+import Signup from "./pages/Signup";
+import SignupWG from "./pages/SignupWG";
+
+import CRB from "./pages/crb"
 
 
 import DeliverySystem from "./pages/delivery_system";
@@ -20,8 +23,10 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/signupwg" element={<SignupWG />} />
         <Route path="/delivery_system" element={<DeliverySystem />} />
+        <Route path="/crb" element={<CRB />} />
       </Routes>
     </AuthProvider>
 

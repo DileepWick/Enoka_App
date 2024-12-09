@@ -36,9 +36,9 @@ export default function AddItemForm() {
     const fetchData = async () => {
       try {
         const [vendorsResponse, brandsResponse, enginesResponse] = await Promise.all([
-          axios.get("https://enoka-d025615470f3.herokuapp.com/api/vendors"),
-          axios.get("https://enoka-d025615470f3.herokuapp.com/api/brands"),
-          axios.get("https://enoka-d025615470f3.herokuapp.com/api/engines"),
+          axios.get("http://localhost:3098/api/vendors"),
+          axios.get("http://localhost:3098/api/brands"),
+          axios.get("http://localhost:3098/api/engines"),
         ]);
 
         setVendors(vendorsResponse.data);
@@ -81,7 +81,7 @@ export default function AddItemForm() {
       };
 
       const { url, key, setter } = endpoints[currentModal];
-      const response = await axios.post(`https://enoka-d025615470f3.herokuapp.com/api/${url}`, {
+      const response = await axios.post(`http://localhost:3098/api/${url}`, {
         [key]: newItemName
       });
 
@@ -98,7 +98,7 @@ export default function AddItemForm() {
     e.preventDefault();
     setSubmitStatus(null);
     try {
-      const response = await axios.post("https://enoka-d025615470f3.herokuapp.com/api/gaskets", formData);
+      const response = await axios.post("http://localhost:3098/api/gaskets", formData);
       setSubmitStatus({ type: "success", message: response.data.message });
       setFormData({
         part_number: "",

@@ -1,2 +1,2 @@
 # web: npm run preview -- --port $PORT --host
-web: npm run dev
+web: npm run dev -- --port $PORT

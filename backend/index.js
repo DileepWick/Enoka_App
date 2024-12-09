@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 import dotenv from 'dotenv';
 dotenv.config();
 
-const PORT = process.env.PORT || 8098;
+const PORT = process.env.PORT || 3098;
 const mongoDBURL = process.env.mongoDBURL;
 
 //CORS

@@ -1,5 +1,5 @@
 import axios from "axios";
-const API_URL = 'http://enoka-d025615470f3.herokuapp.com/api';
+const API_URL = 'https://enoka-d025615470f3.herokuapp.com/api';
 
 // Create a new delivery
 export const createDelivery = async (senderBranch, receiverBranch) => {

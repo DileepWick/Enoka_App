@@ -31,7 +31,7 @@ export default function App({
 
       // Make the API call to change the delivery status
       const response = await axios.put(
-        `http://enoka-d025615470f3.herokuapp.com/api/deliveryItems/updateStatusOfDeliveryItem/${deliveryItemId}`,
+        `https://enoka-d025615470f3.herokuapp.com/api/deliveryItems/updateStatusOfDeliveryItem/${deliveryItemId}`,
         { status }
       );
 
@@ -43,7 +43,7 @@ export default function App({
         // Update the quantity of the item if it's a gasket
         if (itemType === "Gasket") {
           const response = await axios.put(
-            `http://enoka-d025615470f3.herokuapp.com/api/gaskets/increaseGasketQty/${itemId}`,
+            `https://enoka-d025615470f3.herokuapp.com/api/gaskets/increaseGasketQty/${itemId}`,
             { quantity }
           );
 

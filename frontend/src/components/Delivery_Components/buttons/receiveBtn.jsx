@@ -38,7 +38,7 @@ const ReceiveBtn = ({ deliveryId }) => {
   const fetchDeliveryItems = async () => {
     try {
       const response = await axios.get(
-        `http://enoka-d025615470f3.herokuapp.com/api/deliveryItems/getDeliveryItemsByDeliveryId/${deliveryId}`
+        `https://enoka-d025615470f3.herokuapp.com/api/deliveryItems/getDeliveryItemsByDeliveryId/${deliveryId}`
       );
       setDeliveryItems(response.data.data);
       setError(null);

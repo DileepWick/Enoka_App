@@ -25,4 +25,8 @@ export default defineConfig({
   build: {
     outDir: 'dist', // Output directory for production build
   },
+  server: {
+    port: process.env.PORT || 3001,  // Use the $PORT environment variable, or fallback to 3001
+    host: '0.0.0.0',                 // Allow external access to the dev server
+  },
 });

@@ -1,10 +1,13 @@
 {
-  "dependencies": {
-    "vite": "^6.0.1"
-  },
+  "name": "fullstack-monorepo",
+  "private": true,
+  "version": "1.0.0",
   "scripts": {
-    "start": "node server.js",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm i && npm install concurrently && cd frontend && npm i && cd ../backend && npm i && cd .. && concurrently \"npm start --prefix backend\" \"npm start --prefix frontend\"",
-    "dev": "concurrently \"npm run dev --prefix backend\" \"npm start --prefix frontend\""
+    "postinstall": "npm install --prefix frontend && npm install --prefix backend",
+    "start": "npm i && concurrently \"npm start --prefix backend\" \"npm run start --prefix frontend\"",
+    "heroku-postbuild": "npm run build --prefix frontend"
+  },
+  "dependencies": {
+    "concurrently": "^8.0.1"
   }
 }

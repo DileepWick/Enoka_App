@@ -3,7 +3,8 @@
     "vite": "^6.0.1"
   },
   "scripts": {
-    "start": "npm i && npm install concurrently && cd frontend && npm i && cd ../backend && npm i && cd .. && concurrently \"npm start --prefix backend\" \"npm start --prefix frontend\"",
+    "start": "node server.js",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm i && npm install concurrently && cd frontend && npm i && cd ../backend && npm i && cd .. && concurrently \"npm start --prefix backend\" \"npm start --prefix frontend\"",
     "dev": "concurrently \"npm run dev --prefix backend\" \"npm start --prefix frontend\""
   }
 }

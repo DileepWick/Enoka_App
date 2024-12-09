@@ -3,6 +3,7 @@ import Engine from "../models/Engine.js";
 import Brand from "../models/Brand.js";
 import Vendor from "../models/Vendor.js";
 
+// Get all gaskets
 export const getAllGaskets = async (req, res) => {
   try {
     const gaskets = await Gasket.find()
@@ -15,7 +16,7 @@ export const getAllGaskets = async (req, res) => {
   }
 };
 
-
+// Create a new gasket
 export const createGasket = async (req, res) => {
   try {
     const {
@@ -90,7 +91,7 @@ export const createGasket = async (req, res) => {
   }
 };
 
-
+// Update a gasket
 export const updateGasket = async (req, res) => {
   try {
     const updatedGasket = await Gasket.findByIdAndUpdate(
@@ -104,11 +105,55 @@ export const updateGasket = async (req, res) => {
   }
 };
 
+// Delete a gasket
 export const deleteGasket = async (req, res) => {
   try {
     await Gasket.findByIdAndDelete(req.params.id);
     res.json({ message: "Gasket deleted" });
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+};
+
+//Increase Quantity
+export const increaseGasketQuantity = async (req, res) => {
+  const { id } = req.params; // Gasket ID from request params
+  const { quantity } = req.body; // Quantity to add from request body
+
+  if (!quantity || isNaN(quantity) || quantity <= 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid quantity. Please provide a positive number.",
+    });
+  }
+
+  try {
+    // Find the gasket by ID
+    const gasket = await Gasket.findById(id);
+
+    if (!gasket) {
+      return res.status(404).json({
+        success: false,
+        message: `Gasket with ID ${id} not found.`,
+      });
+    }
+
+    // Increase the stock
+    gasket.stock += Number(quantity);
+
+    // Save the updated gasket
+    await gasket.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Stock increased by ${quantity} for gasket ID ${id}.`,
+      data: gasket,
+    });
+  } catch (error) {
+    console.error("Error increasing gasket quantity:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while updating the gasket stock.",
+    });
   }
 };

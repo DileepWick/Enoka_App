@@ -6,7 +6,7 @@
     "start": "cd backend && npm start",
     "preview": "cd frontend && vite preview",
     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm i && npm install concurrently && cd frontend && npm i && npm run build && cd ../backend && npm i && cd ..",
-    "dev": "concurrently \"npm start --prefix backend\" \"npm start preview --prefix frontend"
+    "dev": "concurrently \"npm start --prefix backend\" \"npm start preview --prefix frontend" 
   }
 }
 

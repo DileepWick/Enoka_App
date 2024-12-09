@@ -39,7 +39,7 @@ const CurrentDelivery = () => {
     const fetchLatestPendingDelivery = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8098/api/delivery/deliveries/latest"
+          "http://enoka-d025615470f3.herokuapp.com/api/delivery/deliveries/latest"
         );
   
         const delivery = response.data.data;
@@ -91,7 +91,7 @@ const CurrentDelivery = () => {
   const fetchDeliveryItems = async (deliveryId) => {
     try {
       const response = await axios.get(
-        `http://localhost:8098/api/deliveryItems/getDeliveryItemsByDeliveryId/${deliveryId}`
+        `http://enoka-d025615470f3.herokuapp.com/api/deliveryItems/getDeliveryItemsByDeliveryId/${deliveryId}`
       );
       const items = response.data.data;
       setDeliveryItems(items);
@@ -138,7 +138,7 @@ const CurrentDelivery = () => {
 
     try {
       await axios.put(
-        `http://localhost:8098/api/delivery/${newDelivery._id}/status`,
+        `http://enoka-d025615470f3.herokuapp.com/api/delivery/${newDelivery._id}/status`,
         { status: "on delivery" }
       );
       alert("Delivery started successfully.");
@@ -158,7 +158,7 @@ const CurrentDelivery = () => {
     try {
       // Remove item from backend
       await axios.delete(
-        `http://localhost:8098/api/deliveryItems/deleteDeliveryItem/${itemId}`
+        `http://enoka-d025615470f3.herokuapp.com/api/deliveryItems/deleteDeliveryItem/${itemId}`
       );
 
       // Remove item locally from delivery items

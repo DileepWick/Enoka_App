@@ -1,1 +1,1 @@
-web: npm run preview -- --port $PORT
+web: serve -s dist -l $PORT

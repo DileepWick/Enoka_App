@@ -10,9 +10,6 @@ import {
   GoogleAuthProvider,
 } from "firebase/auth";
 
-import EventEmitter from "eventemitter3";
-
-export const userSessionEmitter = new EventEmitter();
 
 
 export const getIdToken = async () => {

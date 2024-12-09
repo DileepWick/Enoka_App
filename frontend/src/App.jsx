@@ -11,8 +11,6 @@ import SignupWG from "./pages/SignupWG";
 import CRB from "./pages/crb"
 
 
-import DeliverySystem from "./pages/delivery_system";
-
 //Sections
 import { DeliveryManagement } from "./pages/DeliveryManagementSection";
 
@@ -23,17 +21,10 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-
+        <Route path="/deliveryManagement" element={<DeliveryManagement />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/signupwg" element={<SignupWG />} />
-        <Route path="/delivery_system" element={<DeliverySystem />} />
         <Route path="/crb" element={<CRB />} />
-      </Routes>
-    </AuthProvider>
-
-
-        <Route path="/register" element={<Register />} />
-        <Route path="/deliveryManagement" element={<DeliveryManagement />} />
       </Routes>
     </AuthProvider>
   );

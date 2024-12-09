@@ -4,7 +4,7 @@
   },
   "scripts": {
     "start": "cd backend && npm start",
-    "preview": "vite preview",
+    "preview": "cd frontend && vite preview",
     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm i && npm install concurrently && cd frontend && npm i && npm run build && cd ../backend && npm i && cd ..",
     "dev": "concurrently \"npm run dev --prefix backend\" \"npm start --prefix frontend\""
   }

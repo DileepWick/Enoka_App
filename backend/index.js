@@ -3,6 +3,17 @@ import { PORT ,mongoDBURL} from "./config.js";
 import mongoose from "mongoose";
 
 
+//Routes
+import gasketRoutes from './routes/gasketRoutes.js';
+import vendorRoutes from './routes/vendorRoutes.js';
+import engineRoutes from './routes/engineRoutes.js';
+import brandRoutes from './routes/brandRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import branchRoutes from './routes/branchRoutes.js';
+import deliveryRoutes from './routes/delivery_list_routes.js';
+
+
+
 //CORS
 import cors from 'cors'
 
@@ -49,5 +60,11 @@ app.use('/api/gaskets', gasketRoutes);
 app.use('/api/vendors', vendorRoutes);
 app.use('/api/engines', engineRoutes);
 app.use('/api/brands', brandRoutes);
+
+app.use('/api/branches', branchRoutes); 
+app.use('/api/users', userRoutes); 
+app.use('/api/deliveries', deliveryRoutes);
+
 app.use('/api/delivery', deliveryRoutes);
 app.use('/api/deliveryItems', deliveryItemRoutes);
+

@@ -3,10 +3,10 @@
     "vite": "^6.0.1"
   },
   "scripts": {
-    "start": "npm start:backend",
-    "preview": "vite preview:frontend",
+    "start": "cd backend && npm start",
+    "preview": "cd frontend && vite preview",
     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm i && npm install concurrently && cd frontend && npm i && npm run build && cd ../backend && npm i && cd ..",
-    "dev": "concurrently \"npm run preview\" \"npm run start\"" 
+    "dev": "concurrently \"npm start --prefix backend\" \"npm start preview --prefix frontend -- --port $PORT\"" 
   }
 }
 

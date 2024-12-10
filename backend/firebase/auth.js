@@ -8,7 +8,7 @@ import {
   updatePassword,
   signInWithPopup,
   GoogleAuthProvider,
-} from "firebase/auth";
+} from "@firebase/auth";
 
 
 

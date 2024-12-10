@@ -27,7 +27,7 @@ const Signup = () => {
     useEffect(() => {
         const fetchBranches = async () => {
             try {
-                const response = await axios.get('http://localhost:8098/api/branches'); // Adjust the API URL
+                const response = await axios.get('https://enokaback-7e8aa9803d2c.herokuapp.com/api/branches'); // Adjust the API URL
                 if (Array.isArray(response.data)) {
                     setBranches(response.data); // Set only if response is an array
                     console.log(response.data);

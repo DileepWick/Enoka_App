@@ -24,7 +24,7 @@ const CompleteDeliveryBtn = ({ deliveryId }) => {
 
       // Make the API call to change the delivery status
       const response = await axios.put(
-        `http://localhost:8098/api/delivery/updateDeliveryStatus/${deliveryId}`,
+        `https://enokaback-7e8aa9803d2c.herokuapp.com/api/delivery/updateDeliveryStatus/${deliveryId}`,
         { status }
       );
 

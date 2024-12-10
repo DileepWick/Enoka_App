@@ -17,7 +17,7 @@ import deliveryRoutes from './routes/deliveryRoutes.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
-// const PORT = process.env.PORT || 8098; // Default to 8098 if not defined
+const PORT = process.env.PORT || 8098; // Default to 8098 if not defined
 const mongoDBURL = process.env.MONGODB_URL; // MongoDB connection URL
 
 

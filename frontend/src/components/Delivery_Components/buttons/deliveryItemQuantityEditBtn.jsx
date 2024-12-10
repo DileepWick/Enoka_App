@@ -37,7 +37,7 @@ const DeliveryItemQuantityEditBtn = ({ deliveryItemId }) => {
 
     try {
       const response = await axios.put(
-        `https://enokaback-7e8aa9803d2c.herokuapp.com/api/deliveryItems/editDeliveryItemQuantity/${deliveryItemId}`,
+        `https://enokaback-6acbbcbf5c24.herokuapp.com/api/deliveryItems/editDeliveryItemQuantity/${deliveryItemId}`,
         {
           quantity: quantity,
         }

@@ -3,7 +3,7 @@ import axios from 'axios';
 
 
 //API URL
-const GASKET_API_URL = 'https://enokaback-7e8aa9803d2c.herokuapp.com/api/gaskets';
+const GASKET_API_URL = 'https://enokaback-6acbbcbf5c24.herokuapp.com/api/gaskets';
 
 // Function to fetch all gaskets
 export const fetchGaskets = async () => {

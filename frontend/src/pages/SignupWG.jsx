@@ -18,7 +18,7 @@ const GoogleSignIn = () => {
     useEffect(() => {
         const fetchBranches = async () => {
             try {
-                const response = await axios.get('https://enokaback-7e8aa9803d2c.herokuapp.com/api/branches'); // Adjust the API URL
+                const response = await axios.get('https://enokaback-6acbbcbf5c24.herokuapp.com/api/branches'); // Adjust the API URL
                 if (Array.isArray(response.data)) {
                     setBranches(response.data); // Set only if response is an array
                     console.log(response.data);

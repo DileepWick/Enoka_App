@@ -40,7 +40,7 @@ const GasketList = ({}) => {
     const fetchLatestDelivery = async () => {
       try {
         const latestDelivery = await axios.get(
-          "https://enokaback-7e8aa9803d2c.herokuapp.com/api/delivery/deliveries/latest"
+          "https://enokaback-6acbbcbf5c24.herokuapp.com/api/delivery/deliveries/latest"
         );
         const fetchedDeliveryData = latestDelivery.data.data;
 

@@ -33,7 +33,7 @@ const ItemAddToDeliveryButton = ({ item_id, delivery_id ,item_description }) => 
 
     try {
       const response = await axios.post(
-        "https://enokaback-7e8aa9803d2c.herokuapp.com/api/deliveryItems/createDeliveryItem",
+        "https://enokaback-6acbbcbf5c24.herokuapp.com/api/deliveryItems/createDeliveryItem",
         {
           item: item_id, // Use the item_id passed as a prop
           quantity: quantity,

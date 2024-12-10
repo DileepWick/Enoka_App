@@ -1,5 +1,4 @@
 import express from "express";
-import { PORT ,mongoDBURL} from "./config.js";
 import mongoose from "mongoose";
 
 
@@ -14,7 +13,12 @@ import deliveryItemRoutes from './routes/deliveryItemRoutes.js';
 import deliveryRoutes from './routes/deliveryRoutes.js';
 
 
+// Load environment variables from .env file
+import dotenv from 'dotenv';
+dotenv.config();
 
+// const PORT = process.env.PORT || 8098; // Default to 8098 if not defined
+const mongoDBURL = process.env.MONGODB_URL; // MongoDB connection URL
 
 
 

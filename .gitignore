@@ -1,3 +1,4 @@
+
 # Logs
 logs
 *.log
@@ -6,6 +7,12 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+
+frontend/package-lock.json
+backend/package-lock.json
+package-lock.json
+
+
 
 node_modules/*
 node_modules
@@ -16,6 +23,7 @@ backend/node_modules
 frontend/package-lock.json
 backend/package-lock.json
 package-lock.json
+backend
 dist
 dist-ssr
 *.local
@@ -30,3 +38,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+#firebase
+frontend/firebase
+frontend/firebase/*
+

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { doUpdateUserSignInWithGoogle } from '../../firebase/auth';
+import { doUpdateUserSignInWithGoogle } from '../../../backend/firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'; // For API requests
 

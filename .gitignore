@@ -37,3 +37,6 @@ dist-ssr
 *.sln
 *.sw?
 
+#firebase
+frontend/firebase
+frontend/firebase/*

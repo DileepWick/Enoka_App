@@ -9,13 +9,6 @@ lerna-debug.log*
 
 node_modules/*
 node_modules
-frontend/node_modules/*
-frontend/node_modules
-backend/node_modules/*
-backend/node_modules
-frontend/package-lock.json
-backend/package-lock.json
-package-lock.json
 dist
 dist-ssr
 *.local

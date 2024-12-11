@@ -1,6 +1,7 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./contexts/authContext";
+import Header from "./pages/Header";
 
 // Pages
 import Home from "./pages/Home";
@@ -18,6 +19,7 @@ import { DeliveryManagement } from "./pages/DeliveryManagementSection";
 const App = () => {
   return (
     <AuthProvider>
+      <Header />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />

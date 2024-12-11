@@ -1,5 +1,5 @@
 import axios from "axios";
-const API_URL = 'http://localhost:8098/api';
+const API_URL = 'https://enokaback-6acbbcbf5c24.herokuapp.com/api';
 
 // Create a new delivery
 export const createDelivery = async (senderBranch, receiverBranch) => {

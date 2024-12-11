@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { doUpdateUserSignInWithGoogle } from '../../../backend/firebase/auth';
+import { doUpdateUserSignInWithGoogle } from '../../firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'; // For API requests
 
@@ -18,7 +18,7 @@ const GoogleSignIn = () => {
     useEffect(() => {
         const fetchBranches = async () => {
             try {
-                const response = await axios.get('http://localhost:8098/api/branches'); // Adjust the API URL
+                const response = await axios.get('https://enokaback-6acbbcbf5c24.herokuapp.com/api/branches'); // Adjust the API URL
                 if (Array.isArray(response.data)) {
                     setBranches(response.data); // Set only if response is an array
                     console.log(response.data);

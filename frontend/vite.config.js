@@ -24,7 +24,7 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      external: ['firebase/app', 'firebase/auth', 'firebase/analytics']
+      external: ['firebase/app', 'firebase/auth', 'firebase/analytics', 'axios']
     }
   }
 });

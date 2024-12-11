@@ -6,7 +6,7 @@
     "start": "cd backend && npm start",
     "runfront": "cd frontend && vite",
     "preview": "cd frontend && vite preview",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false cd frontend && npm i && cd ..",
+    "heroku-postbuild": "cd frontend && npm i && npm i firebase@11.0.2 && cd ..",
     "ggg": "NPM_CONFIG_PRODUCTION=false npm i && cd frontend && npm update -g npm && npm i && npm i firebase@11.0.2 && npm run build && cd ..",
     "manualfront":"npm install @emotion/react@^11.13.5 @emotion/styled@^11.13.5 @mui/material@^6.1.9 @nextui-org/react@^2.4.8 @radix-ui/react-label@^2.1.0 @radix-ui/react-slot@^1.1.0 @eslint/js@^9.15.0 @types/react@^18.3.12 @types/react-dom@^18.3.1 @vitejs/plugin-react@^4.3.4 axios@^1.7.8 class-variance-authority@^0.7.1 clsx@^2.1.1 firebase@^11.0.2 firebase-admin@^13.0.1 framer-motion@^11.13.1 lucide-react@^0.462.0 mitt@^3.0.1 next@^15.0.3 react@^18.3.1 react-dom@^18.3.1 react-modal@^3.16.1 react-router-dom@^7.0.1 react-select@^5.8.3 react-to-print@^3.0.2 tailwind-merge@^2.5.5 tailwindcss@^3.4.15 autoprefixer@^10.4.20 eslint@^9.15.0 eslint-plugin-react@^7.37.2 eslint-plugin-react-hooks@^5.0.0 eslint-plugin-react-refresh@^0.4.14 globals@^15.12.0 postcss@^8.4.49 vite@^6.0.1 vite-plugin-environment@^1.1.3"
   }

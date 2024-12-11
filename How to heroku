@@ -22,6 +22,8 @@ Fully npm package install. Dont used thare already cached module. that mean gett
 heroku config:set NPM_CONFIG_CACHE=false
 
 
+heroku buildpacks:set heroku/nodejs
+
 
 
 Push frontend branch to heroku selected branch main (Only compile heroku main only. Other wise not compiling)

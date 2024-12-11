@@ -12,6 +12,7 @@
   "dependencies": {
     "@emotion/react": "^11.13.5",
     "@emotion/styled": "^11.13.5",
+    "@mui/core-downloads-tracker": "^6.1.10",
     "@mui/material": "^6.1.9",
     "@nextui-org/react": "^2.4.8",
     "@radix-ui/react-label": "^2.1.0",

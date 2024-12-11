@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/authContext';
-import { doCreateUserWithEmailAndPassword , doSignInWithGoogle } from '../../../backend/firebase/auth';
+import { doCreateUserWithEmailAndPassword , doSignInWithGoogle } from '../../firebase/auth';
 import axios from 'axios'; // For API requests
 
 

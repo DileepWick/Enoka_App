@@ -1,5 +1,5 @@
 import { Sidebar } from "../components/Dashboard_Components/Sidebar";
-import { Header } from "../components/Dashboard_Components/Header";
+import { Header } from "../pages/Header";
 
 //New Delivery
 import DeliverySystem from "./DeliverySystem";

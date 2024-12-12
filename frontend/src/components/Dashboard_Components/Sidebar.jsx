@@ -40,7 +40,7 @@ export function Sidebar() {
           onClick={toggleMobileMenu}
           aria-label="Toggle menu"
         >
-          {isMobileMenuOpen ? '✕' : '☰'}
+          {isMobileMenuOpen ? '' : '☰'}
         </button>
       )}
 

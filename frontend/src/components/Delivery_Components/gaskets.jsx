@@ -27,7 +27,7 @@ const GasketList = ({}) => {
 
   // Pagination
   const [page, setPage] = useState(1);
-  const rowsPerPage = 5;
+  const rowsPerPage = 1000;
 
   const items = useMemo(() => {
     const start = (page - 1) * rowsPerPage;

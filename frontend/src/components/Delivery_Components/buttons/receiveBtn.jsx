@@ -100,7 +100,7 @@ const ReceiveBtn = ({ deliveryId }) => {
   return (
     <>
       <Button onPress={onOpen} color="default" variant="ghost">
-        Receive Items
+        Receive 
       </Button>
       <Modal
         isOpen={isOpen}

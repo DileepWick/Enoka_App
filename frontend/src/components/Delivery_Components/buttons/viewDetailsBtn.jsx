@@ -54,7 +54,7 @@ const ViewDetailsBtn = ({ deliveryId }) => {
   return (
     <>
       <Button onPress={onOpen}  className="mr-2 bg-black text-white">
-        View Items
+        View
       </Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="full" className="font-f1">
         <ModalContent>

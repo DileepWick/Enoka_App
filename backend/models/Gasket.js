@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import Stock from './Stock.js'; // Adjust path to your Stock model
+import Branch from './Branch.js'; // Adjust path to your Branch model
 
 // Helper function to generate random ID with prefix
 const generateId = (prefix) => {
@@ -25,73 +27,44 @@ const gasketSchema = new mongoose.Schema({
   },
   part_number: {
     type: String,
-    required: [true, 'Part number is required'], // Add custom error message
+    required: [true, 'Part number is required'],
     unique: true,
-    trim: true // Remove unnecessary spaces
+    trim: true
   },
   material_type: {
     type: String,
     required: [true, 'Material type is required'],
-    enum: ['steel', 'hellite', 'wog'], // Add predefined material types
+    enum: ['STEEL', 'HELLITE', 'WOG'],
     trim: true
   },
   packing_type: {
     type: String,
     required: [true, 'Packing type is required'],
+    enum: ['FULLSET', 'HEADSET', 'GASKET ONLY'],
     trim: true
   },
   engine: {
-    type: mongoose.Schema.Types.ObjectId, // Use ObjectId reference
-    ref: 'Engine', // Reference to the Engine model
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Engine',
     required: true
   },
   brand: {
-    type: mongoose.Schema.Types.ObjectId, // Use ObjectId reference
-    ref: 'Brand', // Reference to the Brand model
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Brand',
     required: true
   },
   vendor: {
-    type: mongoose.Schema.Types.ObjectId, // Use ObjectId reference
-    ref: 'Vendor', // Reference to the Vendor model
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Vendor',
     required: true
   },
-  description: {
-    type: String,
-    required: [true, 'Description is required'],
-    trim: true,
-    maxlength: [500, 'Description cannot exceed 500 characters'] // Add limit to description length
-  },
-  stock: {
-    type: Number,
-    required: [true, 'Stock value is required'],
-    min: [0, 'Stock cannot be negative'] // Ensure stock is non-negative
-  },
-  minstock: {
-    type: Number,
-    required: [true, 'Minimum stock value is required'],
-    min: [0, 'Minimum stock cannot be negative']
-  },
-  barcode: {
-    type: String,
-    required: [true, 'Barcode is required'],
-    unique: true, // Barcodes should be unique
-    default: () => generateId('BAR'), // Automatically generate barcode
-    validate: {
-      validator: (v) => validateIdPattern(v, 'BAR'),
-      message: (props) => `${props.value} is not a valid barcode!`
-    },
-    trim: true
-  },
-  year: {
-    type: Number,
-    required: [true, 'Year is required'],
-    min: [1900, 'Year must be after 1900'],
-    max: [new Date().getFullYear(), 'Year cannot be in the future'] // Validate against the current year
-  },
+  stock: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Stock'
+  }],
   added_by: {
     type: String,
-    required: [true, 'Added by is required'],
-    trim: true
+    default: 'Admin'
   },
   created_date: {
     type: Date,
@@ -99,21 +72,37 @@ const gasketSchema = new mongoose.Schema({
   }
 });
 
-// Add pre-save middleware to ensure ID and barcode uniqueness
-gasketSchema.pre('save', async function (next) {
-  if (!this.isModified('gasket_id')) return next();
+// Middleware to create stocks for all branches on gasket creation
+gasketSchema.post('save', async function (doc, next) {
+  try {
+    // Check if stocks are already created for this gasket
+    if (doc.stock && doc.stock.length > 0) {
+      return next(); // Skip stock creation if stocks are already associated
+    }
 
-  const existingGasket = await mongoose.models.Gasket.findOne({ gasket_id: this.gasket_id });
-  if (existingGasket) {
-    this.gasket_id = generateId('GSKT'); // Regenerate ID if duplicate found
-  }
+    // Fetch all branches
+    const branches = await Branch.find({});
+    if (!branches.length) return next(); // Skip if no branches found
 
-  if (!this.isModified('barcode')) return next();
-  const existingBarcode = await mongoose.models.Gasket.findOne({ barcode: this.barcode });
-  if (existingBarcode) {
-    this.barcode = generateId('BAR'); // Regenerate barcode if duplicate found
+    // Create stock for each branch
+    const stockEntries = branches.map(branch => ({
+      branch: branch._id,
+      quantity: 100000, // Default quantity for new gasket
+      updated_by: doc.added_by // Use the gasket's "added_by" field
+    }));
+
+    // Insert stocks and update the gasket
+    const createdStocks = await Stock.insertMany(stockEntries);
+    doc.stock = createdStocks.map(stock => stock._id);
+
+    // Update gasket without triggering middleware
+    await this.constructor.updateOne({ _id: doc._id }, { stock: doc.stock });
+
+    next();
+  } catch (error) {
+    next(error); // Pass any error to the next middleware
   }
-  next();
 });
+
 
 export default mongoose.model('Gasket', gasketSchema);

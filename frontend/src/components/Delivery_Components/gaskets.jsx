@@ -32,7 +32,9 @@ const GasketList = ({}) => {
   const items = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
-    return Array.isArray(filteredGaskets) ? filteredGaskets.slice(start, end) : [];
+    return Array.isArray(filteredGaskets)
+      ? filteredGaskets.slice(start, end)
+      : [];
   }, [page, filteredGaskets]);
 
   // Fetch the latest pending delivery
@@ -66,9 +68,7 @@ const GasketList = ({}) => {
       }
     };
 
- 
     getGaskets();
-    
 
     // Fetch the delivery initially
     fetchLatestDelivery();
@@ -90,7 +90,6 @@ const GasketList = ({}) => {
       setDelivery(null);
       fetchLatestDelivery();
       getGaskets();
-      
     };
 
     // Subscribe to both events
@@ -104,8 +103,6 @@ const GasketList = ({}) => {
       emitter.off("deliveryRemoved", handleDeliveryRemoved);
     };
   }, []);
-
-
 
   // Search logic to filter gaskets based on the search term
   useEffect(() => {
@@ -173,40 +170,82 @@ const GasketList = ({}) => {
                 scrollbarWidth: "thin",
               }}
             >
-              <Table
-                aria-label="Example table with client-side pagination"
-                className="font-f1"
-              >
-                <TableHeader className="border border-gray-300">
-                  <TableColumn>Part Number</TableColumn>
-                  <TableColumn>Material Type</TableColumn>
-                  <TableColumn>Packing Type</TableColumn>
-                  <TableColumn>Engine</TableColumn>
-                  <TableColumn>Brand</TableColumn>
-                  <TableColumn>Vendor</TableColumn>
-                  <TableColumn>Actions</TableColumn>
-                </TableHeader>
-                <TableBody className="border border-gray-300">
+              <table className="font-f1 w-full border-collapse border border-gray-300">
+                <thead className="border border-gray-300">
+                  <tr>
+                    <th className="border border-gray-300 px-4 py-2">
+                      Part Number
+                    </th>
+                    <th className="border border-gray-300 px-4 py-2">
+                      Added By
+                    </th>
+                    <th className="border border-gray-300 px-4 py-2">
+                      Stock Details
+                    </th>
+                    <th className="border border-gray-300 px-4 py-2">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
                   {items.map((gasket) => (
-                    <TableRow key={gasket._id}>
-                      <TableCell>{gasket.part_number}</TableCell>
-                      <TableCell>{gasket.material_type}</TableCell>
-                      <TableCell>{gasket.packing_type}</TableCell>
-                      <TableCell>{gasket.engine?.engine_name}</TableCell>
-                      <TableCell>{gasket.stock?._id}</TableCell>
-                      <TableCell>{gasket.vendor?.vendor_name}</TableCell>
-                      <TableCell>
+                    <tr key={gasket._id} className="border border-gray-300">
+                      <td className="border border-gray-300 px-4 py-2">
+                        {gasket.part_number}
+                      </td>
+                      <td className="border border-gray-300 px-4 py-2">
+                        {gasket.added_by}
+                      </td>
+                      <td className="border border-gray-300 px-4 py-2">
+                        <table className="w-full border-collapse border border-gray-200">
+                          <thead>
+                            <tr>
+                              <th className="border border-gray-200 px-2 py-1">
+                                Branch
+                              </th>
+                              <th className="border border-gray-200 px-2 py-1">
+                                Location
+                              </th>
+                              <th className="border border-gray-200 px-2 py-1">
+                                Quantity
+                              </th>
+                              <th className="border border-gray-200 px-2 py-1">
+                                Last Updated By
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {gasket.stock.map((stock) => (
+                              <tr key={stock._id}>
+                                <td className="border border-gray-200 px-2 py-1">
+                                  {stock.branch?.name || "N/A"}
+                                </td>
+                                <td className="border border-gray-200 px-2 py-1">
+                                  {stock.branch?.location || "N/A"}
+                                </td>
+                                <td className="border border-gray-200 px-2 py-1">
+                                  {stock.quantity}
+                                </td>
+                                <td className="border border-gray-200 px-2 py-1">
+                                  {stock.updated_by}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </td>
+                      <td className="border border-gray-300 px-4 py-2">
                         <ItemAddToDeliveryButton
                           item_id={gasket._id}
                           delivery_id={delivery._id}
                           item_description={gasket.description}
                           className="w-full mt-2"
                         />
-                      </TableCell>
-                    </TableRow>
+                      </td>
+                    </tr>
                   ))}
-                </TableBody>
-              </Table>
+                </tbody>
+              </table>
             </div>
           </div>
 

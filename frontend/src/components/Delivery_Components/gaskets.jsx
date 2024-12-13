@@ -193,7 +193,7 @@ const GasketList = ({}) => {
                       <TableCell>{gasket.material_type}</TableCell>
                       <TableCell>{gasket.packing_type}</TableCell>
                       <TableCell>{gasket.engine?.engine_name}</TableCell>
-                      <TableCell>{gasket.brand?.brand_name}</TableCell>
+                      <TableCell>{gasket.stock?._id}</TableCell>
                       <TableCell>{gasket.vendor?.vendor_name}</TableCell>
                       <TableCell>
                         <ItemAddToDeliveryButton

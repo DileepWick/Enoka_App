@@ -7,9 +7,15 @@ import Vendor from "../models/Vendor.js";
 export const getAllGaskets = async (req, res) => {
   try {
     const gaskets = await Gasket.find()
-      .populate("engine")
-      .populate("brand")
-      .populate("vendor");
+    .populate("engine")
+    .populate("brand")
+    .populate("vendor")
+    .populate({
+      path: "stock", // Populate the 'stock' array
+      populate: {
+        path: "branch", // Further populate the 'branch' field inside each stock
+      },
+    });
     res.json(gaskets);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -26,14 +32,10 @@ export const createGasket = async (req, res) => {
       engine,
       brand,
       vendor,
-      description,
-      stock,
-      minstock,
-      year,
       added_by,
     } = req.body;
 
-    // Validate references (check if vendor, engine, and brand exist by their ObjectIds)
+    // Validate references (Vendor, Engine, and Brand)
     const vendorExists = await Vendor.findById(vendor);
     if (!vendorExists) {
       return res
@@ -55,22 +57,18 @@ export const createGasket = async (req, res) => {
         .json({ error: `Brand with ID ${brand} does not exist.` });
     }
 
-    // Create the Gasket document with ObjectId references
+    // Create a new gasket
     const gasket = new Gasket({
       part_number,
       material_type,
       packing_type,
-      engine,  // Reference to Engine
-      brand,   // Reference to Brand
-      vendor,  // Reference to Vendor
-      description,
-      stock,
-      minstock,
-      year,
+      engine,
+      brand,
+      vendor,
       added_by,
     });
 
-    // Save the gasket to the database
+    // Save the gasket to trigger post-save middleware
     const savedGasket = await gasket.save();
 
     // Return success response

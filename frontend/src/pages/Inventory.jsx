@@ -5,6 +5,8 @@ import Header from "../pages/Header";
 import { Chip } from "@nextui-org/react";
 import { Tabs, Tab } from "@nextui-org/react";
 
+import AddItemForm from "./Add_gasket";
+
 const Inventory = () => {
   return (
     <div className="flex h-screen bg-gray-100">
@@ -20,7 +22,7 @@ const Inventory = () => {
               <h1>Stocks</h1>
             </Tab>
             <Tab key="New Item" title="New Item">
-              <h1>New Item</h1>
+              <AddItemForm />
             </Tab>
             <Tab key="Reports" title="Reports">
               <h1>Reports</h1>

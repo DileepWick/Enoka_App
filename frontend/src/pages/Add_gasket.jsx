@@ -3,17 +3,13 @@ import axiosInstance from "@/config/axiosInstance";
 
 import Select from "react-select";
 import Modal from "react-modal";
-import { Button ,Input} from "@nextui-org/react";
+import { Button } from "@nextui-org/react";
 
 Modal.setAppElement("#root");
 
 export default function AddItemForm() {
   const [formData, setFormData] = useState({
     part_number: "",
-    description: "",
-    stock: "",
-    minstock: "",
-    year: "",
     material_type: "",
     packing_type: "",
     engine: "",
@@ -28,7 +24,6 @@ export default function AddItemForm() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [submitStatus, setSubmitStatus] = useState(null);
-
   const [currentModal, setCurrentModal] = useState(null);
   const [newItemName, setNewItemName] = useState("");
   const [isAddingItem, setIsAddingItem] = useState(false);
@@ -103,10 +98,6 @@ export default function AddItemForm() {
       setSubmitStatus({ type: "success", message: response.data.message });
       setFormData({
         part_number: "",
-        description: "",
-        stock: "",
-        minstock: "",
-        year: "",
         material_type: "",
         packing_type: "",
         engine: "",
@@ -151,58 +142,6 @@ export default function AddItemForm() {
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-            <input
-              type="text"
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
-            <input
-              type="number"
-              id="stock"
-              name="stock"
-              value={formData.stock}
-              onChange={handleInputChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="minstock" className="block text-sm font-medium text-gray-700 mb-1">Minimum Stock</label>
-            <input
-              type="number"
-              id="minstock"
-              name="minstock"
-              value={formData.minstock}
-              onChange={handleInputChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="year" className="block text-sm font-medium text-gray-700 mb-1">Year</label>
-            <input
-              type="number"
-              id="year"
-              name="year"
-              value={formData.year}
-              onChange={handleInputChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
             <label htmlFor="material_type" className="block text-sm font-medium text-gray-700 mb-1">Material Type</label>
             <select
               id="material_type"
@@ -213,9 +152,9 @@ export default function AddItemForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select material type</option>
-              <option value="steel">Steel</option>
-              <option value="hellite">Hellite</option>
-              <option value="wog">WOG</option>
+              <option value="STEEL">Steel</option>
+              <option value="HELLITE">Hellite</option>
+              <option value="WOG">WOG</option>
             </select>
           </div>
 
@@ -230,9 +169,9 @@ export default function AddItemForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select packing type</option>
-              <option value="fullSet">Full Set</option>
-              <option value="headSet">Head Set</option>
-              <option value="gasketOnly">Gasket Only</option>
+              <option value="FULLSET">Full Set</option>
+              <option value="HEADSET">Head Set</option>
+              <option value="GASKET ONLY">Gasket Only</option>
             </select>
           </div>
 
@@ -250,13 +189,6 @@ export default function AddItemForm() {
                 classNamePrefix="react-select"
               />
             </div>
-            <Button 
-              type="button" 
-              onClick={() => openModal('engine')}
-              className="ml-2 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              +
-            </Button>
           </div>
 
           <div className="flex items-end">
@@ -273,13 +205,6 @@ export default function AddItemForm() {
                 classNamePrefix="react-select"
               />
             </div>
-            <Button 
-              type="button" 
-              onClick={() => openModal('brand')}
-              className="ml-2 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              +
-            </Button>
           </div>
 
           <div className="flex items-end">
@@ -296,51 +221,37 @@ export default function AddItemForm() {
                 classNamePrefix="react-select"
               />
             </div>
-            <Button 
-              type="button" 
-              onClick={() => openModal('vendor')}
-              className="ml-2 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              +
-            </Button>
           </div>
         </div>
 
         <Button type="submit" className="w-full" variant="ghost" color="primary" size="lg">
-          Submit
+          Add Gasket
         </Button>
       </form>
 
-      <Modal
-        isOpen={!!currentModal}
-        onRequestClose={closeModal}
-        className="fixed inset-0 flex items-center justify-center"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50"
-      >
-        <div className="bg-white p-6 rounded-lg w-96">
-          <h2 className="text-xl font-semibold mb-4">Add New {currentModal}</h2>
-          <input
-            type="text"
-            value={newItemName}
-            onChange={(e) => setNewItemName(e.target.value)}
-            placeholder={`Enter new ${currentModal} name`}
-            className="w-full px-3 py-2 border rounded mb-4"
-          />
-          <div className="flex justify-end space-x-2">
-            <button 
-              onClick={closeModal} 
-              className="px-4 py-2 border rounded"
-            >
-              Cancel
-            </button>
-            <button 
-              onClick={handleAddNew} 
-              disabled={isAddingItem}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-            >
-              {isAddingItem ? 'Adding...' : 'Add'}
-            </button>
-          </div>
+      <Modal isOpen={!!currentModal} onRequestClose={closeModal}>
+        <h2 className="text-lg font-bold mb-4">Add New {currentModal}</h2>
+        <input
+          type="text"
+          value={newItemName}
+          onChange={(e) => setNewItemName(e.target.value)}
+          placeholder={`Enter ${currentModal} name`}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md mb-4"
+        />
+        <div className="flex justify-end">
+          <button 
+            onClick={handleAddNew} 
+            disabled={isAddingItem}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mr-2"
+          >
+            Add
+          </button>
+          <button 
+            onClick={closeModal}
+            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          >
+            Cancel
+          </button>
         </div>
       </Modal>
     </div>

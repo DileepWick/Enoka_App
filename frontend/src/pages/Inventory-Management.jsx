@@ -14,13 +14,11 @@ const Inventory = () => {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
-        <Chip className="ml-8 font-f1 text-2xl p-4" variant="dot" size="lg">
-          Inventory Management
-        </Chip>
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
           <Tabs className="font-f1" size="md" variant="bordered" color="danger">
             <Tab key="Stocks" title="Stocks">
-              <label className="font-f1">Select Item Type :</label><br></br>
+              <h1 className="text-lg font-f1">Select Item Type :</h1>
+              <br></br>
               <Tabs aria-label="Items" className="font-f1" size="lg">
                 <Tab key="gaskets" title="Gaskets">
                   <AllGaskets />

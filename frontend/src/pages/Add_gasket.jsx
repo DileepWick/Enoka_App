@@ -82,7 +82,7 @@ export default function AddItemForm() {
       };
 
       const { url, key, setter } = endpoints[currentModal];
-      const response = await axios.post(`https://enokaback-6acbbcbf5c24.herokuapp.com/api/${url}`, {
+      const response = await axiosInstance.post(`/api/${url}`, {
         [key]: newItemName
       });
 
@@ -99,7 +99,7 @@ export default function AddItemForm() {
     e.preventDefault();
     setSubmitStatus(null);
     try {
-      const response = await axios.post("https://enokaback-6acbbcbf5c24.herokuapp.com/api/gaskets", formData);
+      const response = await axiosInstance.post("/api/gaskets", formData);
       setSubmitStatus({ type: "success", message: response.data.message });
       setFormData({
         part_number: "",

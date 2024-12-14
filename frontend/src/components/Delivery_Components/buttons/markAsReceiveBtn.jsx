@@ -9,7 +9,10 @@ import {
   useDisclosure,
   Chip,
 } from "@nextui-org/react";
-import axios from "axios";
+
+//Controller for API ENDPOINT
+import axiosInstance from "@/config/axiosInstance";
+
 
 //Emitter
 import emitter from "../../../../util/emitter.js";
@@ -30,8 +33,8 @@ export default function App({
       const status = "Received";
 
       // Make the API call to change the delivery status
-      const response = await axios.put(
-        `https://enokaback-6acbbcbf5c24.herokuapp.com/api/deliveryItems/updateStatusOfDeliveryItem/${deliveryItemId}`,
+      const response = await axiosInstance.put(
+        `/api/deliveryItems/updateStatusOfDeliveryItem/${deliveryItemId}`,
         { status }
       );
 
@@ -43,7 +46,7 @@ export default function App({
         // Update the quantity of the item if it's a gasket
         if (itemType === "Gasket") {
           const response = await axios.put(
-            `https://enokaback-6acbbcbf5c24.herokuapp.com/api/gaskets/increaseGasketQty/${itemId}`,
+            `/api/gaskets/increaseGasketQty/${itemId}`,
             { quantity }
           );
 

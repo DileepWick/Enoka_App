@@ -1,16 +1,16 @@
-import axios from "axios";
-const API_URL = 'https://enokaback-6acbbcbf5c24.herokuapp.com/api';
+import axiosInstance from "@/config/axiosInstance";
+
 
 // Create a new delivery
 export const createDelivery = async (senderBranch, receiverBranch) => {
-  const response = await axios.post(`${API_URL}/delivery`, { senderBranch, receiverBranch });
+  const response = await axiosInstance.post(`/api/delivery`, { senderBranch, receiverBranch });
   return response.data.delivery;  // Access the 'delivery' object correctly
 };
 
 // Function to remove delivery by ID
 export const removeDelivery = async (deliveryId) => {
   try {
-    const response = await axios.delete(`${API_URL}/delivery/${deliveryId}`);
+    const response = await axiosInstance.delete(`/api/delivery/${deliveryId}`);
     return response;
   } catch (error) {
     console.error("Error removing delivery:", error);
@@ -21,7 +21,7 @@ export const removeDelivery = async (deliveryId) => {
 //Get latest pending delivery
 export const getLatestPendingDelivery = async () => {
   try {
-    const response = await axios.get(`${API_URL}/delivery/deliveries/latest`);
+    const response = await axiosInstance.get(`/api/delivery/deliveries/latest`);
     return response.data.delivery;  // Access the 'delivery' object correctly
   } catch (error) {
     console.error("Error fetching pending delivery:", error);
@@ -32,7 +32,7 @@ export const getLatestPendingDelivery = async () => {
 //Get delivery Items by deliveryId
 export const getDeliveryItemsByDeliveryId = async (deliveryId) => {
   try {
-    const response = await axios.get(`${API_URL}/deliveryItems/getDeliveryItemsByDeliveryId/${deliveryId}`);
+    const response = await axiosInstance.get(`/api/deliveryItems/getDeliveryItemsByDeliveryId/${deliveryId}`);
     return response;
   } catch (error) {
     console.error("Error fetching delivery items:", error);
@@ -43,7 +43,7 @@ export const getDeliveryItemsByDeliveryId = async (deliveryId) => {
 //Get ondelivery deliveries
 export const getOnDeliveryDeliveries = async () => {
   try {
-    const response = await axios.get(`${API_URL}/delivery/deliveries/on-delivery`);
+    const response = await axiosInstance.get(`/api/delivery/deliveries/on-delivery`);
     return response; 
   } catch (error) {
     console.error("Error fetching on delivery deliveries:", error);
@@ -54,7 +54,7 @@ export const getOnDeliveryDeliveries = async () => {
 //Get received deliveries
 export const getReceivedDeliveries = async () => {
   try {
-    const response = await axios.get(`${API_URL}/delivery/deliveries/received`);
+    const response = await axiosInstance.get(`/api/delivery/deliveries/received`);
     return response;
   } catch (error) {
     console.error("Error fetching received deliveries:", error);
@@ -65,7 +65,7 @@ export const getReceivedDeliveries = async () => {
 //Change status of delivery
 export const changeDeliveryStatus = async (deliveryId, status) => {
   try {
-    const response = await axios.put(`${API_URL}/deliveryItems/updateStatusOfDeliveryItem/${deliveryId}`, { status: status });
+    const response = await axiosInstance.put(`/api/deliveryItems/updateStatusOfDeliveryItem/${deliveryId}`, { status: status });
     return response;
   } catch (error) {
     console.error("Error changing delivery status:", error);

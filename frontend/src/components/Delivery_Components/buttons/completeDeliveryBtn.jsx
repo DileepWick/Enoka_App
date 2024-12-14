@@ -8,7 +8,10 @@ import {
   Button,
   useDisclosure,
 } from "@nextui-org/react";
-import axios from "axios";
+
+//Controller for API ENDPOINT
+import axiosInstance from "@/config/axiosInstance";
+
 
 // Emitter
 import emitter from "../../../../util/emitter.js";
@@ -23,8 +26,8 @@ const CompleteDeliveryBtn = ({ deliveryId }) => {
       const status = "received";
 
       // Make the API call to change the delivery status
-      const response = await axios.put(
-        `https://enokaback-6acbbcbf5c24.herokuapp.com/api/delivery/updateDeliveryStatus/${deliveryId}`,
+      const response = await axiosInstance.put(
+        `/api/delivery/updateDeliveryStatus/${deliveryId}`,
         { status }
       );
 

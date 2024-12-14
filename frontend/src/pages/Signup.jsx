@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Navigate, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/authContext';
 import { doCreateUserWithEmailAndPassword , doSignInWithGoogle } from '../../firebase/auth';
-import axios from 'axios'; // For API requests
+import axiosInstance from "../config/axiosInstance";
+
 
 
 
@@ -27,7 +28,7 @@ const Signup = () => {
     useEffect(() => {
         const fetchBranches = async () => {
             try {
-                const response = await axios.get('https://enokaback-6acbbcbf5c24.herokuapp.com/api/branches'); // Adjust the API URL
+                const response = await axiosInstance.get('/api/branches'); // Adjust the API URL
                 if (Array.isArray(response.data)) {
                     setBranches(response.data); // Set only if response is an array
                     console.log(response.data);

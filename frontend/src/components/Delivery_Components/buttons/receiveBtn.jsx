@@ -24,7 +24,10 @@ import emitter from "../../../../util/emitter.js";
 
 //Buttons
 import CompleteDeliveryBtn from "./completeDeliveryBtn.jsx";
-import axios from "axios";
+
+//Controller for API ENDPOINT
+import axiosInstance from "@/config/axiosInstance";
+
 
 const ReceiveBtn = ({ deliveryId }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -37,8 +40,8 @@ const ReceiveBtn = ({ deliveryId }) => {
   // Fetch Delivery Items function
   const fetchDeliveryItems = async () => {
     try {
-      const response = await axios.get(
-        `https://enokaback-6acbbcbf5c24.herokuapp.com/api/deliveryItems/getDeliveryItemsByDeliveryId/${deliveryId}`
+      const response = await axiosInstance.get(
+        `/api/deliveryItems/getDeliveryItemsByDeliveryId/${deliveryId}`
       );
       setDeliveryItems(response.data.data);
       setError(null);

@@ -9,7 +9,10 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@nextui-org/react";
-import axios from "axios";
+
+//Controller for API ENDPOINT
+import axiosInstance from "@/config/axiosInstance";
+
 
 // Emmiter
 import emitter from "../../../../util/emitter.js";
@@ -36,8 +39,8 @@ const DeliveryItemQuantityEditBtn = ({ deliveryItemId }) => {
     }
 
     try {
-      const response = await axios.put(
-        `https://enokaback-6acbbcbf5c24.herokuapp.com/api/deliveryItems/editDeliveryItemQuantity/${deliveryItemId}`,
+      const response = await axiosInstance.put(
+        `/api/deliveryItems/editDeliveryItemQuantity/${deliveryItemId}`,
         {
           quantity: quantity,
         }

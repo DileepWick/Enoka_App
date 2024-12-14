@@ -88,23 +88,6 @@ export const doUpdateUserSignInWithGoogle = async (
     const uEmail=sessionStorage.getItem('userLoggedInEmail');
     const uStatus=0;
 
-    // console.log(userDetails.branch);
-    // userSessionEmitter.on("userLoggedInUid", (uid) => {
-    //   console.log(`User logged in with UID: ${uid}`);
-    //   uUid = uid;
-    // });
-
-
-
-    // userSessionEmitter.on("userLoggedInEmail", (email) => {
-    //   console.log(`User logged in with UID: ${email}`);
-    //   uEmail = email;
-    // });
-
-    // userSessionEmitter.on("userStatus", (status) => {
-    //   console.log(`User logged in with UID: ${status}`);
-    //   uStatus = status;
-    // });
 
     if (uStatus === 0) {
       // Prepare user details for API

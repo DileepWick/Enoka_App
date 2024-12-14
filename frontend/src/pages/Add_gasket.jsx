@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "@/config/axiosInstance";
+
 import Select from "react-select";
 import Modal from "react-modal";
 import { Button ,Input} from "@nextui-org/react";
@@ -36,9 +37,9 @@ export default function AddItemForm() {
     const fetchData = async () => {
       try {
         const [vendorsResponse, brandsResponse, enginesResponse] = await Promise.all([
-          axios.get("https://enokaback-6acbbcbf5c24.herokuapp.com/api/vendors"),
-          axios.get("https://enokaback-6acbbcbf5c24.herokuapp.com/api/brands"),
-          axios.get("https://enokaback-6acbbcbf5c24.herokuapp.com/api/engines"),
+          axiosInstance.get("/api/vendors"),
+          axiosInstance.get("/api/brands"),
+          axiosInstance.get("/api/engines"),
         ]);
 
         setVendors(vendorsResponse.data);

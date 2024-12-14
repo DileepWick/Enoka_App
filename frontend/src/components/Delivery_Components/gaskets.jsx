@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { fetchGaskets } from "../../services/inventoryServices";
-import axios from "axios";
+
+//Controller for API ENDPOINT
+import axiosInstance from "@/config/axiosInstance";
+
 import ItemAddToDeliveryButton from "./buttons/itemAddToDeliveryButton";
 import { Spinner } from "@nextui-org/react";
 import {
@@ -41,8 +44,8 @@ const GasketList = ({}) => {
   useEffect(() => {
     const fetchLatestDelivery = async () => {
       try {
-        const latestDelivery = await axios.get(
-          "https://enokaback-6acbbcbf5c24.herokuapp.com/api/delivery/deliveries/latest"
+        const latestDelivery = await axiosInstance.get(
+          "/api/delivery/deliveries/latest"
         );
         const fetchedDeliveryData = latestDelivery.data.data;
 

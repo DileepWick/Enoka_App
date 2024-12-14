@@ -1,14 +1,11 @@
 // services/gasketService.js
-import axios from 'axios';
+import axiosInstance from "@/config/axiosInstance";
 
-
-//API URL
-const GASKET_API_URL = 'https://enokaback-6acbbcbf5c24.herokuapp.com/api/gaskets';
 
 // Function to fetch all gaskets
 export const fetchGaskets = async () => {
   try {
-    const response = await axios.get(GASKET_API_URL);
+    const response = await axiosInstance.get("/api/gaskets");
     return response.data; // Return the gaskets data
   } catch (error) {
     console.error('Error fetching gaskets:', error);

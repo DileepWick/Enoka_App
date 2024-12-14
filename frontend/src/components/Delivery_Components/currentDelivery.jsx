@@ -1,6 +1,8 @@
 "use client";
 
-import axios from "axios";
+//Controller for API ENDPOINT
+import axiosInstance from "@/config/axiosInstance";
+
 import { useState, useEffect } from "react";
 import { removeDelivery } from "@/services/deliveryServices";
 import { Button, Checkbox, Chip, Divider, Progress } from "@nextui-org/react";
@@ -38,8 +40,8 @@ const CurrentDelivery = () => {
   useEffect(() => {
     const fetchLatestPendingDelivery = async () => {
       try {
-        const response = await axios.get(
-          "https://enokaback-6acbbcbf5c24.herokuapp.com/api/delivery/deliveries/latest"
+        const response = await axiosInstance.get(
+          "/api/delivery/deliveries/latest"
         );
   
         const delivery = response.data.data;
@@ -90,8 +92,8 @@ const CurrentDelivery = () => {
   //Fetch Delivery Items
   const fetchDeliveryItems = async (deliveryId) => {
     try {
-      const response = await axios.get(
-        `https://enokaback-6acbbcbf5c24.herokuapp.com/api/deliveryItems/getDeliveryItemsByDeliveryId/${deliveryId}`
+      const response = await axiosInstance.get(
+        `/api/deliveryItems/getDeliveryItemsByDeliveryId/${deliveryId}`
       );
       const items = response.data.data;
       setDeliveryItems(items);
@@ -137,8 +139,8 @@ const CurrentDelivery = () => {
     }
 
     try {
-      await axios.put(
-        `https://enokaback-6acbbcbf5c24.herokuapp.com/api/delivery/${newDelivery._id}/status`,
+      await axiosInstance.put(
+        `/api/delivery/${newDelivery._id}/status`,
         { status: "on delivery" }
       );
       alert("Delivery started successfully.");
@@ -157,8 +159,8 @@ const CurrentDelivery = () => {
   const handleRemoveItem = async (itemId) => {
     try {
       // Remove item from backend
-      await axios.delete(
-        `https://enokaback-6acbbcbf5c24.herokuapp.com/api/deliveryItems/deleteDeliveryItem/${itemId}`
+      await axiosInstance.delete(
+        `/api/deliveryItems/deleteDeliveryItem/${itemId}`
       );
 
       // Remove item locally from delivery items

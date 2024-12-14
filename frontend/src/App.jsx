@@ -13,7 +13,7 @@ import CRB from "./pages/crb"
 
 //Sections
 import { DeliveryManagement } from "./pages/DeliveryManagementSection";
-import Inventory from "./pages/Inventory";
+import Inventory from "./pages/Inventory-Management";
 
 
 const App = () => {

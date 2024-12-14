@@ -1,11 +1,12 @@
 import React from "react";
 
 import { Sidebar } from "../components/Dashboard_Components/Sidebar";
-import Header from "../pages/Header";
+import Header from "./Header";
 import { Chip } from "@nextui-org/react";
 import { Tabs, Tab } from "@nextui-org/react";
 
 import AddItemForm from "./Add_gasket";
+import AllGaskets from "@/Sections/Inventory/AllGaskets";
 
 const Inventory = () => {
   return (
@@ -19,7 +20,18 @@ const Inventory = () => {
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
           <Tabs className="font-f1" size="md" variant="bordered" color="danger">
             <Tab key="Stocks" title="Stocks">
-              <h1>Stocks</h1>
+              <label className="font-f1">Select Item Type :</label><br></br>
+              <Tabs aria-label="Items" className="font-f1" size="lg">
+                <Tab key="gaskets" title="Gaskets">
+                  <AllGaskets />
+                </Tab>
+                <Tab key="pistons" title="Pistons">
+                  No Data
+                </Tab>
+                <Tab key="razors" title="Razors">
+                  No Data
+                </Tab>
+              </Tabs>
             </Tab>
             <Tab key="New Item" title="New Item">
               <AddItemForm />

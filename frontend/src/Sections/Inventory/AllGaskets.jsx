@@ -1,13 +1,27 @@
-import { Tabs, Tab, Button } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
-import axiosInstance from "../../config/axiosInstance";
+import {
+  Tabs,
+  Tab,
+  Input,
+  Button,
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Chip,
+} from "@nextui-org/react";
+import axiosInstance from "@/config/axiosInstance";
+import { User, Link } from "@nextui-org/react";
 
 const AllGaskets = () => {
-  // State variables
   const [gaskets, setGaskets] = useState([]);
   const [branches, setBranches] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
+  // Fetch the list of gaskets
   useEffect(() => {
     const fetchGaskets = async () => {
       try {
@@ -18,6 +32,7 @@ const AllGaskets = () => {
       }
     };
 
+    // Fetch the list of branches
     const fetchBranches = async () => {
       try {
         const response = await axiosInstance.get("/api/branches");
@@ -31,90 +46,142 @@ const AllGaskets = () => {
     fetchBranches();
   }, []);
 
-  // Filter gaskets based on selected branch
-  const filteredGaskets = selectedBranch
-    ? gaskets.filter((gasket) =>
-        gasket.stock.some((stock) => stock.branch?.name === selectedBranch)
-      )
-    : gaskets;
+  // Filter gaskets based on branch and search term
+  const filteredGaskets = gaskets.filter((gasket) => {
+    const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
+    const matchesBranch =
+      !selectedBranch ||
+      gasket.stock.some((stock) => stock.branch?.name === selectedBranch);
+    const matchesSearchTerm = searchWords.every(
+      (word) =>
+        gasket.part_number.toLowerCase().includes(word) ||
+        gasket.engine?.engine_name.toLowerCase().includes(word) ||
+        gasket.packing_type.toLowerCase().includes(word) ||
+        gasket.material_type.toLowerCase().includes(word) ||
+        gasket.vendor?.vendor_name.toLowerCase().includes(word)
+    );
+    return matchesBranch && matchesSearchTerm;
+  });
+
+  // Render stock details
+  const renderStockDetails = (gasket) => {
+    if (selectedBranch) {
+      const selectedStock = gasket.stock.find(
+        (stock) => stock.branch?.name === selectedBranch
+      );
+      return (
+        <div>
+          <p>{selectedStock?.quantity || "N/A"}</p>
+        </div>
+      );
+    }
+    return (
+      <Table aria-label="Stock details" className="min-w-[300px]" isStriped>
+        <TableHeader>
+          <TableColumn>Branch</TableColumn>
+          <TableColumn>Quantity</TableColumn>
+          <TableColumn>Last Updated</TableColumn>
+        </TableHeader>
+        <TableBody>
+          {gasket.stock.map((stock) => (
+            <TableRow key={stock._id}>
+              <TableCell>{stock.branch?.name || "N/A"}</TableCell>
+              <TableCell>{stock.quantity}</TableCell>
+              <TableCell>{stock.updated_by || "N/A"}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    );
+  };
 
   return (
-    <div>
-      <label className="font-f1">Select Branch :</label><br></br>
-      {/* Branch Filter Tabs */}
-      <Tabs
-        aria-label="Branch Filter"
-        selectedKey={selectedBranch}
-        onSelectionChange={setSelectedBranch}
-        className="mb-6"
-      >
-        {branches.map((branch) => (
-          <Tab key={branch.name} title={branch.name}>
-            {branch.name}
-          </Tab>
-        ))}
-      </Tabs>
+    <div className="container ">
+      <h1 className="text-2xl font-bold mb-6">Gasket Inventory</h1>
 
-      {/* Gaskets Table */}
-      <table className="font-f1 w-full border-collapse border border-gray-300">
-        <thead className="border border-gray-300">
-          <tr>
-            <th className="border border-gray-300 px-4 py-2">Part Number</th>
-            <th className="border border-gray-300 px-4 py-2">Added By</th>
-            <th className="border border-gray-300 px-4 py-2">Stock Details</th>
-          </tr>
-        </thead>
-        <tbody>
+      <div className="flex flex-col md:flex-row md:space-x-6">
+        <div className="mb-6">
+          <h2 className="text-lg font-f1 mb-2">Select Branch</h2>
+          <Tabs
+            aria-label="Branch Filter"
+            selectedKey={selectedBranch}
+            onSelectionChange={(key) => setSelectedBranch(key)}
+            variant="bordered"
+            color="primary"
+            className="font-f1"
+            size="md"
+          >
+            {branches.map((branch) => (
+              <Tab key={branch.name} title={`${branch.name} Branch`} />
+            ))}
+          </Tabs>
+        </div>
+
+        <div className="mb-6">
+          <h2 className="text-lg font-f1 mb-2 w-[300px]">Search Gaskets</h2>
+          <Input
+            aria-label="Search Gaskets"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search by Part Number, Description..."
+            variant="bordered"
+            className="font-f1"
+            fullWidth
+          />
+        </div>
+      </div>
+
+      <Table aria-label="Gaskets inventory" className="mb-6">
+        <TableHeader>
+          <TableColumn className="text-md font-f1">Part Number</TableColumn>
+          <TableColumn className="text-md font-f1">Description</TableColumn>
+          <TableColumn className="text-md font-f1">Brand</TableColumn>
+          <TableColumn className="text-md font-f1">
+            {selectedBranch ? `${selectedBranch} Stock` : "Stock"}
+          </TableColumn>
+          <TableColumn className="text-md font-f1">Last Updated By</TableColumn>
+          <TableColumn className="text-md font-f1">Actions</TableColumn>
+        </TableHeader>
+        <TableBody>
           {filteredGaskets.map((gasket) => (
-            <tr key={gasket._id} className="border border-gray-300">
-              <td className="border border-gray-300 px-4 py-2">
-                {gasket.part_number}
-              </td>
-              <td className="border border-gray-300 px-4 py-2">
-                {gasket.added_by}
-              </td>
-              <td className="border border-gray-300 px-4 py-2">
-                <table className="w-full border-collapse border border-gray-200">
-                  <thead>
-                    <tr>
-                      <th className="border border-gray-200 px-2 py-1">
-                        Branch
-                      </th>
-                      <th className="border border-gray-200 px-2 py-1">
-                        Quantity
-                      </th>
-                      <th className="border border-gray-200 px-2 py-1">
-                        Last Updated By
-                      </th>
-                      <th className="border border-gray-200 px-2 py-1">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {gasket.stock.map((stock) => (
-                      <tr key={stock._id}>
-                        <td className="border border-gray-200 px-2 py-1">
-                          {stock.branch?.name || "N/A"}
-                        </td>
-                        <td className="border border-gray-200 px-2 py-1">
-                          {stock.quantity}
-                        </td>
-                        <td className="border border-gray-200 px-2 py-1">
-                          {stock.updated_by}
-                        </td>
-                        <td className="border border-gray-200 px-2 py-1">
-                          <Button size="sm">Adjust Stock</Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </td>
-            </tr>
+            <TableRow key={gasket._id} className="font-f1">
+              <TableCell>{gasket.part_number}</TableCell>
+              <TableCell>
+                {gasket.engine?.engine_name} {gasket.packing_type}{" "}
+                {gasket.material_type}{" "}
+                <Chip
+                  color="primary"
+                  size="sm"
+                  variant="bordered"
+                  className="ml-4"
+                >
+                  {gasket.vendor?.vendor_name}
+                </Chip>
+              </TableCell>
+              <TableCell>{gasket.brand?.brand_name}</TableCell>
+              <TableCell>{renderStockDetails(gasket)}</TableCell>
+              <TableCell>
+                <User
+                  avatarProps={{
+                    src: "https://avatars.githubusercontent.com/u/30373425?v=4",
+                  }}
+                  description={
+                    <Link isExternal href="https://x.com/jrgarciadev" size="sm">
+                      @LoggedUserEmail
+                    </Link>
+                  }
+                  name="Logged User"
+                />
+              </TableCell>
+              <TableCell>
+                <Button size="sm" className="bg-black text-white">
+                  Adjust Stock
+                </Button>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 };

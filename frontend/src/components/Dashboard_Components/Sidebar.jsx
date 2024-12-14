@@ -1,12 +1,8 @@
 import { useState, useEffect } from 'react';
 
 const menuItems = [
-  { icon: '🏠', label: 'Dashboard', href: '#' },
-  { icon: '🚗', label: 'Vehicles', href: '#' },
-  { icon: '📊', label: 'Analytics', href: '#' },
-  { icon: '👥', label: 'Customers', href: '#' },
-  { icon: '📄', label: 'Reports', href: '#' },
-  { icon: '⚙️', label: 'Settings', href: '#' },
+  { label: 'Inventory Management', href: '/inventory' },
+  {  label: 'Delivery Management', href: '/deliveryManagement' },
 ];
 
 export function Sidebar() {

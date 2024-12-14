@@ -13,6 +13,7 @@ import CRB from "./pages/crb"
 
 //Sections
 import { DeliveryManagement } from "./pages/DeliveryManagementSection";
+import Inventory from "./pages/Inventory";
 
 
 const App = () => {
@@ -25,6 +26,7 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/signupwg" element={<SignupWG />} />
         <Route path="/crb" element={<CRB />} />
+        <Route path="/inventory" element={<Inventory />} />
       </Routes>
     </AuthProvider>
   );

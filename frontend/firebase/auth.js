@@ -1,5 +1,4 @@
 import { auth } from "./firebase";
-import axios from "axios";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -10,6 +9,8 @@ import {
   GoogleAuthProvider,
 } from "firebase/auth";
 
+//Controller for API ENDPOINT
+import axiosInstance from "@/config/axiosInstance";
 
 
 export const getIdToken = async () => {
@@ -52,8 +53,8 @@ export const doCreateUserWithEmailAndPassword = async (
     // console.log(userDetails.branch);
 
     // Send user details to the API endpoint
-    const response = await axios.post(
-      "http://localhost:8098/api/users",
+    const response = await axiosInstance.post(
+      "/api/users",
       userDetails,
       {
         headers: { "Content-Type": "application/json" },
@@ -102,8 +103,8 @@ export const doUpdateUserSignInWithGoogle = async (
       };
 
       // Send user details to the API endpoint
-      const response = await axios.post(
-        "http://localhost:8098/api/users",
+      const response = await axiosInstance.post(
+        "/api/users",
         userDetails,
         {
           headers: { "Content-Type": "application/json" },
@@ -151,8 +152,8 @@ export const doSignInWithGoogle = async () => {
         // userSessionEmitter.emit("userLoggedInEmail", email);
 
     // Check if the user already exists via API
-    const userResponse = await axios.get(
-      `http://localhost:8098/api/users/?id=${uid}`
+    const userResponse = await axiosInstance.get(
+      `/api/users/?id=${uid}`
     );
 
     let user = userResponse.data;

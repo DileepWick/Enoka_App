@@ -1,9 +1,8 @@
 import admin from 'firebase-admin';
-
-
+import serviceAccount from '../firebase/crb2k18-firebase-adminsdk-cqhpc-3aa248d8cc.json';
 // Initialize Firebase Admin SDK
 admin.initializeApp({
-  credential: admin.credential.applicationDefault(), // Or use a service account
+  credential: admin.credential.applicationDefault(serviceAccount), // Or use a service account
 });
 
 const validateFirebaseToken = async (req, res, next) => {

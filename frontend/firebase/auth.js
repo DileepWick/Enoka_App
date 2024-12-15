@@ -35,13 +35,6 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 
-export const getIdToken = async () => {
-  if (auth.currentUser) {
-    return await auth.currentUser.getIdToken();
-  } else {
-    throw new Error("No user is currently signed in.");
-  }
-};
 
 export const doCreateUserWithEmailAndPassword = async (
   email,
@@ -212,4 +205,18 @@ export const getUserSession = () => {
     email: sessionStorage.getItem("userLoggedInEmail"),
     token: sessionStorage.getItem("sessionToken"),
   };
+};
+
+
+export const getIdToken = async () => {
+  if (auth.currentUser) {
+    try {
+      return await auth.currentUser.getIdToken(true); // Fetch a fresh token
+    } catch (error) {
+      console.error("Error fetching ID token:", error);
+      throw error;
+    }
+  } else {
+    throw new Error("User is not authenticated.");
+  }
 };

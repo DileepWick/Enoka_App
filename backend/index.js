@@ -13,6 +13,9 @@ import deliveryItemRoutes from './routes/deliveryItemRoutes.js';
 import deliveryRoutes from './routes/deliveryRoutes.js';
 
 
+//Protected routes
+import validateFirebaseToken from "./routes/middlewareRoute.js";
+
 // Load environment variables from .env file
 import dotenv from 'dotenv';
 dotenv.config();
@@ -55,6 +58,18 @@ mongoose
     console.error("Error connecting to MongoDB");
   });
 
+
+
+
+// Protected route
+app.use("/api", validateFirebaseToken, (req, res) => {
+  res.json({ message: "Welcome to the protected route!", user: req.user });
+});
+
+// Public route
+app.get("/public", (req, res) => {
+  res.json({ message: "This is a public route." });
+});
 
 
 

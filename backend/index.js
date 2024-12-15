@@ -62,9 +62,9 @@ mongoose
 
 
 // Protected route
-app.use("/api", validateFirebaseToken, (req, res) => {
-  res.json({ message: "Welcome to the protected route!", user: req.user });
-});
+// app.use("/api", validateFirebaseToken, (req, res) => {
+//   res.json({ message: "Welcome to the protected route!", user: req.user });
+// });
 
 // Public route
 app.get("/public", (req, res) => {

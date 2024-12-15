@@ -8,6 +8,8 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   onAuthStateChanged,
+  setPersistence,
+  browserLocalPersistence,
 } from "firebase/auth";
 
 //Controller for API ENDPOINT

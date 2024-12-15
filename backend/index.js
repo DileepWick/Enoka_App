@@ -14,7 +14,7 @@ import deliveryRoutes from './routes/deliveryRoutes.js';
 
 
 //Protected routes
-import validateFirebaseToken from "./routes/middlewareRoute.js";
+import validateFirebaseToken from "./firebase/middlewareRoute.js";
 
 // Load environment variables from .env file
 import dotenv from 'dotenv';

@@ -1,5 +1,9 @@
 import admin from 'firebase-admin';
-import serviceAccount from '../firebase/crb2k18-firebase-adminsdk-cqhpc-3aa248d8cc.json';
+import fs from 'fs';
+
+// Read the service account key file
+const serviceAccount = JSON.parse(fs.readFileSync('firebase/firebaseadmin.json', 'utf8'));
+
 // Initialize Firebase Admin SDK
 admin.initializeApp({
   credential: admin.credential.applicationDefault(serviceAccount), // Or use a service account

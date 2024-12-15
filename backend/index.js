@@ -79,7 +79,7 @@ app.use('/api/vendors', vendorRoutes);
 app.use('/api/engines', engineRoutes);
 app.use('/api/brands', brandRoutes);
 app.use('/api/branches', branchRoutes); 
-app.use('/api/users', userRoutes); 
+app.use('/public/users', userRoutes); 
 app.use('/api/deliveries', deliveryRoutes);
 app.use('/api/delivery', deliveryRoutes);
 app.use('/api/deliveryItems', deliveryItemRoutes);

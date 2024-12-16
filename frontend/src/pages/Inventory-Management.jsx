@@ -46,7 +46,7 @@ const Inventory = () => {
                 variant="bordered"
                 color="primary"
               >
-                <Tab key="gaskets" title="GASKET">
+                <Tab key="gaskets" title="GASKET" className="text-sm">
                   <AddItemForm />
                 </Tab>
                 <Tab key="pistons" title="PISTON">

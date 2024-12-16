@@ -6,6 +6,9 @@ import Modal from "react-modal";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 
+//Styles
+import StyledSelect from "@/components/Inventory_Components/StyledSelect";
+
 Modal.setAppElement("#root");
 
 export default function AddItemForm() {
@@ -28,6 +31,19 @@ export default function AddItemForm() {
   const [currentModal, setCurrentModal] = useState(null);
   const [newItemName, setNewItemName] = useState("");
   const [isAddingItem, setIsAddingItem] = useState(false);
+
+  //
+  const Packing_options = [
+    { value: "FULLSET", label: "Full Set" },
+    { value: "HEADSET", label: "Head Set" },
+    { value: "GASKET ONLY", label: "Gasket Only" },
+  ];
+
+  const Material_options = [
+    { value: "STEEL", label: "STEEL" },
+    { value: "HELLITE", label: "HELLITE" },
+    { value: "WOG", label: "WOG" },
+  ];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -141,7 +157,7 @@ export default function AddItemForm() {
             >
               Part Number
             </label>
-            <Input
+            <input
               type="text"
               id="part_number"
               name="part_number"
@@ -150,6 +166,7 @@ export default function AddItemForm() {
               required
               size="sm"
               variant="bordered"
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black`}
             />
           </div>
 
@@ -160,35 +177,21 @@ export default function AddItemForm() {
             >
               Material Type
             </label>
-            <select
+            <StyledSelect
               id="material_type"
               name="material_type"
-              value={formData.material_type}
-              onChange={handleInputChange}
+              value={Material_options.find(
+                (option) => option.value === formData.material_type
+              )}
+              onChange={(selected) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  material_type: selected.value,
+                }))
+              }
+              options={Material_options}
               required
-              className="w-full px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  fontSize: "12px", // Decrease font size in the input
-                }),
-                menu: (base) => ({
-                  ...base,
-                  fontSize: "12px", // Decrease font size in dropdown menu
-                }),
-                option: (base) => ({
-                  ...base,
-                  fontSize: "12px", // Decrease font size in options
-                }),
-              }}
-            >
-              <option value="" className="text-[10PX]">
-                Select material type
-              </option>
-              <option value="STEEL">Steel</option>
-              <option value="HELLITE">Hellite</option>
-              <option value="WOG">WOG</option>
-            </select>
+            />
           </div>
 
           <div>
@@ -198,30 +201,32 @@ export default function AddItemForm() {
             >
               Packing Type
             </label>
-            <select
+            <StyledSelect
               id="packing_type"
               name="packing_type"
-              value={formData.packing_type}
-              onChange={handleInputChange}
+              value={Packing_options.find(
+                (option) => option.value === formData.packing_type
+              )}
+              onChange={(selected) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  packing_type: selected.value,
+                }))
+              }
+              options={Packing_options}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select packing type</option>
-              <option value="FULLSET">Full Set</option>
-              <option value="HEADSET">Head Set</option>
-              <option value="GASKET ONLY">Gasket Only</option>
-            </select>
+            />
           </div>
 
           <div className="flex items-end">
             <div className="flex-grow">
               <label
                 htmlFor="engine"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-xs font-medium text-gray-700 mb-1"
               >
                 Engine
               </label>
-              <Select
+              <StyledSelect
                 name="engine"
                 value={engines.find((e) => e._id === formData.engine)}
                 onChange={(selected) =>
@@ -244,7 +249,7 @@ export default function AddItemForm() {
               >
                 Brand
               </label>
-              <Select
+              <StyledSelect
                 name="brand"
                 value={brands.find((b) => b._id === formData.brand)}
                 onChange={(selected) =>
@@ -267,7 +272,7 @@ export default function AddItemForm() {
               >
                 Vendor
               </label>
-              <Select
+              <StyledSelect
                 name="vendor"
                 value={vendors.find((v) => v._id === formData.vendor)}
                 onChange={(selected) =>

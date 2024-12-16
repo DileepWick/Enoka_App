@@ -11,6 +11,7 @@ import userRoutes from './routes/userRoutes.js';
 import branchRoutes from './routes/branchRoutes.js';
 import deliveryItemRoutes from './routes/deliveryItemRoutes.js';
 import deliveryRoutes from './routes/deliveryRoutes.js';
+import stockRoutes from './routes/stockRoutes.js';
 
 
 //Protected routes
@@ -83,4 +84,5 @@ app.use('/api/users', validateFirebaseToken, userRoutes);
 app.use('/api/deliveries', validateFirebaseToken, deliveryRoutes);
 app.use('/api/delivery', validateFirebaseToken, deliveryRoutes);
 app.use('/api/deliveryItems', validateFirebaseToken, deliveryItemRoutes);
+app.use('/api/stocks', validateFirebaseToken, stockRoutes);
 

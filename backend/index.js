@@ -62,9 +62,9 @@ mongoose
 
 
 // Protected route
-app.use("/api", validateFirebaseToken, (req, res) => {
-  res.json({ message: "Welcome to the protected route!", user: req.user });
-});
+// app.use("/api", validateFirebaseToken, (req, res) => {
+//   res.json({ message: "Welcome to the protected route!", user: req.user });
+// });
 
 // Public route
 app.get("/public", (req, res) => {
@@ -74,13 +74,13 @@ app.get("/public", (req, res) => {
 
 
 // Routes
-app.use('/api/gaskets', gasketRoutes);
-app.use('/api/vendors', vendorRoutes);
-app.use('/api/engines', engineRoutes);
-app.use('/api/brands', brandRoutes);
-app.use('/api/branches', branchRoutes); 
-app.use('/public/users', userRoutes); 
-app.use('/api/deliveries', deliveryRoutes);
-app.use('/api/delivery', deliveryRoutes);
-app.use('/api/deliveryItems', deliveryItemRoutes);
+app.use('/api/gaskets', validateFirebaseToken, gasketRoutes);
+app.use('/api/vendors', validateFirebaseToken, vendorRoutes);
+app.use('/api/engines', validateFirebaseToken, engineRoutes);
+app.use('/api/brands', validateFirebaseToken, brandRoutes);
+app.use('/api/branches', validateFirebaseToken, branchRoutes); 
+app.use('/api/users', validateFirebaseToken, userRoutes); 
+app.use('/api/deliveries', validateFirebaseToken, deliveryRoutes);
+app.use('/api/delivery', validateFirebaseToken, deliveryRoutes);
+app.use('/api/deliveryItems', validateFirebaseToken, deliveryItemRoutes);
 

@@ -13,7 +13,7 @@ export const fetchGaskets = async () => {
 };
 
 // Function to update stock
-export const updateStock = async (stockId, quantity) => {
+export const updateStock = async (stockId, quantity, updatedBy) => {
   try {
     const response = await axiosInstance.put(
       `/api/stocks/updateStockQuantity/${stockId}`,

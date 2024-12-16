@@ -10,6 +10,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { updateStock } from "@/services/inventoryServices"; // Import your service function
+import { toast } from "react-toastify";
 
 const Adjust_Stock_Button = ({ stockid, currentStock }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -23,11 +24,20 @@ const Adjust_Stock_Button = ({ stockid, currentStock }) => {
     setError(null); // Reset error before starting the update
     try {
       // Call the service to update the stock quantity
-      const response = await updateStock(stockid, newQuantity);
+      const response = await updateStock(stockid, newQuantity, "Session User");
 
       // Handle the successful update (e.g., show a success message)
       console.log("Stock updated successfully:", response);
-      alert("Stock quantity updated successfully!");
+      toast.success("Stock updated successfully", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        progress: undefined,
+        theme: "colored",
+      });
 
       // Close the modal after successful update
       onOpenChange(false);
@@ -48,30 +58,38 @@ const Adjust_Stock_Button = ({ stockid, currentStock }) => {
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           <ModalHeader>
-            <h3>Adjust Stock Quantity</h3>
+            <h3 className="font-f1">Adjust Stock Quantity</h3>
           </ModalHeader>
           <ModalBody>
             <div>
-              <h4>Current Stock: {currentStock}</h4>
-              <h4>Stock ID: {stockid}</h4>
               <Input
                 type="number"
                 value={newQuantity}
                 onChange={(e) => setNewQuantity(Number(e.target.value))}
-                label="New Quantity"
+                label="Adjust Stock Quantity"
                 min={0}
+                size="lg"
                 fullWidth
-                aria-label="New Stock Quantity"
+                className="font-f1"
+                aria-label="Adjust Stock Quantity"
               />
-              {error && <p className="text-red-500 mt-2">{error}</p>} {/* Display error message */}
+              {error && <p className="text-red-500 mt-2">{error}</p>}{" "}
+              {/* Display error message */}
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button onPress={() => onOpenChange(false)} color="error" flat>
+            <Button
+              onPress={() => onOpenChange(false)}
+              color="danger"
+              flat
+              className="font-f1"
+              variant="bordered"
+            >
               Cancel
             </Button>
             <Button
               onPress={handleUpdateStock}
+              className="bg-black text-white font-f1"
               disabled={loading || newQuantity < 0} // Disable button if loading or quantity is invalid
             >
               {loading ? "Updating..." : "Update Stock"}

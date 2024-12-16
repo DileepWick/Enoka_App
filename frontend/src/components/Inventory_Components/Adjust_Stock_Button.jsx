@@ -71,7 +71,7 @@ const Adjust_Stock_Button = ({ stockid, currentStock }) => {
 
   return (
     <>
-      <Button onPress={onOpen} className="bg-black text-white">
+      <Button onPress={onOpen} className="bg-black text-white" size="sm">
         Adjust Stock
       </Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>

@@ -59,7 +59,6 @@ const AllGaskets = () => {
     return () => {
       emitter.off("stockUpdated", stockUpdatedListener);
     };
-
   }, []);
 
   // Filter gaskets based on branch and search term
@@ -112,12 +111,10 @@ const AllGaskets = () => {
   };
 
   return (
-    <div className="container ">
-      <h1 className="text-2xl font-bold mb-6">Gasket Inventory</h1>
-
+    <div className="container">
       <div className="flex flex-col md:flex-row md:space-x-6">
         <div className="mb-6">
-          <h2 className="text-lg font-f1 mb-2">Select Branch</h2>
+          <h2 className="text-sm font-f1 mb-2">Select Branch</h2>
           <Tabs
             aria-label="Branch Filter"
             selectedKey={selectedBranch}
@@ -125,7 +122,7 @@ const AllGaskets = () => {
             variant="bordered"
             color="primary"
             className="font-f1"
-            size="md"
+            size="sm"
           >
             {branches.map((branch) => (
               <Tab key={branch.name} title={`${branch.name} Branch`} />
@@ -134,7 +131,7 @@ const AllGaskets = () => {
         </div>
 
         <div className="mb-6">
-          <h2 className="text-lg font-f1 mb-2 w-[300px]">Search Gaskets</h2>
+          <h2 className="text-sm font-f1 mb-2 w-[300px]">Search Gaskets</h2>
           <Input
             aria-label="Search Gaskets"
             value={searchTerm}
@@ -143,20 +140,21 @@ const AllGaskets = () => {
             variant="bordered"
             className="font-f1"
             fullWidth
+            size="md"
           />
         </div>
       </div>
 
       <Table aria-label="Gaskets inventory" className="mb-6">
         <TableHeader>
-          <TableColumn className="text-md font-f1">Part Number</TableColumn>
-          <TableColumn className="text-md font-f1">Description</TableColumn>
-          <TableColumn className="text-md font-f1">Brand</TableColumn>
-          <TableColumn className="text-md font-f1">
+          <TableColumn className="text-sm font-f1">Part Number</TableColumn>
+          <TableColumn className="text-sm font-f1">Description</TableColumn>
+          <TableColumn className="text-sm font-f1">Brand</TableColumn>
+          <TableColumn className="text-sm font-f1">
             {selectedBranch ? `${selectedBranch} Stock` : "Stock"}
           </TableColumn>
-          <TableColumn className="text-md font-f1">Last Updated By</TableColumn>
-          <TableColumn className="text-md font-f1">Actions</TableColumn>
+          <TableColumn className="text-sm font-f1">Last Updated By</TableColumn>
+          <TableColumn className="text-sm font-f1">Actions</TableColumn>
         </TableHeader>
         <TableBody>
           {filteredGaskets.map((gasket) => (

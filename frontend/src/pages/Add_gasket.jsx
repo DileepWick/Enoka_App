@@ -4,6 +4,7 @@ import axiosInstance from "@/config/axiosInstance";
 import Select from "react-select";
 import Modal from "react-modal";
 import { Button } from "@nextui-org/react";
+import { Input } from "@nextui-org/react";
 
 Modal.setAppElement("#root");
 
@@ -15,7 +16,7 @@ export default function AddItemForm() {
     engine: "",
     brand: "",
     vendor: "",
-    added_by: "Admin"
+    added_by: "Admin",
   });
 
   const [vendors, setVendors] = useState([]);
@@ -31,11 +32,12 @@ export default function AddItemForm() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [vendorsResponse, brandsResponse, enginesResponse] = await Promise.all([
-          axiosInstance.get("/api/vendors"),
-          axiosInstance.get("/api/brands"),
-          axiosInstance.get("/api/engines"),
-        ]);
+        const [vendorsResponse, brandsResponse, enginesResponse] =
+          await Promise.all([
+            axiosInstance.get("/api/vendors"),
+            axiosInstance.get("/api/brands"),
+            axiosInstance.get("/api/engines"),
+          ]);
 
         setVendors(vendorsResponse.data);
         setBrands(brandsResponse.data);
@@ -52,7 +54,7 @@ export default function AddItemForm() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const openModal = (type) => {
@@ -73,15 +75,15 @@ export default function AddItemForm() {
       const endpoints = {
         engine: { url: "engines", key: "engine_name", setter: setEngines },
         brand: { url: "brands", key: "brand_name", setter: setBrands },
-        vendor: { url: "vendors", key: "vendor_name", setter: setVendors }
+        vendor: { url: "vendors", key: "vendor_name", setter: setVendors },
       };
 
       const { url, key, setter } = endpoints[currentModal];
       const response = await axiosInstance.post(`/api/${url}`, {
-        [key]: newItemName
+        [key]: newItemName,
       });
 
-      setter(prev => [...prev, response.data]);
+      setter((prev) => [...prev, response.data]);
       closeModal();
     } catch (err) {
       alert(err.response?.data?.message || "Failed to add item");
@@ -103,12 +105,12 @@ export default function AddItemForm() {
         engine: "",
         brand: "",
         vendor: "",
-        added_by: "Admin"
+        added_by: "Admin",
       });
     } catch (err) {
       setSubmitStatus({
         type: "error",
-        message: err.response?.data?.error || "Failed to create gasket"
+        message: err.response?.data?.error || "Failed to create gasket",
       });
     }
   };
@@ -117,11 +119,15 @@ export default function AddItemForm() {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="max-w-4xl mx-auto p-6 mt-8">
-      <h1 className="text-2xl font-bold mb-6 text-center">Add New Gasket</h1>
+    <div className="max-w-4xl mx-auto p-6 ">
+      <h1 className="text-2xl font-f1 mb-6 text-center">Add New Gasket</h1>
 
       {submitStatus && (
-        <div className={`mb-6 p-4 rounded-md ${submitStatus.type === "success" ? "bg-green-100" : "bg-red-100"}`}>
+        <div
+          className={`mb-6 p-4 rounded-md ${
+            submitStatus.type === "success" ? "bg-green-100" : "bg-red-100"
+          }`}
+        >
           {submitStatus.message}
         </div>
       )}
@@ -129,29 +135,56 @@ export default function AddItemForm() {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="part_number" className="block text-sm font-medium text-gray-700 mb-1">Part Number</label>
-            <input
+            <label
+              htmlFor="part_number"
+              className="block text-sm font-f1 text-gray-700 mb-1"
+            >
+              Part Number
+            </label>
+            <Input
               type="text"
               id="part_number"
               name="part_number"
               value={formData.part_number}
               onChange={handleInputChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              size="sm"
+              variant="bordered"
             />
           </div>
 
           <div>
-            <label htmlFor="material_type" className="block text-sm font-medium text-gray-700 mb-1">Material Type</label>
+            <label
+              htmlFor="material_type"
+              className="block text-sm font-f1 text-gray-700 mb-1"
+            >
+              Material Type
+            </label>
             <select
               id="material_type"
               name="material_type"
               value={formData.material_type}
               onChange={handleInputChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  fontSize: "12px", // Decrease font size in the input
+                }),
+                menu: (base) => ({
+                  ...base,
+                  fontSize: "12px", // Decrease font size in dropdown menu
+                }),
+                option: (base) => ({
+                  ...base,
+                  fontSize: "12px", // Decrease font size in options
+                }),
+              }}
             >
-              <option value="">Select material type</option>
+              <option value="" className="text-[10PX]">
+                Select material type
+              </option>
               <option value="STEEL">Steel</option>
               <option value="HELLITE">Hellite</option>
               <option value="WOG">WOG</option>
@@ -159,7 +192,12 @@ export default function AddItemForm() {
           </div>
 
           <div>
-            <label htmlFor="packing_type" className="block text-sm font-medium text-gray-700 mb-1">Packing Type</label>
+            <label
+              htmlFor="packing_type"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Packing Type
+            </label>
             <select
               id="packing_type"
               name="packing_type"
@@ -177,14 +215,21 @@ export default function AddItemForm() {
 
           <div className="flex items-end">
             <div className="flex-grow">
-              <label htmlFor="engine" className="block text-sm font-medium text-gray-700 mb-1">Engine</label>
+              <label
+                htmlFor="engine"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Engine
+              </label>
               <Select
                 name="engine"
-                value={engines.find(e => e._id === formData.engine)}
-                onChange={(selected) => setFormData(prev => ({ ...prev, engine: selected._id }))}
+                value={engines.find((e) => e._id === formData.engine)}
+                onChange={(selected) =>
+                  setFormData((prev) => ({ ...prev, engine: selected._id }))
+                }
                 options={engines}
-                getOptionLabel={option => option.engine_name}
-                getOptionValue={option => option._id}
+                getOptionLabel={(option) => option.engine_name}
+                getOptionValue={(option) => option._id}
                 className="react-select-container"
                 classNamePrefix="react-select"
               />
@@ -193,14 +238,21 @@ export default function AddItemForm() {
 
           <div className="flex items-end">
             <div className="flex-grow">
-              <label htmlFor="brand" className="block text-sm font-medium text-gray-700 mb-1">Brand</label>
+              <label
+                htmlFor="brand"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Brand
+              </label>
               <Select
                 name="brand"
-                value={brands.find(b => b._id === formData.brand)}
-                onChange={(selected) => setFormData(prev => ({ ...prev, brand: selected._id }))}
+                value={brands.find((b) => b._id === formData.brand)}
+                onChange={(selected) =>
+                  setFormData((prev) => ({ ...prev, brand: selected._id }))
+                }
                 options={brands}
-                getOptionLabel={option => option.brand_name}
-                getOptionValue={option => option.brand_id}
+                getOptionLabel={(option) => option.brand_name}
+                getOptionValue={(option) => option.brand_id}
                 className="react-select-container"
                 classNamePrefix="react-select"
               />
@@ -209,22 +261,29 @@ export default function AddItemForm() {
 
           <div className="flex items-end">
             <div className="flex-grow">
-              <label htmlFor="vendor" className="block text-sm font-medium text-gray-700 mb-1">Vendor</label>
+              <label
+                htmlFor="vendor"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Vendor
+              </label>
               <Select
                 name="vendor"
-                value={vendors.find(v => v._id === formData.vendor)}
-                onChange={(selected) => setFormData(prev => ({ ...prev, vendor: selected._id }))}
+                value={vendors.find((v) => v._id === formData.vendor)}
+                onChange={(selected) =>
+                  setFormData((prev) => ({ ...prev, vendor: selected._id }))
+                }
                 options={vendors}
-                getOptionLabel={option => option.vendor_name}
-                getOptionValue={option => option._id}
-                className="react-select-container"
+                getOptionLabel={(option) => option.vendor_name}
+                getOptionValue={(option) => option._id}
+                className="react-select-container font-f1 text-[px]"
                 classNamePrefix="react-select"
               />
             </div>
           </div>
         </div>
 
-        <Button type="submit" className="w-full" variant="ghost" color="primary" size="lg">
+        <Button type="submit" className="w-full bg-black text-white" size="lg">
           Add Gasket
         </Button>
       </form>
@@ -239,14 +298,14 @@ export default function AddItemForm() {
           className="w-full px-3 py-2 border border-gray-300 rounded-md mb-4"
         />
         <div className="flex justify-end">
-          <button 
-            onClick={handleAddNew} 
+          <button
+            onClick={handleAddNew}
             disabled={isAddingItem}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mr-2"
           >
             Add
           </button>
-          <button 
+          <button
             onClick={closeModal}
             className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
           >

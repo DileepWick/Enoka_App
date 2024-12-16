@@ -18,6 +18,9 @@ import { User, Link } from "@nextui-org/react";
 //Buttons
 import Adjust_Stock_Button from "@/components/Inventory_Components/Adjust_Stock_Button";
 
+//Emitter
+import emitter from "../../../util/emitter.js";
+
 const AllGaskets = () => {
   const [gaskets, setGaskets] = useState([]);
   const [branches, setBranches] = useState([]);
@@ -47,6 +50,16 @@ const AllGaskets = () => {
 
     fetchGaskets();
     fetchBranches();
+
+    // Register the stockUpdated event listener
+    const stockUpdatedListener = () => fetchGaskets();
+    emitter.on("stockUpdated", stockUpdatedListener);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      emitter.off("stockUpdated", stockUpdatedListener);
+    };
+
   }, []);
 
   // Filter gaskets based on branch and search term

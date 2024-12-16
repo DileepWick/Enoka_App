@@ -12,11 +12,27 @@ import {
 import { updateStock } from "@/services/inventoryServices"; // Import your service function
 import { toast } from "react-toastify";
 
+//Emiiter
+import emitter from "../../../util/emitter.js";
+
 const Adjust_Stock_Button = ({ stockid, currentStock }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [newQuantity, setNewQuantity] = useState(currentStock); // To store the new quantity
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+
+  // Handle input change
+  const handleChange = (e) => {
+    const value = e.target.value;
+    
+    // Check if the value is empty (for clearing the input)
+    if (value === "") {
+      setNewQuantity(""); // Allow clearing the input
+    } else if (!isNaN(value) && Number(value) >= 0) {
+      setNewQuantity(Number(value)); // Only set the value if it's a valid number
+    }
+  };
 
   // Handle stock update
   const handleUpdateStock = async () => {
@@ -38,6 +54,9 @@ const Adjust_Stock_Button = ({ stockid, currentStock }) => {
         progress: undefined,
         theme: "colored",
       });
+
+      // Emit an event to notify other components
+      emitter.emit("stockUpdated");
 
       // Close the modal after successful update
       onOpenChange(false);
@@ -65,7 +84,7 @@ const Adjust_Stock_Button = ({ stockid, currentStock }) => {
               <Input
                 type="number"
                 value={newQuantity}
-                onChange={(e) => setNewQuantity(Number(e.target.value))}
+                onChange={handleChange}
                 label="Adjust Stock Quantity"
                 min={0}
                 size="lg"

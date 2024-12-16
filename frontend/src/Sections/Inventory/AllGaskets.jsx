@@ -15,6 +15,9 @@ import {
 import axiosInstance from "@/config/axiosInstance";
 import { User, Link } from "@nextui-org/react";
 
+//Buttons
+import Adjust_Stock_Button from "@/components/Inventory_Components/Adjust_Stock_Button";
+
 const AllGaskets = () => {
   const [gaskets, setGaskets] = useState([]);
   const [branches, setBranches] = useState([]);
@@ -174,9 +177,33 @@ const AllGaskets = () => {
                 />
               </TableCell>
               <TableCell>
-                <Button size="sm" className="bg-black text-white">
-                  Adjust Stock
-                </Button>
+                {selectedBranch ? (
+                  // If a branch is selected, find the stock for that branch
+                  gasket.stock.some(
+                    (stock) => stock.branch?.name === selectedBranch
+                  ) ? (
+                    gasket.stock
+                      .filter((stock) => stock.branch?.name === selectedBranch)
+                      .map((selectedStock) => (
+                        <Adjust_Stock_Button
+                          key={selectedStock._id}
+                          stockid={selectedStock._id}
+                          currentStock={selectedStock.quantity || 0}
+                        />
+                      ))
+                  ) : (
+                    <p>No stock available for {selectedBranch}</p>
+                  )
+                ) : (
+                  // If no branch is selected, display all stock options with action buttons
+                  gasket.stock.map((stock) => (
+                    <Adjust_Stock_Button
+                      key={stock._id}
+                      stockid={stock._id}
+                      currentStock={stock.quantity || 0}
+                    />
+                  ))
+                )}
               </TableCell>
             </TableRow>
           ))}

@@ -219,7 +219,7 @@ const AllGaskets = () => {
                 )}
               </TableCell>
               <TableCell>
-                <Delete_Gasket gasketid={gasket._id} engine={gasket.engine?.engine_name} brand={gasket.brand?.brand_name} packing={gasket.packing_type} material={gasket.material_type} vendor={gasket.vendor?.vendor_name}/>
+                <Delete_Gasket gasketId={gasket._id} engine={gasket.engine?.engine_name} brand={gasket.brand?.brand_name} packing={gasket.packing_type} material={gasket.material_type} vendor={gasket.vendor?.vendor_name}/>
               </TableCell>
             </TableRow>
           ))}

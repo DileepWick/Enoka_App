@@ -65,6 +65,9 @@ const Delete_Gasket = ({
               Are you sure you want to delete this gasket?
             </p>
             <p className="font-f1">
+              <strong>Gasket ID:</strong> {gasketId}
+            </p>
+            <p className="font-f1">
               <strong>Engine:</strong> {engine}
             </p>
             <p className="font-f1">

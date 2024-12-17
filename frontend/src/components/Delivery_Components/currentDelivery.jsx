@@ -6,17 +6,15 @@ import axiosInstance from "@/config/axiosInstance";
 import { useState, useEffect } from "react";
 import { removeDelivery } from "@/services/deliveryServices";
 import { Button, Checkbox, Chip, Divider, Progress } from "@nextui-org/react";
-<<<<<<< Updated upstream
-=======
 import { toast } from "react-toastify";
->>>>>>> Stashed changes
+
 
 //Components
 import EditQtyBtn from "./buttons/deliveryItemQuantityEditBtn";
 
 //Emitter
 import emitter from "../../../util/emitter.js";
-import { toast } from "react-toastify";
+
 
 const CurrentDelivery = () => {
   //States
@@ -84,11 +82,6 @@ const CurrentDelivery = () => {
     emitter.on("deliveryItemAdded", handleDeliveryItemCreated);
     emitter.on("deliveryItemQuantityUpdated", handleDeliveryItemCreated);
 
-<<<<<<< Updated upstream
-=======
-    //Receive stock id from GasketList
-
->>>>>>> Stashed changes
     // Cleanup listeners on unmount
     return () => {
       emitter.off("deliveryCreated", handleDeliveryCreated);
@@ -148,11 +141,9 @@ const CurrentDelivery = () => {
       await axiosInstance.put(`/api/delivery/${newDelivery._id}/status`, {
         status: "on delivery",
       });
-<<<<<<< Updated upstream
-      alert("Delivery started successfully.");
-=======
       toast.success("Delivery started successfully!");
->>>>>>> Stashed changes
+
+
       emitter.emit("deliveryStarted");
       setNewDelivery(null);
       setDeliveryItems([]);
@@ -163,7 +154,6 @@ const CurrentDelivery = () => {
   };
 
   //Remove Item
-<<<<<<< Updated upstream
   const handleRemoveItem = async (itemId, stockId, quantity) => {
     try {
       // Perform both actions simultaneously
@@ -175,19 +165,6 @@ const CurrentDelivery = () => {
       ]);
   
       // Update frontend states
-=======
-  const handleRemoveItem = async (itemId,stockId) => {
-    try {
-      // Remove item from backend
-      await axiosInstance.delete(
-        `/api/deliveryItems/deleteDeliveryItem/${itemId}`
-      );
-
-      //Increase stock quantity
-      await axiosInstance.put(`/api/stocks/increaseStockQuantity/${stockId}`, { quantity: quantity });
-
-      // Remove item locally from delivery items
->>>>>>> Stashed changes
       const updatedItems = deliveryItems.filter((item) => item._id !== itemId);
       setDeliveryItems(updatedItems);
       const updatedCheckedItems = { ...checkedItems };
@@ -277,7 +254,7 @@ const CurrentDelivery = () => {
                           onValueChange={() => handleCheckboxChange(item._id)}
                         />
                       </td>
-                      <td className="border px-2 py-2">{item.item.stock}</td>
+                      <td className="border px-2 py-2">{item.stock}</td>
                       <td className="border px-2 py-2">{item.quantity}</td>
                       <td className="border px-2 py-2">
                         <div className="flex items-center space-x-2">

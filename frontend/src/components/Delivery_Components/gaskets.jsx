@@ -250,14 +250,6 @@ const GasketList = ({}) => {
                                     stockId={stock._id}
                                   />
                                 </td>
-                                <td className="border border-gray-300 px-4 py-2">
-                                  <ItemAddToDeliveryButton
-                                    item_id={gasket._id}
-                                    delivery_id={delivery._id}
-                                    item_description={gasket.part_number}
-                                    stockid={stock._id}
-                                  />
-                                </td>
                               </tr>
                             ))}
                           </tbody>

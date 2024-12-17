@@ -14,16 +14,14 @@ import {
 //Controller for API ENDPOINT
 import axiosInstance from "@/config/axiosInstance";
 
+import { toast } from "react-toastify";
 
-
-//Emmiter
-import emitter from "../../../../util/emitter.js";
-
-<<<<<<< Updated upstream
-const ItemAddToDeliveryButton = ({ item_id, delivery_id ,item_description ,stockid}) => {
-=======
-const ItemAddToDeliveryButton = ({ item_id, delivery_id ,stockId, item_description }) => {
->>>>>>> Stashed changes
+const ItemAddToDeliveryButton = ({
+  item_id,
+  delivery_id,
+  stockId,
+  item_description,
+}) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [quantity, setQuantity] = useState("");
   const [error, setError] = useState("");
@@ -31,7 +29,14 @@ const ItemAddToDeliveryButton = ({ item_id, delivery_id ,stockId, item_descripti
 
   // Handle form submission for new delivery item creation
   const handleSubmit = async (e) => {
+    if (!stockId) {
+      toast.error("Stock ID not found. Please try again.");
+      return;
+    }
+
     e.preventDefault(); // Prevent the default form submission
+
+    console.log("Props received:", { item_id, delivery_id, stockId });
 
     if (!quantity || isNaN(quantity) || quantity <= 0) {
       setError("Please provide a valid quantity.");
@@ -39,37 +44,36 @@ const ItemAddToDeliveryButton = ({ item_id, delivery_id ,stockId, item_descripti
     }
 
     try {
+      console.log("Payload being sent:", {
+        item: item_id,
+        quantity: quantity,
+        deliveryId: delivery_id,
+        stock: stockId,
+      });
+
       const response = await axiosInstance.post(
         "/api/deliveryItems/createDeliveryItem",
         {
           item: item_id, // Use the item_id passed as a prop
           quantity: quantity,
           deliveryId: delivery_id, // Use the delivery_id passed as a props
-          stock: stockid,
+          stock: stockId,
         }
       );
 
+      //Console log the response
+      console.log("Delivery item created:", response.data);
+
       //Decrease stock quantity
-<<<<<<< Updated upstream
-      await axiosInstance.put(`/api/stocks/decreaseStockQuantity/${stockid}`, {
+      await axiosInstance.put(`/api/stocks/decreaseStockQuantity/${stockId}`, {
         quantity: quantity,
       });
-=======
-      await axiosInstance.put(`/api/stocks/decreaseStockQuantity/${stockId}`, { quantity: quantity });
-
-      //Emit the stock id tp current delivery
-      emitter.emit("stockIdAdded", stockId);
->>>>>>> Stashed changes
 
       // Check if the delivery item creation was successful
       if (response.status === 201) {
         setError(""); // Clear error message if the request is successful
         setQuantity(""); // Clear the quantity field after success
         onOpenChange(false);
-
-        // Emit an event to notify the parent component that the delivery item was added
-        emitter.emit("deliveryItemAdded");
-      
       }
     } catch (error) {
       console.error("Error creating delivery item:", error.message);
@@ -87,10 +91,15 @@ const ItemAddToDeliveryButton = ({ item_id, delivery_id ,stockId, item_descripti
   return (
     <>
       <Button onPress={onOpen}>Add + </Button>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} onClose={handleClose} size="lg">
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        onClose={handleClose}
+        size="lg"
+      >
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1 font-f1">
-             {item_description}
+            {item_description}
           </ModalHeader>
           <ModalBody>
             <form onSubmit={handleSubmit}>
@@ -100,14 +109,20 @@ const ItemAddToDeliveryButton = ({ item_id, delivery_id ,stockId, item_descripti
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
                 className="font-f1"
-                label="Quantity" placeholder="Enter your quantity"
+                label="Quantity"
+                placeholder="Enter your quantity"
                 required
               />
               {error && <p className="text-red-500">{error}</p>}
               {successMessage && (
                 <p className="text-green-500">{successMessage}</p>
               )}
-              <Button type="submit" className="mt-8 mb-8 font-f1 bg-black text-white">Add Item</Button>
+              <Button
+                type="submit"
+                className="mt-8 mb-8 font-f1 bg-black text-white"
+              >
+                Add Item
+              </Button>
             </form>
           </ModalBody>
         </ModalContent>

@@ -8,13 +8,11 @@ import { removeDelivery } from "@/services/deliveryServices";
 import { Button, Checkbox, Chip, Divider, Progress } from "@nextui-org/react";
 import { toast } from "react-toastify";
 
-
 //Components
 import EditQtyBtn from "./buttons/deliveryItemQuantityEditBtn";
 
 //Emitter
 import emitter from "../../../util/emitter.js";
-
 
 const CurrentDelivery = () => {
   //States
@@ -38,6 +36,7 @@ const CurrentDelivery = () => {
     }
   };
 
+  // Fetch latest pending delivery
   useEffect(() => {
     const fetchLatestPendingDelivery = async () => {
       try {
@@ -79,13 +78,13 @@ const CurrentDelivery = () => {
 
     // Subscribe to the events
     emitter.on("deliveryCreated", handleDeliveryCreated);
-    emitter.on("deliveryItemAdded", handleDeliveryItemCreated);
+    emitter.on("deliveryItemCreated", handleDeliveryItemCreated);
     emitter.on("deliveryItemQuantityUpdated", handleDeliveryItemCreated);
 
     // Cleanup listeners on unmount
     return () => {
       emitter.off("deliveryCreated", handleDeliveryCreated);
-      emitter.off("deliveryItemAdded", handleDeliveryItemCreated);
+      emitter.off("deliveryItemCreated", handleDeliveryItemCreated);
     };
   }, []);
 
@@ -143,7 +142,6 @@ const CurrentDelivery = () => {
       });
       toast.success("Delivery started successfully!");
 
-
       emitter.emit("deliveryStarted");
       setNewDelivery(null);
       setDeliveryItems([]);
@@ -163,20 +161,23 @@ const CurrentDelivery = () => {
           quantity,
         }),
       ]);
-  
+
+      toast.success("Item removed successfully!");
+
+      // Emit the event to notify GasketList
+      emitter.emit("deliveryItemRemoved");
+
       // Update frontend states
       const updatedItems = deliveryItems.filter((item) => item._id !== itemId);
       setDeliveryItems(updatedItems);
       const updatedCheckedItems = { ...checkedItems };
       delete updatedCheckedItems[itemId];
       setCheckedItems(updatedCheckedItems);
-      
     } catch (error) {
       console.error("Error removing item:", error.message);
       toast.error("Error removing item. Please try again.");
     }
   };
-
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 font-f1 text-black">
@@ -195,17 +196,6 @@ const CurrentDelivery = () => {
             </div>
             <Divider className="my-4 border-gray-700" />
 
-            <div className="my-6">
-              <Progress
-                value={progressPercentage}
-                color="danger"
-                className="h-4 rounded-lg "
-              />
-              <p className="mt-2 text-center text-sm">
-                {checkedCount} / {deliveryItems.length} items checked (
-                {Math.round(progressPercentage)}%)
-              </p>
-            </div>
             <div className="flex flex-col sm:flex-row justify-between mt-4">
               <Button
                 className="w-full sm:w-auto mb-4 sm:mb-0 bg-black text-white"
@@ -229,44 +219,78 @@ const CurrentDelivery = () => {
             {/* Delivery Items */}
             <Divider className="my-6 border-black" />
             <h2 className="text-2xl font-f1 mb-4 sm:mb-6 ">Delivery Items</h2>
+            <div className="my-6">
+              <Progress
+                value={progressPercentage}
+                color="danger"
+                className="h-4 rounded-lg "
+              />
+              <p className="mt-2 text-center text-sm">
+                {checkedCount} / {deliveryItems.length} items checked (
+                {Math.round(progressPercentage)}%)
+              </p>
+            </div>
             <div
               className="overflow-x-auto overflow-y-auto max-h-64  rounded-lg p-2"
               style={{ scrollbarWidth: "thin" }}
             >
-              <table className="min-w-full table-auto text-xs sm:text-sm">
+              <table className="min-w-full table-auto text-xs sm:text-sm border-collapse">
                 <thead>
-                  <tr>
-                    <th className="border px-2 py-2 text-left " colSpan={2}>
-                      Item
+                  <tr className="bg-gray-200 text-gray-700">
+                    <th className="border px-4 py-2 text-center w-12">
+                      Select
                     </th>
-                    <th className="border px-2 py-2 text-left ">Quantity</th>
-                    <th className="border px-2 py-2 text-left ">Actions</th>
+                    <th className="border px-4 py-2 text-left">Item</th>
+                    <th className="border px-4 py-2 text-center">Quantity</th>
+                    <th className="border px-4 py-2 text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {deliveryItems.map((item) => (
-                    <tr key={item._id}>
-                      <td className="border px-2 py-2">
+                  {deliveryItems.map((item, index) => (
+                    <tr
+                      key={item._id}
+                      className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
+                    >
+                      {/* Checkbox Column */}
+                      <td className="border px-4 py-2 text-center">
                         <Checkbox
                           color="danger"
-                          size="lg"
+                          size="md"
                           isSelected={checkedItems[item._id] || false}
                           onValueChange={() => handleCheckboxChange(item._id)}
                         />
                       </td>
-                      <td className="border px-2 py-2">{item.stock}</td>
-                      <td className="border px-2 py-2">{item.quantity}</td>
-                      <td className="border px-2 py-2">
-                        <div className="flex items-center space-x-2">
+
+                      {/* Stock Column */}
+                      <td className="border px-4 py-2 text-left font-medium">
+                        {item.item.engine?.engine_name}
+                      </td>
+
+                      {/* Quantity Column */}
+                      <td className="border px-4 py-2 text-center">
+                        {item.quantity}
+                      </td>
+
+                      {/* Actions Column */}
+                      <td className="border px-4 py-2 text-center">
+                        <div className="flex items-center justify-center space-x-2">
                           <Button
-                            className="bg-black text-white text-xs"
+                            className="bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700"
                             onClick={() =>
-                              handleRemoveItem(item._id, item.item.stock ,item.quantity)
+                              handleRemoveItem(
+                                item._id,
+                                item.stock,
+                                item.quantity
+                              )
                             }
                           >
                             Remove
                           </Button>
-                          <EditQtyBtn deliveryItemId={item._id} />
+                          <EditQtyBtn
+                            deliveryItemId={item._id}
+                            stockId={item.stock}
+                            currentQuantity={item.quantity}
+                          />
                         </div>
                       </td>
                     </tr>

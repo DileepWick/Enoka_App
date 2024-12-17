@@ -13,11 +13,14 @@ import {
 //Controller for API ENDPOINT
 import axiosInstance from "@/config/axiosInstance";
 
-
 // Emmiter
 import emitter from "../../../../util/emitter.js";
 
-const DeliveryItemQuantityEditBtn = ({ deliveryItemId }) => {
+const DeliveryItemQuantityEditBtn = ({
+  deliveryItemId,
+  stockId,
+  currentQuantity,
+}) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   // State to store the quantity input and error message
@@ -45,6 +48,28 @@ const DeliveryItemQuantityEditBtn = ({ deliveryItemId }) => {
           quantity: quantity,
         }
       );
+
+      // Check the difference in quantity
+      const difference = quantity - currentQuantity;
+
+      // Update the stock quantity
+      if (difference > 0) {
+        // New quantity is greater: decrease stock
+        await axiosInstance.put(
+          `/api/stocks/decreaseStockQuantity/${stockId}`,
+          {
+            quantity: difference,
+          }
+        );
+      } else if (difference < 0) {
+        // New quantity is smaller: increase stock
+        await axiosInstance.put(
+          `/api/stocks/increaseStockQuantity/${stockId}`,
+          {
+            quantity: Math.abs(difference),
+          }
+        );
+      }
 
       // Check if the update was successful
       if (response.status === 200) {
@@ -76,10 +101,12 @@ const DeliveryItemQuantityEditBtn = ({ deliveryItemId }) => {
             <h1 className="text-2xl font-bold">Edit Quantity</h1>
           </ModalHeader>
           <ModalBody>
-            <form onSubmit={(e) => {
-              e.preventDefault();  // Prevent default form submission
-              handleEditQuantity();
-            }}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault(); // Prevent default form submission
+                handleEditQuantity();
+              }}
+            >
               <Input
                 type="number"
                 size="lg"

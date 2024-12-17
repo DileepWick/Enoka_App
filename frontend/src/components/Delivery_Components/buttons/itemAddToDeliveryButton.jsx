@@ -14,6 +14,9 @@ import {
 //Controller for API ENDPOINT
 import axiosInstance from "@/config/axiosInstance";
 
+//Emitter
+import emitter from "../../../../util/emitter.js";
+
 import { toast } from "react-toastify";
 
 const ItemAddToDeliveryButton = ({
@@ -74,6 +77,9 @@ const ItemAddToDeliveryButton = ({
         setError(""); // Clear error message if the request is successful
         setQuantity(""); // Clear the quantity field after success
         onOpenChange(false);
+        toast.success("Item added to delivery successfully!");
+        //Emit the event to notify GasketList
+        emitter.emit("deliveryItemCreated");
       }
     } catch (error) {
       console.error("Error creating delivery item:", error.message);
@@ -90,7 +96,7 @@ const ItemAddToDeliveryButton = ({
 
   return (
     <>
-      <Button onPress={onOpen}>Add + </Button>
+      <Button onPress={onOpen} className="bg-black text-white">Add + </Button>
       <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}

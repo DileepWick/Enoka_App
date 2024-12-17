@@ -5,7 +5,7 @@ import { fetchGaskets } from "../../services/inventoryServices";
 import axiosInstance from "@/config/axiosInstance";
 
 import ItemAddToDeliveryButton from "./buttons/itemAddToDeliveryButton";
-import { Spinner } from "@nextui-org/react";
+import { Chip, Spinner } from "@nextui-org/react";
 import {
   Table,
   TableHeader,
@@ -53,6 +53,7 @@ const GasketList = ({}) => {
 
         if (fetchedDeliveryData) {
           setDelivery(fetchedDeliveryData);
+          setSenderBranch(fetchedDeliveryData.senderBranch);
         } else {
           //alert("No pending delivery found");//
         }
@@ -102,6 +103,9 @@ const GasketList = ({}) => {
     emitter.on("deliveryCreated", handleDeliveryCreated);
     emitter.on("deliveryRemoved", handleDeliveryRemoved);
     emitter.on("deliveryStarted", handleDeliveryRemoved);
+    emitter.on("deliveryItemCreated", handleDeliveryCreated);
+    emitter.on("deliveryItemQuantityUpdated", handleDeliveryCreated);
+    emitter.on("deliveryItemRemoved", handleDeliveryCreated);
 
     // Subscribe to the sender branch change event
     emitter.on("fromBranchSelected", (branch) => {
@@ -195,9 +199,27 @@ const GasketList = ({}) => {
             <div
               className="max-h-64 overflow-y-auto rounded border border-gray-300"
               style={{
-                scrollbarWidth: "thin",
+                scrollbarWidth: "thin", // Firefox scrollbar
+                msOverflowStyle: "none", // IE/Edge scrollbar
               }}
             >
+              <style>
+                {`
+        /* Chrome, Safari scrollbar */
+        .max-h-64::-webkit-scrollbar {
+          width: 6px;
+        }
+        .max-h-64::-webkit-scrollbar-thumb {
+          background-color: #c0c0c0;
+          border-radius: 8px;
+        }
+        .max-h-64::-webkit-scrollbar-track {
+          background-color: #f0f0f0;
+        }
+      `}
+              </style>
+
+              {/* Table */}
               <table className="font-f1 w-full border-collapse border border-gray-300">
                 <thead className="border border-gray-300">
                   <tr>
@@ -205,55 +227,62 @@ const GasketList = ({}) => {
                       Part Number
                     </th>
                     <th className="border border-gray-300 px-4 py-2">
-                      Added By
+                      Item
+                    </th>
+                    <th className="border border-gray-300 px-4 py-2">Brand</th>
+                    <th className="border border-gray-300 px-4 py-2">Branch</th>
+                    <th className="border border-gray-300 px-4 py-2">
+                      Quantity
                     </th>
                     <th className="border border-gray-300 px-4 py-2">
-                      Stock Details
+                      Actions
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {items.map((gasket) => (
+                  {items.map((gasket, index) => (
                     <tr key={gasket._id} className="border border-gray-300">
+                      {/* Part Number */}
                       <td className="border border-gray-300 px-4 py-2">
                         {gasket.part_number}
                       </td>
+
+                      {/* Description */}
                       <td className="border border-gray-300 px-4 py-2">
-                        {gasket.added_by}
+                        {gasket.engine?.engine_name || "N/A"}  {gasket.packing_type || "N/A"} {gasket.material_type || "N/A"} <Chip className="ml-8" variant="bordered" color="primary">{gasket.vendor?.vendor_name || "N/A"}</Chip>
                       </td>
+
+                      {/* Brand */}
                       <td className="border border-gray-300 px-4 py-2">
-                        <table className="w-full border-collapse border border-gray-200">
-                          <thead>
-                            <tr>
-                              <th className="border border-gray-200 px-2 py-1">
-                                Branch
-                              </th>
-                              <th className="border border-gray-200 px-2 py-1" colSpan={2}>
-                                Quantity
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {gasket.stock.map((stock) => (
-                              <tr key={stock._id}>
-                                <td className="border border-gray-200 px-2 py-1">
-                                  {stock.branch?.name || "N/A"}
-                                </td>
-                                <td className="border border-gray-200 px-2 py-1">
-                                  {stock.quantity}
-                                </td>
-                                <td className="border border-gray-300 px-4 py-2">
-                                  <ItemAddToDeliveryButton
-                                    item_id={gasket._id}
-                                    delivery_id={delivery._id}
-                                    item_description={gasket.part_number}
-                                    stockId={stock._id}
-                                  />
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                        {gasket.brand?.brand_name || "N/A"}
+                      </td>
+
+                      {/* Branch */}
+                      <td className="border border-gray-300 px-4 py-2">
+                        {gasket.stock.map((stock) => (
+                          <div key={stock._id} className="py-1">
+                            {stock.branch?.name || "N/A"}
+                          </div>
+                        ))}
+                      </td>
+
+                      {/* Quantity */}
+                      <td className="border border-gray-300 px-4 py-2">
+                        {gasket.stock.map((stock) => (
+                          <div key={stock._id} className="py-1">
+                            {stock.quantity}
+                          </div>
+                        ))}
+                      </td>
+
+                      {/* Actions */}
+                      <td className="border border-gray-300 px-4 py-2">
+                        <ItemAddToDeliveryButton
+                          item_id={gasket._id}
+                          delivery_id={delivery._id}
+                          item_description={gasket.part_number}
+                          stockId={gasket.stock[0]._id} // Assuming one stock is selected for simplicity
+                        />
                       </td>
                     </tr>
                   ))}

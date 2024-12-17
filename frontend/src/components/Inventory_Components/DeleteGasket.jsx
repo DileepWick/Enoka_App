@@ -7,11 +7,11 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
+  Progress,
 } from "@nextui-org/react";
 import { deleteGasket } from "@/services/inventoryServices.jsx";
 
-
-//Emiiter
+//Emitter
 import emitter from "../../../util/emitter.js";
 
 const Delete_Gasket = ({
@@ -27,13 +27,10 @@ const Delete_Gasket = ({
 
   // Handle stock update
   const handleDeleteGasket = async () => {
-    setLoading(true);
+    setLoading(true); // Start loading
     try {
-      //Delete the gasket
+      // Delete the gasket
       const response = await deleteGasket(gasketId);
-
-      // Handle the successful update (e.g., show a success message)
-      console.log("Gasket Deleted Successfully:", response);
 
       // Emit an event to notify other components
       emitter.emit("gasketDeleted");
@@ -41,16 +38,24 @@ const Delete_Gasket = ({
       // Close the modal after successful update
       onOpenChange(false);
     } catch (err) {
-      // Handle error if the update fails
-      console.error("Error updating stock:", err);
+      // Handle error if the deletion fails
+      console.error("Error deleting gasket:", err);
     } finally {
-      setLoading(false); // Set loading to false after the request completes
+      setLoading(false); // Stop loading
     }
   };
 
   return (
     <>
-      
+      {/* Conditional Progress Bar */}
+      {loading && (
+        <Progress
+          isIndeterminate
+          aria-label="Deleting..."
+          className="max-w-md mb-2"
+          size="sm"
+        />
+      )}
       <Button onPress={onOpen} color="danger" size="sm" variant="bordered">
         Delete
       </Button>
@@ -81,6 +86,14 @@ const Delete_Gasket = ({
             <p className="font-f1">
               <strong>Vendor:</strong> {vendor}
             </p>
+            {/* Inline Progress Bar for Modal */}
+            {loading && (
+              <Progress
+                isIndeterminate
+                aria-label="Deleting gasket..."
+                size="sm"
+              />
+            )}
           </ModalBody>
           <ModalFooter>
             <Button
@@ -89,12 +102,14 @@ const Delete_Gasket = ({
               flat
               className="font-f1"
               variant="bordered"
+              isDisabled={loading} // Disable Cancel button while deleting
             >
               Cancel
             </Button>
             <Button
               onPress={handleDeleteGasket}
               className="bg-black text-white font-f1"
+              isDisabled={loading} // Disable delete button while loading
             >
               {loading ? "Deleting..." : "Delete Gasket"}
             </Button>

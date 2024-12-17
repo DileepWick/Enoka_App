@@ -10,7 +10,6 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { updateStock } from "@/services/inventoryServices"; // Import your service function
-import { toast } from "react-toastify";
 
 //Emiiter
 import emitter from "../../../util/emitter.js";
@@ -44,16 +43,6 @@ const Adjust_Stock_Button = ({ stockid, currentStock }) => {
 
       // Handle the successful update (e.g., show a success message)
       console.log("Stock updated successfully:", response);
-      toast.success("Stock updated successfully", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: false,
-        progress: undefined,
-        theme: "colored",
-      });
 
       // Emit an event to notify other components
       emitter.emit("stockUpdated");

@@ -35,6 +35,14 @@ export const createGasket = async (req, res) => {
       added_by,
     } = req.body;
 
+        // Check if part number already exists
+        const existingGasket = await Gasket.findOne({ part_number });
+        if (existingGasket) {
+          return res
+            .status(409)
+            .json({ error: `Part number ${part_number} already exists.` });
+        }
+
     // Validate references (Vendor, Engine, and Brand)
     const vendorExists = await Vendor.findById(vendor);
     if (!vendorExists) {

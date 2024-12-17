@@ -33,6 +33,7 @@ const GasketList = ({}) => {
   const [page, setPage] = useState(1);
   const rowsPerPage = 1000;
 
+  // Pagination
   const items = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
@@ -60,6 +61,7 @@ const GasketList = ({}) => {
       }
     };
 
+    // Fetch gaskets
     const getGaskets = async () => {
       try {
         const data = await fetchGaskets();
@@ -163,6 +165,7 @@ const GasketList = ({}) => {
     }
   }, [senderBranch, gaskets]);
 
+  // Handle search
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
   };
@@ -254,17 +257,18 @@ const GasketList = ({}) => {
                                 <td className="border border-gray-200 px-2 py-1">
                                   {stock.updated_by}
                                 </td>
+                                <td className="border border-gray-300 px-4 py-2">
+                                  <ItemAddToDeliveryButton
+                                    item_id={gasket._id}
+                                    delivery_id={delivery._id}
+                                    item_description={gasket.part_number}
+                                    stockid={stock._id}
+                                  />
+                                </td>
                               </tr>
                             ))}
                           </tbody>
                         </table>
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2">
-                        <ItemAddToDeliveryButton
-                          item_id={gasket._id}
-                          delivery_id={delivery._id}
-                          item_description={gasket.part_number}
-                        />
                       </td>
                     </tr>
                   ))}

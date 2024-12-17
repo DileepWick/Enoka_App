@@ -19,7 +19,7 @@ import axiosInstance from "@/config/axiosInstance";
 //Emmiter
 import emitter from "../../../../util/emitter.js";
 
-const ItemAddToDeliveryButton = ({ item_id, delivery_id ,item_description }) => {
+const ItemAddToDeliveryButton = ({ item_id, delivery_id ,item_description ,stockid}) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [quantity, setQuantity] = useState("");
   const [error, setError] = useState("");
@@ -40,9 +40,15 @@ const ItemAddToDeliveryButton = ({ item_id, delivery_id ,item_description }) => 
         {
           item: item_id, // Use the item_id passed as a prop
           quantity: quantity,
-          deliveryId: delivery_id, // Use the delivery_id passed as a prop
+          deliveryId: delivery_id, // Use the delivery_id passed as a props
+          stock: stockid,
         }
       );
+
+      //Decrease stock quantity
+      await axiosInstance.put(`/api/stocks/decreaseStockQuantity/${stockid}`, {
+        quantity: quantity,
+      });
 
       // Check if the delivery item creation was successful
       if (response.status === 201) {

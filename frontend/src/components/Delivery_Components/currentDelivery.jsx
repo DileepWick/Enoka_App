@@ -7,12 +7,12 @@ import { useState, useEffect } from "react";
 import { removeDelivery } from "@/services/deliveryServices";
 import { Button, Checkbox, Chip, Divider, Progress } from "@nextui-org/react";
 
-
 //Components
 import EditQtyBtn from "./buttons/deliveryItemQuantityEditBtn";
 
 //Emitter
 import emitter from "../../../util/emitter.js";
+import { toast } from "react-toastify";
 
 const CurrentDelivery = () => {
   //States
@@ -30,7 +30,6 @@ const CurrentDelivery = () => {
         setCheckedItems({});
         // Emit the event to notify GasketList
         emitter.emit("deliveryRemoved");
-
       } catch (error) {
         console.error("Error removing delivery:", error.message);
       }
@@ -43,7 +42,7 @@ const CurrentDelivery = () => {
         const response = await axiosInstance.get(
           "/api/delivery/deliveries/latest"
         );
-  
+
         const delivery = response.data.data;
         if (delivery) {
           setNewDelivery(delivery);
@@ -57,9 +56,9 @@ const CurrentDelivery = () => {
         console.error("Error fetching latest pending delivery:", error.message);
       }
     };
-  
+
     fetchLatestPendingDelivery();
-  
+
     // Listen for the deliveryCreated event
     const handleDeliveryCreated = () => {
       console.log(
@@ -67,7 +66,7 @@ const CurrentDelivery = () => {
       );
       fetchLatestPendingDelivery();
     };
-  
+
     // Listen for the delivery item creation
     const handleDeliveryItemCreated = () => {
       console.log(
@@ -75,19 +74,18 @@ const CurrentDelivery = () => {
       );
       fetchLatestPendingDelivery();
     };
-  
+
     // Subscribe to the events
     emitter.on("deliveryCreated", handleDeliveryCreated);
     emitter.on("deliveryItemAdded", handleDeliveryItemCreated);
     emitter.on("deliveryItemQuantityUpdated", handleDeliveryItemCreated);
-  
+
     // Cleanup listeners on unmount
     return () => {
       emitter.off("deliveryCreated", handleDeliveryCreated);
       emitter.off("deliveryItemAdded", handleDeliveryItemCreated);
     };
   }, []);
-  
 
   //Fetch Delivery Items
   const fetchDeliveryItems = async (deliveryId) => {
@@ -106,7 +104,6 @@ const CurrentDelivery = () => {
       console.error("Error fetching delivery items:", error.message);
     }
   };
-
 
   //Check Box Change
   const handleCheckboxChange = (itemId) => {
@@ -139,43 +136,43 @@ const CurrentDelivery = () => {
     }
 
     try {
-      await axiosInstance.put(
-        `/api/delivery/${newDelivery._id}/status`,
-        { status: "on delivery" }
-      );
+      await axiosInstance.put(`/api/delivery/${newDelivery._id}/status`, {
+        status: "on delivery",
+      });
       alert("Delivery started successfully.");
       emitter.emit("deliveryStarted");
       setNewDelivery(null);
       setDeliveryItems([]);
       setCheckedItems({});
-      
-
     } catch (error) {
       console.error("Error starting delivery:", error.message);
     }
   };
 
   //Remove Item
-  const handleRemoveItem = async (itemId) => {
+  const handleRemoveItem = async (itemId, stockId, quantity) => {
     try {
-      // Remove item from backend
-      await axiosInstance.delete(
-        `/api/deliveryItems/deleteDeliveryItem/${itemId}`
-      );
-
-      // Remove item locally from delivery items
+      // Perform both actions simultaneously
+      await Promise.all([
+        axiosInstance.delete(`/api/deliveryItems/deleteDeliveryItem/${itemId}`),
+        axiosInstance.put(`/api/stocks/increaseStockQuantity/${stockId}`, {
+          quantity,
+        }),
+      ]);
+  
+      // Update frontend states
       const updatedItems = deliveryItems.filter((item) => item._id !== itemId);
       setDeliveryItems(updatedItems);
-
-      // Remove item from checkedItems state
       const updatedCheckedItems = { ...checkedItems };
       delete updatedCheckedItems[itemId];
       setCheckedItems(updatedCheckedItems);
+      
     } catch (error) {
       console.error("Error removing item:", error.message);
-      alert("Failed to remove item. Please try again.");
+      toast.error("Error removing item. Please try again.");
     }
   };
+
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 font-f1 text-black">
@@ -231,6 +228,8 @@ const CurrentDelivery = () => {
                 Cancel Delivery
               </Button>
             </div>
+
+            {/* Delivery Items */}
             <Divider className="my-6 border-black" />
             <h2 className="text-2xl font-f1 mb-4 sm:mb-6 ">Delivery Items</h2>
             <div
@@ -258,15 +257,15 @@ const CurrentDelivery = () => {
                           onValueChange={() => handleCheckboxChange(item._id)}
                         />
                       </td>
-                      <td className="border px-2 py-2">
-                        {item.item.description}
-                      </td>
+                      <td className="border px-2 py-2">{item.item.stock}</td>
                       <td className="border px-2 py-2">{item.quantity}</td>
                       <td className="border px-2 py-2">
                         <div className="flex items-center space-x-2">
                           <Button
                             className="bg-black text-white text-xs"
-                            onClick={() => handleRemoveItem(item._id)}
+                            onClick={() =>
+                              handleRemoveItem(item._id, item.item.stock ,item.quantity)
+                            }
                           >
                             Remove
                           </Button>

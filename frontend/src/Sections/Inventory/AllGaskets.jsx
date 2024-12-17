@@ -64,12 +64,12 @@ const AllGaskets = () => {
     };
 
     // Register the stockUpdated event listener
-    emitter.on("stockUpdated", fetchGaskets());
+    emitter.on("stockUpdated", fetchGaskets);
     emitter.on("gasketDeleted", gasketDeletedListener);
 
     // Cleanup the event listener on component unmount
     return () => {
-      emitter.off("stockUpdated", fetchGaskets());
+      emitter.off("stockUpdated", fetchGaskets);
       emitter.off("gasketDeleted", gasketDeletedListener);
     };
   }, []);
@@ -114,7 +114,7 @@ const AllGaskets = () => {
               isIndeterminate
               aria-label="Adding Gasket..."
               size="sm"
-              label="Loading The Form..."
+              label="Loading . . ."
             />
           )}
         </div>

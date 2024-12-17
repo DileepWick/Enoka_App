@@ -84,5 +84,8 @@ app.use('/api/users', validateFirebaseToken, userRoutes);
 app.use('/api/deliveries', validateFirebaseToken, deliveryRoutes);
 app.use('/api/delivery', validateFirebaseToken, deliveryRoutes);
 app.use('/api/deliveryItems', validateFirebaseToken, deliveryItemRoutes);
-app.use('/api/stocks', validateFirebaseToken, stockRoutes);
+//app.use('/api/stocks', validateFirebaseToken, stockRoutes);
 
+
+
+app.use('/api/stocks', stockRoutes);

@@ -7,7 +7,6 @@ import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { Progress } from "@nextui-org/react";
 
-
 //Styles
 import StyledSelect from "@/components/Inventory_Components/StyledSelect";
 import { toast } from "react-toastify";
@@ -15,6 +14,7 @@ import { toast } from "react-toastify";
 Modal.setAppElement("#root");
 
 export default function AddItemForm() {
+  // Form state
   const [formData, setFormData] = useState({
     part_number: "",
     material_type: "",
@@ -25,6 +25,7 @@ export default function AddItemForm() {
     added_by: "Admin",
   });
 
+  // Fetch data
   const [vendors, setVendors] = useState([]);
   const [brands, setBrands] = useState([]);
   const [engines, setEngines] = useState([]);
@@ -36,20 +37,21 @@ export default function AddItemForm() {
   const [isAddingItem, setIsAddingItem] = useState(false);
   const [formKey, setFormKey] = useState(0); // Add this to reset the form
 
-
-  //
+  // Options for select dropdowns
   const Packing_options = [
     { value: "FULLSET", label: "Full Set" },
     { value: "HEADSET", label: "Head Set" },
     { value: "GASKET ONLY", label: "Gasket Only" },
   ];
 
+  // Options for select dropdowns
   const Material_options = [
     { value: "STEEL", label: "STEEL" },
     { value: "HELLITE", label: "HELLITE" },
     { value: "WOG", label: "WOG" },
   ];
 
+  // Fetch vendors, brands, and engines
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -73,23 +75,27 @@ export default function AddItemForm() {
     fetchData();
   }, []);
 
+  // Handle input change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Open a modal
   const openModal = (type) => {
     setCurrentModal(type);
     setNewItemName("");
     setIsAddingItem(false);
   };
 
+  // Close the modal
   const closeModal = () => {
     setCurrentModal(null);
     setNewItemName("");
     setIsAddingItem(false);
   };
 
+  // Handle adding a new item
   const handleAddNew = async () => {
     setIsAddingItem(true);
     try {
@@ -113,49 +119,83 @@ export default function AddItemForm() {
     }
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitStatus(null);
+
+    const resetForm = () => {
+      setFormData({
+        part_number: "",
+        material_type: "",
+        packing_type: "",
+        engine: "",
+        brand: "",
+        vendor: "",
+      });
+      setFormKey((prevKey) => prevKey + 1); // Reset form inputs by changing the key
+    };
+
     try {
       const response = await axiosInstance.post("/api/gaskets", formData);
-      toast.success(response.data.message);
-      setFormData((prev) => ({
-        ...prev,
-        part_number: "",
-        material_type: "",
-        packing_type: "",
-        engine: "",
-        brand: "",
-        vendor: "",
-      }));
 
-      setFormKey((prevKey) => prevKey + 1); // Change key to reset inputs
-      
+      // Success: Show toast and reset the form
+      toast.success("Gasket added successfully!");
+      resetForm();
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to add gasket");
-      setFormData((prev) => ({
-        ...prev,
-        part_number: "",
-        material_type: "",
-        packing_type: "",
-        engine: "",
-        brand: "",
-        vendor: "",
-      }));
+      // Check if error response is available
+      if (err.response) {
+        const status = err.response.status;
 
-      setFormKey((prevKey) => prevKey + 1); // Change key to reset inputs
-      
+        if (status === 409) {
+          // Specific handling for 409 Conflict
+          toast.error(`Part number ${formData.part_number} already exists.`);
+        } else {
+          // Other server-side errors
+          const message =
+            err.response.data?.error || "An unexpected error occurred.";
+          toast.error(message);
+        }
+      } else {
+        // Handle network or client-side errors
+        toast.error("Failed to connect to the server. Please try again.");
+      }
+
+      // Reset form regardless of the error
+      resetForm();
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div>
+        {" "}
+        {/* Inline Progress Bar for Modal */}
+        {isLoading && (
+          <Progress
+            isIndeterminate
+            aria-label="Adding Gasket..."
+            size="sm"
+            label="Loading The Form..."
+          />
+        )}
+      </div>
+    );
   if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="max-w-4xl mx-auto p-6 ">
+      {isLoading && (
+        <Progress
+          isIndeterminate
+          aria-label="Adding Gasket..."
+          size="sm"
+          label="Loading The Form..."
+        />
+      )}
       <h1 className="text-2xl font-f1 mb-6 text-center">Add New Gasket</h1>
 
-      <form key={formKey} onSubmit={handleSubmit} className="space-y-6" >
+      <form key={formKey} onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label

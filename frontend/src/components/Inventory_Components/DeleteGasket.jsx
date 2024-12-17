@@ -47,15 +47,6 @@ const Delete_Gasket = ({
 
   return (
     <>
-      {/* Conditional Progress Bar */}
-      {loading && (
-        <Progress
-          isIndeterminate
-          aria-label="Deleting..."
-          className="max-w-md mb-2"
-          size="sm"
-        />
-      )}
       <Button onPress={onOpen} color="danger" size="sm" variant="bordered">
         Delete
       </Button>

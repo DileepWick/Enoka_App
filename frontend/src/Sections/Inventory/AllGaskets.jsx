@@ -14,6 +14,7 @@ import {
 } from "@nextui-org/react";
 import axiosInstance from "@/config/axiosInstance";
 import { User, Link } from "@nextui-org/react";
+import Delete_Gasket from "@/components/Inventory_Components/DeleteGasket.jsx";
 
 //Buttons
 import Adjust_Stock_Button from "@/components/Inventory_Components/Adjust_Stock_Button";
@@ -154,7 +155,8 @@ const AllGaskets = () => {
             {selectedBranch ? `${selectedBranch} Stock` : "Stock"}
           </TableColumn>
           <TableColumn className="text-sm font-f1">Last Updated By</TableColumn>
-          <TableColumn className="text-sm font-f1">Actions</TableColumn>
+          <TableColumn className="text-sm font-f1" >Stock Adjustment</TableColumn>
+          <TableColumn className="text-sm font-f1" >Deletions</TableColumn>
         </TableHeader>
         <TableBody>
           {filteredGaskets.map((gasket) => (
@@ -215,6 +217,9 @@ const AllGaskets = () => {
                     />
                   ))
                 )}
+              </TableCell>
+              <TableCell>
+                <Delete_Gasket gasketid={gasket._id} engine={gasket.engine?.engine_name} brand={gasket.brand?.brand_name} packing={gasket.packing_type} material={gasket.material_type} vendor={gasket.vendor?.vendor_name}/>
               </TableCell>
             </TableRow>
           ))}

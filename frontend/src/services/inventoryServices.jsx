@@ -28,3 +28,15 @@ export const updateStock = async (stockId, quantity, updatedBy) => {
     throw error; // Rethrow the error so it can be handled in the component
   }
 };
+
+
+// Function to delete a gasket
+export const deleteGasket = async (gasketId) => {
+  try {
+    const response = await axiosInstance.delete(`/api/gaskets/${gasketId}`);
+    return response.data; // Return the deleted gasket data
+  } catch (error) {
+    console.error("Error deleting gasket:", error);
+    throw error; // Rethrow the error so it can be handled in the component
+  }
+};

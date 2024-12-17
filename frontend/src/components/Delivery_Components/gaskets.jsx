@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { fetchGaskets } from "../../services/inventoryServices";
 
-//Controller for API ENDPOINT
+// Controller for API ENDPOINT
 import axiosInstance from "@/config/axiosInstance";
 
 import ItemAddToDeliveryButton from "./buttons/itemAddToDeliveryButton";
@@ -16,7 +16,7 @@ import {
   Input,
 } from "@nextui-org/react";
 
-//Util
+// Util
 import emitter from "../../../util/emitter.js";
 
 const GasketList = ({}) => {
@@ -27,6 +27,7 @@ const GasketList = ({}) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredGaskets, setFilteredGaskets] = useState([]);
   const [delivery, setDelivery] = useState(null);
+  const [senderBranch, setSenderBranch] = useState(""); // New state for sender branch
 
   // Pagination
   const [page, setPage] = useState(1);
@@ -88,7 +89,7 @@ const GasketList = ({}) => {
     // Delivery removed event handler
     const handleDeliveryRemoved = () => {
       console.log(
-        "Delivery removed event received! Fetching latest delivery in gaskets..."
+        "Delivery removed event received! Fetching latest delivery in gaskets... "
       );
       setDelivery(null);
       fetchLatestDelivery();
@@ -100,10 +101,16 @@ const GasketList = ({}) => {
     emitter.on("deliveryRemoved", handleDeliveryRemoved);
     emitter.on("deliveryStarted", handleDeliveryRemoved);
 
+    // Subscribe to the sender branch change event
+    emitter.on("fromBranchSelected", (branch) => {
+      setSenderBranch(branch);
+    });
+
     // Cleanup listeners on unmount
     return () => {
       emitter.off("deliveryCreated", handleDeliveryCreated);
       emitter.off("deliveryRemoved", handleDeliveryRemoved);
+      emitter.off("fromBranchSelected");
     };
   }, []);
 
@@ -141,6 +148,21 @@ const GasketList = ({}) => {
     filterGaskets();
   }, [searchTerm, gaskets]);
 
+  // Filter gaskets by sender branch
+  useEffect(() => {
+    if (senderBranch) {
+      const filteredByBranch = gaskets.map((gasket) => ({
+        ...gasket,
+        stock: gasket.stock.filter(
+          (stock) => stock.branch?.name === senderBranch
+        ),
+      }));
+      setFilteredGaskets(filteredByBranch);
+    } else {
+      setFilteredGaskets(gaskets); // Show all gaskets if no sender branch is selected
+    }
+  }, [senderBranch, gaskets]);
+
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
   };
@@ -161,7 +183,7 @@ const GasketList = ({}) => {
             placeholder="Search gaskets"
             value={searchTerm}
             onChange={handleSearch}
-            className="  p-2 mb-4 "
+            className="p-2 mb-4"
             variant="bordered"
           />
 
@@ -241,8 +263,7 @@ const GasketList = ({}) => {
                         <ItemAddToDeliveryButton
                           item_id={gasket._id}
                           delivery_id={delivery._id}
-                          item_description={gasket.description}
-                          className="w-full mt-2"
+                          item_description={gasket.part_number}
                         />
                       </td>
                     </tr>
@@ -251,43 +272,9 @@ const GasketList = ({}) => {
               </table>
             </div>
           </div>
-
-          {/* Mobile View */}
-          <div className="sm:hidden mt-4 space-y-4">
-            {items.map((gasket) => (
-              <div key={gasket._id} className="bg-white p-4 rounded shadow">
-                <h3 className="font-bold text-lg mb-2">{gasket.part_number}</h3>
-                <p className="mb-1">
-                  <span className="font-semibold">Material - </span>
-                  {gasket.material_type}
-                </p>
-                <p className="mb-1">
-                  <span className="font-semibold">Packing - </span>
-                  {gasket.packing_type}
-                </p>
-                <p className="mb-1">
-                  <span className="font-semibold">Engine - </span>
-                  {gasket.engine?.engine_name}
-                </p>
-                <p className="mb-1">
-                  <span className="font-semibold">Brand - </span>
-                  {gasket.brand?.brand_name}
-                </p>
-                <p className="mb-1">
-                  <span className="font-semibold">Vendor - </span>
-                  {gasket.vendor?.vendor_name}
-                </p>
-                <ItemAddToDeliveryButton
-                  item_id={gasket._id}
-                  delivery_id={delivery._id}
-                  className="w-full mt-2"
-                />
-              </div>
-            ))}
-          </div>
         </>
       ) : (
-        <div className="text-center py-4">Waiting for delivery creation</div>
+        <div>No active delivery found</div>
       )}
     </div>
   );

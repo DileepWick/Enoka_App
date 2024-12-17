@@ -15,6 +15,8 @@ import {
 import axiosInstance from "@/config/axiosInstance";
 import { User, Link } from "@nextui-org/react";
 import Delete_Gasket from "@/components/Inventory_Components/DeleteGasket.jsx";
+import { toast, Flip, ToastContainer } from "react-toastify";
+
 
 //Buttons
 import Adjust_Stock_Button from "@/components/Inventory_Components/Adjust_Stock_Button";
@@ -55,10 +57,27 @@ const AllGaskets = () => {
     // Register the stockUpdated event listener
     const stockUpdatedListener = () => fetchGaskets();
     emitter.on("stockUpdated", stockUpdatedListener);
+    emitter.on("gasketDeleted", stockUpdatedListener);
+
+    //show toast if gasket deleted
+    const gasketDeletedListener = () => {
+      toast.success("Gasket Deleted Successfully", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        progress: undefined,
+        theme: "colored",
+      });
+    };
+    emitter.on("gasketDeleted", gasketDeletedListener);
 
     // Cleanup the event listener on component unmount
     return () => {
       emitter.off("stockUpdated", stockUpdatedListener);
+      emitter.off("gasketDeleted", stockUpdatedListener);
     };
   }, []);
 
@@ -220,6 +239,7 @@ const AllGaskets = () => {
               </TableCell>
               <TableCell>
                 <Delete_Gasket gasketId={gasket._id} engine={gasket.engine?.engine_name} brand={gasket.brand?.brand_name} packing={gasket.packing_type} material={gasket.material_type} vendor={gasket.vendor?.vendor_name}/>
+                <ToastContainer />
               </TableCell>
             </TableRow>
           ))}

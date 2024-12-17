@@ -6,10 +6,10 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-  Input,
   useDisclosure,
 } from "@nextui-org/react";
 import { deleteGasket } from "@/services/inventoryServices.jsx";
+
 
 //Emiiter
 import emitter from "../../../util/emitter.js";
@@ -34,17 +34,15 @@ const Delete_Gasket = ({
 
       // Handle the successful update (e.g., show a success message)
       console.log("Gasket Deleted Successfully:", response);
-      alert("Gasket Deleted Successfully");
 
       // Emit an event to notify other components
-      emitter.emit("stockUpdated");
+      emitter.emit("gasketDeleted");
 
       // Close the modal after successful update
       onOpenChange(false);
     } catch (err) {
       // Handle error if the update fails
       console.error("Error updating stock:", err);
-
     } finally {
       setLoading(false); // Set loading to false after the request completes
     }
@@ -52,6 +50,7 @@ const Delete_Gasket = ({
 
   return (
     <>
+      
       <Button onPress={onOpen} color="danger" size="sm" variant="bordered">
         Delete
       </Button>

@@ -19,7 +19,11 @@ import axiosInstance from "@/config/axiosInstance";
 //Emmiter
 import emitter from "../../../../util/emitter.js";
 
+<<<<<<< Updated upstream
 const ItemAddToDeliveryButton = ({ item_id, delivery_id ,item_description ,stockid}) => {
+=======
+const ItemAddToDeliveryButton = ({ item_id, delivery_id ,stockId, item_description }) => {
+>>>>>>> Stashed changes
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [quantity, setQuantity] = useState("");
   const [error, setError] = useState("");
@@ -46,9 +50,16 @@ const ItemAddToDeliveryButton = ({ item_id, delivery_id ,item_description ,stock
       );
 
       //Decrease stock quantity
+<<<<<<< Updated upstream
       await axiosInstance.put(`/api/stocks/decreaseStockQuantity/${stockid}`, {
         quantity: quantity,
       });
+=======
+      await axiosInstance.put(`/api/stocks/decreaseStockQuantity/${stockId}`, { quantity: quantity });
+
+      //Emit the stock id tp current delivery
+      emitter.emit("stockIdAdded", stockId);
+>>>>>>> Stashed changes
 
       // Check if the delivery item creation was successful
       if (response.status === 201) {

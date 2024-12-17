@@ -210,9 +210,6 @@ const GasketList = ({}) => {
                     <th className="border border-gray-300 px-4 py-2">
                       Stock Details
                     </th>
-                    <th className="border border-gray-300 px-4 py-2">
-                      Actions
-                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -231,14 +228,8 @@ const GasketList = ({}) => {
                               <th className="border border-gray-200 px-2 py-1">
                                 Branch
                               </th>
-                              <th className="border border-gray-200 px-2 py-1">
-                                Location
-                              </th>
-                              <th className="border border-gray-200 px-2 py-1">
+                              <th className="border border-gray-200 px-2 py-1" colSpan={2}>
                                 Quantity
-                              </th>
-                              <th className="border border-gray-200 px-2 py-1">
-                                Last Updated By
                               </th>
                             </tr>
                           </thead>
@@ -249,13 +240,15 @@ const GasketList = ({}) => {
                                   {stock.branch?.name || "N/A"}
                                 </td>
                                 <td className="border border-gray-200 px-2 py-1">
-                                  {stock.branch?.location || "N/A"}
-                                </td>
-                                <td className="border border-gray-200 px-2 py-1">
                                   {stock.quantity}
                                 </td>
-                                <td className="border border-gray-200 px-2 py-1">
-                                  {stock.updated_by}
+                                <td className="border border-gray-300 px-4 py-2">
+                                  <ItemAddToDeliveryButton
+                                    item_id={gasket._id}
+                                    delivery_id={delivery._id}
+                                    item_description={gasket.part_number}
+                                    stockId={stock._id}
+                                  />
                                 </td>
                                 <td className="border border-gray-300 px-4 py-2">
                                   <ItemAddToDeliveryButton

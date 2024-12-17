@@ -6,6 +6,10 @@ import axiosInstance from "@/config/axiosInstance";
 import { useState, useEffect } from "react";
 import { removeDelivery } from "@/services/deliveryServices";
 import { Button, Checkbox, Chip, Divider, Progress } from "@nextui-org/react";
+<<<<<<< Updated upstream
+=======
+import { toast } from "react-toastify";
+>>>>>>> Stashed changes
 
 //Components
 import EditQtyBtn from "./buttons/deliveryItemQuantityEditBtn";
@@ -80,6 +84,11 @@ const CurrentDelivery = () => {
     emitter.on("deliveryItemAdded", handleDeliveryItemCreated);
     emitter.on("deliveryItemQuantityUpdated", handleDeliveryItemCreated);
 
+<<<<<<< Updated upstream
+=======
+    //Receive stock id from GasketList
+
+>>>>>>> Stashed changes
     // Cleanup listeners on unmount
     return () => {
       emitter.off("deliveryCreated", handleDeliveryCreated);
@@ -139,7 +148,11 @@ const CurrentDelivery = () => {
       await axiosInstance.put(`/api/delivery/${newDelivery._id}/status`, {
         status: "on delivery",
       });
+<<<<<<< Updated upstream
       alert("Delivery started successfully.");
+=======
+      toast.success("Delivery started successfully!");
+>>>>>>> Stashed changes
       emitter.emit("deliveryStarted");
       setNewDelivery(null);
       setDeliveryItems([]);
@@ -150,6 +163,7 @@ const CurrentDelivery = () => {
   };
 
   //Remove Item
+<<<<<<< Updated upstream
   const handleRemoveItem = async (itemId, stockId, quantity) => {
     try {
       // Perform both actions simultaneously
@@ -161,6 +175,19 @@ const CurrentDelivery = () => {
       ]);
   
       // Update frontend states
+=======
+  const handleRemoveItem = async (itemId,stockId) => {
+    try {
+      // Remove item from backend
+      await axiosInstance.delete(
+        `/api/deliveryItems/deleteDeliveryItem/${itemId}`
+      );
+
+      //Increase stock quantity
+      await axiosInstance.put(`/api/stocks/increaseStockQuantity/${stockId}`, { quantity: quantity });
+
+      // Remove item locally from delivery items
+>>>>>>> Stashed changes
       const updatedItems = deliveryItems.filter((item) => item._id !== itemId);
       setDeliveryItems(updatedItems);
       const updatedCheckedItems = { ...checkedItems };
@@ -180,24 +207,17 @@ const CurrentDelivery = () => {
         {newDelivery ? (
           <div className="bg-white text-black shadow-md rounded-lg p-4 sm:p-6">
             <h2 className="text-2xl font-f1 mb-4 sm:mb-6 ">Delivery Details</h2>
-            <Divider className="my-4 border-gray-700" />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm sm:text-base">
               <p>
-                <strong>From - </strong> {newDelivery.senderBranch}
-              </p>
-              <p>
+                <strong>From - </strong> {newDelivery.senderBranch}{" "}
                 <strong>To - </strong> {newDelivery.receiverBranch}
-              </p>
-              <p>
-                <strong>Delivery ID - </strong> <Chip>{newDelivery._id}</Chip>
-              </p>
-              <p>
+                <br></br>
+                <strong>Total Items - </strong> {totalItemsDelivered} -{" "}
                 <strong>Item Types - </strong> {deliveryItems.length}
               </p>
-              <p>
-                <strong>Total Items - </strong> {totalItemsDelivered}
-              </p>
             </div>
+            <Divider className="my-4 border-gray-700" />
+
             <div className="my-6">
               <Progress
                 value={progressPercentage}

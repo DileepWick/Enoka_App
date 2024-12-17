@@ -72,3 +72,25 @@ export const changeDeliveryStatus = async (deliveryId, status) => {
     throw error;
   }
 };
+
+//Decrease quantity of a stock
+export const decreaseStockQuantity = async (stockId, quantity) => {
+  try {
+    const response = await axiosInstance.put(`/api/stocks/decreaseStockQuantity/${stockId}`, { quantity: quantity });
+    return response;
+  } catch (error) {
+    console.error("Error decreasing stock quantity:", error);
+    throw error;
+  }
+};
+
+//Increase quantity of a stock
+export const increaseStockQuantity = async (stockId, quantity) => {
+  try {
+    const response = await axiosInstance.put(`/api/stocks/increaseStockQuantity/${stockId}`, { quantity: quantity });
+    return response;
+  } catch (error) {
+    console.error("Error increasing stock quantity:", error);
+    throw error;
+  }
+};

@@ -3,9 +3,17 @@ import mongoose from "mongoose";
 
 //Create a new delivery item
 export const createDeliveryItem = async (req, res) => {
-  const { item, quantity, deliveryId,stock } = req.body; // Destructure item, quantity, and deliveryId
+  const { item, quantity, deliveryId, stock } = req.body; // Destructure item, quantity, and deliveryId
 
   try {
+
+    // Validate input
+    if (!item || !quantity || !deliveryId || !stock) {
+      return res.status(400).json({
+        message: "All fields are required",
+      });
+    }
+
     // Check if the delivery exists
     const delivery = await mongoose.model("Delivery").findById(deliveryId);
     if (!delivery) {

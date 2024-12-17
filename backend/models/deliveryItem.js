@@ -6,6 +6,11 @@ const deliveryItemSchema = new mongoose.Schema({
     required: true, 
     refPath: 'itemType' // Dynamically references different schemas based on 'itemType'
   },
+  stock: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Stock',
+    required: true
+  },
   itemType: { 
     type: String, 
     required: true 

@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 //Create a new delivery item
 export const createDeliveryItem = async (req, res) => {
-  const { item, quantity, deliveryId } = req.body; // Destructure item, quantity, and deliveryId
+  const { item, quantity, deliveryId,stock } = req.body; // Destructure item, quantity, and deliveryId
 
   try {
     // Check if the delivery exists
@@ -46,6 +46,7 @@ export const createDeliveryItem = async (req, res) => {
       itemType, // Dynamically set itemType
       quantity,
       deliveryId, // Set the deliveryId
+      stock
     });
 
     // Save the new delivery item

@@ -5,9 +5,12 @@ import Select from "react-select";
 import Modal from "react-modal";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
+import { Progress } from "@nextui-org/react";
+
 
 //Styles
 import StyledSelect from "@/components/Inventory_Components/StyledSelect";
+import { toast } from "react-toastify";
 
 Modal.setAppElement("#root");
 
@@ -31,6 +34,8 @@ export default function AddItemForm() {
   const [currentModal, setCurrentModal] = useState(null);
   const [newItemName, setNewItemName] = useState("");
   const [isAddingItem, setIsAddingItem] = useState(false);
+  const [formKey, setFormKey] = useState(0); // Add this to reset the form
+
 
   //
   const Packing_options = [
@@ -113,21 +118,33 @@ export default function AddItemForm() {
     setSubmitStatus(null);
     try {
       const response = await axiosInstance.post("/api/gaskets", formData);
-      setSubmitStatus({ type: "success", message: response.data.message });
-      setFormData({
+      toast.success(response.data.message);
+      setFormData((prev) => ({
+        ...prev,
         part_number: "",
         material_type: "",
         packing_type: "",
         engine: "",
         brand: "",
         vendor: "",
-        added_by: "Admin",
-      });
+      }));
+
+      setFormKey((prevKey) => prevKey + 1); // Change key to reset inputs
+      
     } catch (err) {
-      setSubmitStatus({
-        type: "error",
-        message: err.response?.data?.error || "Failed to create gasket",
-      });
+      toast.error(err.response?.data?.message || "Failed to add gasket");
+      setFormData((prev) => ({
+        ...prev,
+        part_number: "",
+        material_type: "",
+        packing_type: "",
+        engine: "",
+        brand: "",
+        vendor: "",
+      }));
+
+      setFormKey((prevKey) => prevKey + 1); // Change key to reset inputs
+      
     }
   };
 
@@ -138,17 +155,7 @@ export default function AddItemForm() {
     <div className="max-w-4xl mx-auto p-6 ">
       <h1 className="text-2xl font-f1 mb-6 text-center">Add New Gasket</h1>
 
-      {submitStatus && (
-        <div
-          className={`mb-6 p-4 rounded-md ${
-            submitStatus.type === "success" ? "bg-green-100" : "bg-red-100"
-          }`}
-        >
-          {submitStatus.message}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form key={formKey} onSubmit={handleSubmit} className="space-y-6" >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label

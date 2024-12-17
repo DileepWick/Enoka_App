@@ -1,12 +1,11 @@
 import DeliveryItem from "../models/deliveryItem.js";
 import mongoose from "mongoose";
 
-//Create a new delivery item
+// Create a new delivery item
 export const createDeliveryItem = async (req, res) => {
   const { item, quantity, deliveryId, stock } = req.body; // Destructure item, quantity, and deliveryId
 
   try {
-
     // Validate input
     if (!item || !quantity || !deliveryId || !stock) {
       return res.status(400).json({
@@ -19,6 +18,18 @@ export const createDeliveryItem = async (req, res) => {
     if (!delivery) {
       return res.status(404).json({
         message: "Delivery not found",
+      });
+    }
+
+    // Check if the item has already been added to the delivery
+    const existingItem = await mongoose.model("DeliveryItem").findOne({
+      item,
+      deliveryId,
+    });
+
+    if (existingItem) {
+      return res.status(419).json({
+        message: "Item has already been added to this delivery",
       });
     }
 
@@ -72,6 +83,7 @@ export const createDeliveryItem = async (req, res) => {
     });
   }
 };
+
 
 //Get all delivery items
 export const getAllDeliveryItems = async (req, res) => {

@@ -28,7 +28,6 @@ import CompleteDeliveryBtn from "./completeDeliveryBtn.jsx";
 //Controller for API ENDPOINT
 import axiosInstance from "@/config/axiosInstance";
 
-
 const ReceiveBtn = ({ deliveryId }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [deliveryItems, setDeliveryItems] = useState([]);
@@ -103,7 +102,7 @@ const ReceiveBtn = ({ deliveryId }) => {
   return (
     <>
       <Button onPress={onOpen} color="default" variant="ghost">
-        Receive 
+        Receive
       </Button>
       <Modal
         isOpen={isOpen}
@@ -188,8 +187,12 @@ const ReceiveBtn = ({ deliveryId }) => {
                             <TableCell>{item.itemType}</TableCell>
                             <TableCell>{item.quantity}</TableCell>
                             <TableCell>{item.stock._id}</TableCell>
-                            <TableCell>{item.deliveryId.senderBranch}</TableCell>
-                            <TableCell>{item.deliveryId.receiverBranch}</TableCell>
+                            <TableCell>
+                              {item.deliveryId.senderBranch}
+                            </TableCell>
+                            <TableCell>
+                              {item.deliveryId.receiverBranch}
+                            </TableCell>
                             <TableCell>
                               {item.status === "Received" ? (
                                 <Chip className="font-f1 bg-black text-white">
@@ -211,6 +214,11 @@ const ReceiveBtn = ({ deliveryId }) => {
                                   quantity={item.quantity}
                                   itemId={item.item._id}
                                   itemType={item.itemType}
+                                  SenderStock={item.stock._id}
+                                  receivingBranch={
+                                    item.deliveryId.receiverBranch
+                                  }
+                                  deliveryId={item.deliveryId._id}
                                 />
                               )}
                             </TableCell>

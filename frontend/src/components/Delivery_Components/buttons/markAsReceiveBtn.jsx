@@ -8,13 +8,13 @@ import {
   Button,
   useDisclosure,
   Chip,
+  Input,
 } from "@nextui-org/react";
 
-//Controller for API ENDPOINT
+// Controller for API ENDPOINT
 import axiosInstance from "@/config/axiosInstance";
 
-
-//Emitter
+// Emitter
 import emitter from "../../../../util/emitter.js";
 
 export default function App({
@@ -23,44 +23,65 @@ export default function App({
   quantity,
   itemId,
   itemType,
+  receivingBranchId,
+  senderBranchId,
 }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [isConfirmed, setIsConfirmed] = useState(false); // State to track if confirmation is completed
+  const [receivedQuantity, setReceivedQuantity] = useState(quantity); // State for user-input quantity
 
   // Handle the confirmation of marking the delivery as received
   const handleConfirm = async () => {
     try {
-      const status = "Received";
+      const returnedQuantity = quantity - receivedQuantity;
 
-      // Make the API call to change the delivery status
-      const response = await axiosInstance.put(
-        `/api/deliveryItems/updateStatusOfDeliveryItem/${deliveryItemId}`,
-        { status }
-      );
+      // Update the received items
+      const receivedStatus = "Received";
+      const returnedStatus = "Returned";
 
-      // Check if the response is successful
-      if (response.status === 200) {
-        console.log("Delivery marked as received successfully.");
-        setIsConfirmed(true); // Mark the confirmation as completed
+      if (receivedQuantity > 0) {
+        // Mark the delivery as received
+        await axiosInstance.put(
+          `/api/deliveryItems/updateStatusOfDeliveryItem/${deliveryItemId}`,
+          { status: receivedStatus, quantity: receivedQuantity }
+        );
 
-        // Update the quantity of the item if it's a gasket
+        // Add received items to the receiving branch stock
         if (itemType === "Gasket") {
-          const response = await axios.put(
-            `/api/gaskets/increaseGasketQty/${itemId}`,
-            { quantity }
-          );
-
-          if (response) {
-            // Emit the event to notify
-            emitter.emit("deliveryItemReceived");
-          }
+          await axiosInstance.put(`/api/gaskets/increaseGasketQty/${itemId}`, {
+            quantity: receivedQuantity,
+            branchId: receivingBranchId,
+          });
         } else {
           alert("Unknown Item Type : " + itemType);
         }
       }
+
+      if (returnedQuantity > 0) {
+        // Create a new delivery item for returned items
+        await axiosInstance.post(`/api/deliveryItems`, {
+          itemId,
+          itemType,
+          quantity: returnedQuantity,
+          status: returnedStatus,
+          senderBranchId,
+          receivingBranchId,
+        });
+
+        // Add returned items to the sender branch stock
+        if (itemType === "Gasket") {
+          await axiosInstance.put(`/api/gaskets/increaseGasketQty/${itemId}`, {
+            quantity: returnedQuantity,
+            branchId: senderBranchId,
+          });
+        }
+      }
+
+      setIsConfirmed(true); // Mark the confirmation as completed
+      emitter.emit("deliveryItemProcessed");
     } catch (error) {
-      console.error("Error marking delivery as received:", error);
-      alert("Failed to mark delivery as received.");
+      console.error("Error processing delivery item:", error);
+      alert("Failed to process delivery item.");
     }
   };
 
@@ -74,13 +95,23 @@ export default function App({
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1 font-f1">
-                Do you want to mark this item as received ?
+                Process Delivery Item
               </ModalHeader>
               <ModalBody className="font-f1">
                 <p>
-                  Once you confirm, <Chip color="danger">{Item}</Chip> will be
-                  added to the system.
+                  You have <Chip color="danger">{quantity}</Chip> items of <Chip>{Item}</Chip>.
+                  <br />
+                  How many would you like to mark as received?
                 </p>
+                <Input
+                  type="number"
+                  value={receivedQuantity}
+                  min={0}
+                  max={quantity}
+                  onChange={(e) => setReceivedQuantity(Number(e.target.value))}
+                  fullWidth
+                  placeholder="Enter quantity to mark as received"
+                />
               </ModalBody>
               <ModalFooter className="font-f1">
                 <Button
@@ -90,12 +121,12 @@ export default function App({
                     onClose();
                   }}
                   className="bg-black"
-                  disabled={isConfirmed} // Disable confirm button after confirmation
+                  disabled={isConfirmed || receivedQuantity <= 0 || receivedQuantity > quantity}
                 >
                   Confirm
                 </Button>
                 <Button color="danger" variant="bordered" onPress={onClose}>
-                  No
+                  Cancel
                 </Button>
               </ModalFooter>
             </>

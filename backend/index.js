@@ -12,6 +12,7 @@ import deliveryItemRoutes from "./routes/deliveryItemRoutes.js";
 import deliveryRoutes from "./routes/deliveryRoutes.js";
 import stockRoutes from "./routes/stockRoutes.js";
 
+import  whitelistRoutes from './routes/wluserRoutes.js';
 //Protected routes
 import validateFirebaseToken from "./firebase/middlewareRoute.js";
 
@@ -86,3 +87,5 @@ app.use("/api/users", userRoutes);
 app.use("/api/deliveries", deliveryRoutes);
 app.use("/api/delivery", deliveryRoutes);
 app.use("/api/deliveryItems", deliveryItemRoutes);
+
+app.use("/api/wlusers", whitelistRoutes);

@@ -12,9 +12,13 @@ import deliveryItemRoutes from "./routes/deliveryItemRoutes.js";
 import deliveryRoutes from "./routes/deliveryRoutes.js";
 import stockRoutes from "./routes/stockRoutes.js";
 
-import  whitelistRoutes from './routes/wluserRoutes.js';
+import whitelistRoutes from "./routes/wluserRoutes.js";
+
 //Protected routes
-import validateFirebaseToken from "./firebase/middlewareRoute.js";
+import {
+  validateAndVerifyWhitelist,
+} from "./firebase/middlewareRoute.js";
+import sessionRouter from "./firebase/middlewareRoute.js";
 
 // Load environment variables from .env file
 import dotenv from "dotenv";
@@ -56,7 +60,7 @@ mongoose
   });
 
 // Protected route
-// app.use("/api", validateFirebaseToken, (req, res) => {
+// app.use("/api", validateAndVerifyWhitelist, (req, res) => {
 //   res.json({ message: "Welcome to the protected route!", user: req.user });
 // });
 
@@ -66,16 +70,16 @@ app.get("/public", (req, res) => {
 });
 
 // Routes
-// app.use('/api/gaskets', validateFirebaseToken, gasketRoutes);
-// app.use('/api/vendors', validateFirebaseToken, vendorRoutes);
-// app.use('/api/engines', validateFirebaseToken, engineRoutes);
-// app.use('/api/brands', validateFirebaseToken, brandRoutes);
-// app.use('/api/branches', validateFirebaseToken, branchRoutes);
-// app.use('/api/users', validateFirebaseToken, userRoutes);
-// app.use('/api/deliveries', validateFirebaseToken, deliveryRoutes);
-// app.use('/api/delivery', validateFirebaseToken, deliveryRoutes);
-// app.use('/api/deliveryItems', validateFirebaseToken, deliveryItemRoutes);
-//app.use('/api/stocks', validateFirebaseToken, stockRoutes);
+// app.use('/api/gaskets', validateAndVerifyWhitelist, gasketRoutes);
+// app.use('/api/vendors', validateAndVerifyWhitelist, vendorRoutes);
+// app.use('/api/engines', validateAndVerifyWhitelist, engineRoutes);
+// app.use('/api/brands', validateAndVerifyWhitelist, brandRoutes);
+// app.use('/api/branches', validateAndVerifyWhitelist, branchRoutes);
+// app.use('/api/users', validateAndVerifyWhitelist, userRoutes);
+// app.use('/api/deliveries', validateAndVerifyWhitelist, deliveryRoutes);
+// app.use('/api/delivery', validateAndVerifyWhitelist, deliveryRoutes);
+// app.use('/api/deliveryItems', validateAndVerifyWhitelist, deliveryItemRoutes);
+//app.use('/api/stocks', validateAndVerifyWhitelist, stockRoutes);
 
 app.use("/api/stocks", stockRoutes);
 app.use("/api/gaskets", gasketRoutes);
@@ -89,3 +93,6 @@ app.use("/api/delivery", deliveryRoutes);
 app.use("/api/deliveryItems", deliveryItemRoutes);
 
 app.use("/api/wlusers", whitelistRoutes);
+
+// Use the sessionRouter for the /extend-session route
+app.use('/api/extend', sessionRouter);

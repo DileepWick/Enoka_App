@@ -42,7 +42,6 @@ export default function App({
 
       // Update the received items
       const receivedStatus = "Received";
-      const returnedStatus = "Returned";
 
       // Update stock for received items
       if (receivedQuantity > 0) {
@@ -69,8 +68,22 @@ export default function App({
           }
         );
         console.log("Delivery item response:", deliveryItemResponse.data);
+
+        //Set received quantity by api
+        const receivedQuantityResponse = await axiosInstance.put(
+          `/api/deliveryItems/setReceivedQuantity`,
+          {
+            deliveryItemId: deliveryItemId,
+            received_quantity: receivedQuantity,
+          }
+        );
+        console.log(
+          "Received quantity update response:",
+          receivedQuantityResponse.data
+        );
       }
 
+      // Update stock for returned items
       if (returnedQuantity > 0) {
         console.log(
           `Returning ${returnedQuantity} of ${Item} to sender branch`
@@ -89,6 +102,19 @@ export default function App({
             senderStockResponse.data
           );
         }
+
+        //Set returned quantity by api
+        const returnedQuantityResponse = await axiosInstance.put(
+          `/api/deliveryItems/setReturnedQuantity`,
+          {
+            deliveryItemId: deliveryItemId,
+            returned_quantity: returnedQuantity,
+          }
+        );
+        console.log(
+          "Returned quantity update response:",
+          returnedQuantityResponse.data
+        );
       }
 
       setIsConfirmed(true); // Mark the confirmation as completed

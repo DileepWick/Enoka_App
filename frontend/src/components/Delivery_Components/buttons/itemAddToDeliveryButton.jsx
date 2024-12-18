@@ -58,7 +58,7 @@ const ItemAddToDeliveryButton = ({
         "/api/deliveryItems/createDeliveryItem",
         {
           item: item_id, // Use the item_id passed as a prop
-          quantity: quantity,
+          delivery_quantity: quantity,
           deliveryId: delivery_id, // Use the delivery_id passed as a prop
           stock: stockId,
         }

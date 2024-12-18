@@ -40,21 +40,11 @@ const ViewDetailsBtn = ({ deliveryId }) => {
     }
   }, [isOpen, deliveryId]);
 
-  // Print the table as a report
-  const handlePrintReport = () => {
-    const printContent = document.getElementById("printableTable");
-    const newWindow = window.open("", "_blank");
-    newWindow.document.write("<html><head><title>Delivery Report</title></head><body>");
-    newWindow.document.write(printContent.outerHTML);
-    newWindow.document.write("</body></html>");
-    newWindow.document.close();
-    newWindow.print();
-  };
 
   return (
     <>
       <Button onPress={onOpen}  className="mr-2 bg-black text-white">
-        View
+        View Items
       </Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="full" className="font-f1">
         <ModalContent>
@@ -77,18 +67,24 @@ const ViewDetailsBtn = ({ deliveryId }) => {
                   >
                     <Table aria-label="Delivery Items Table" className="font-f1">
                       <TableHeader>
-                        <TableColumn>Item</TableColumn>
-                        <TableColumn>Item Type</TableColumn>
-                        <TableColumn>Quantity</TableColumn>
-                        <TableColumn>Checking Status</TableColumn>
+                        <TableColumn>PART NUMBER</TableColumn>
+                        <TableColumn>ITEM</TableColumn>
+                        <TableColumn>TYPE</TableColumn>
+                        <TableColumn>DELIVERED</TableColumn>
+                        <TableColumn>RECEIVED</TableColumn>
+                        <TableColumn>RETURNED</TableColumn>
+                        <TableColumn>STATUS</TableColumn>
                       </TableHeader>
                       <TableBody>
                         {deliveryItems.map((item) => (
                           <TableRow key={item._id}>
-                            <TableCell>{item.item.description}</TableCell>
+                            <TableCell>{item.item.part_number}</TableCell>
+                            <TableCell>{item.item.packing_type} {item.item.material_type}</TableCell>
                             <TableCell>{item.itemType}</TableCell>
-                            <TableCell>{item.quantity}</TableCell>
-                            <TableCell><Chip color="warning" variant="dot">{item.status}</Chip></TableCell>
+                            <TableCell>{item.delivery_quantity}</TableCell>
+                            <TableCell>{item.received_quantity}</TableCell>
+                            <TableCell>{item.returned_quantity}</TableCell>
+                            <TableCell><Chip color="primary">{item.status}</Chip></TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -99,9 +95,6 @@ const ViewDetailsBtn = ({ deliveryId }) => {
               <ModalFooter>
                 <Button onPress={onClose} color="danger" variant="bordered">
                   Close
-                </Button>
-                <Button onPress={handlePrintReport} className="bg-black text-white" >
-                  Print Report
                 </Button>
               </ModalFooter>
             </>

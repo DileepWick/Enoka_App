@@ -53,7 +53,7 @@ const ReceiveBtn = ({ deliveryId }) => {
   // Delivery Item Received Event Handler
   const handleDeliveryItemReceived = () => {
     console.log(
-      "DeliveryItem Received event received! Fetching Delivery Items..."
+      "DeliveryItem Processed event received! Fetching Delivery Items..."
     );
     fetchDeliveryItems();
   };
@@ -65,11 +65,11 @@ const ReceiveBtn = ({ deliveryId }) => {
     }
 
     // Subscribe to the 'deliveryItemReceived' event
-    emitter.on("deliveryItemReceived", handleDeliveryItemReceived);
+    emitter.on("deliveryItemProcessed", handleDeliveryItemReceived);
 
     // Cleanup listener on component unmount
     return () => {
-      emitter.off("deliveryItemReceived", handleDeliveryItemReceived);
+      emitter.off("deliveryItemProcessed", handleDeliveryItemReceived);
     };
   }, [isOpen, deliveryId]);
 
@@ -107,7 +107,7 @@ const ReceiveBtn = ({ deliveryId }) => {
       <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
-        size="5xl"
+        size="full"
         className="font-f1"
       >
         <ModalContent>
@@ -171,10 +171,11 @@ const ReceiveBtn = ({ deliveryId }) => {
                       className="font-f1"
                     >
                       <TableHeader>
-                        <TableColumn>Item Id</TableColumn>
+                        <TableColumn>Item </TableColumn>
                         <TableColumn>Item Type</TableColumn>
-                        <TableColumn>Quantity</TableColumn>
-                        <TableColumn>Stock of the sender</TableColumn>
+                        <TableColumn>Delivered Quantity</TableColumn>
+                        <TableColumn>Received Quantity</TableColumn>
+                        <TableColumn>Returned Quantity</TableColumn>
                         <TableColumn>Sender</TableColumn>
                         <TableColumn>Receiver</TableColumn>
                         <TableColumn>Checking Status</TableColumn>
@@ -183,10 +184,11 @@ const ReceiveBtn = ({ deliveryId }) => {
                       <TableBody>
                         {filteredItems.map((item) => (
                           <TableRow key={item._id}>
-                            <TableCell>{item.item._id}</TableCell>
+                            <TableCell>{item.item.part_number}</TableCell>
                             <TableCell>{item.itemType}</TableCell>
-                            <TableCell>{item.quantity}</TableCell>
-                            <TableCell>{item.stock._id}</TableCell>
+                            <TableCell>{item.delivery_quantity}</TableCell>
+                            <TableCell>{item.received_quantity}</TableCell>
+                            <TableCell>{item.returned_quantity}</TableCell>
                             <TableCell>
                               {item.deliveryId.senderBranch}
                             </TableCell>
@@ -211,7 +213,7 @@ const ReceiveBtn = ({ deliveryId }) => {
                                 <MarkAsReceive
                                   deliveryItemId={item._id}
                                   Item={item.item.part_number}
-                                  quantity={item.quantity}
+                                  quantity={item.delivery_quantity}
                                   itemId={item.item._id}
                                   itemType={item.itemType}
                                   SenderStock={item.stock._id}

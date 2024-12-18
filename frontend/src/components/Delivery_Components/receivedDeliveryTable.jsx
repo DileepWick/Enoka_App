@@ -152,7 +152,7 @@ const ReceivedDeliveryTable = () => {
                   {new Date(delivery.receivedAt).toLocaleDateString()}
                 </TableCell>
                 <TableCell>
-                  <Chip variant="dot" size="lg" color="success">
+                  <Chip  size="lg" color="primary">
                     {delivery.status}
                   </Chip>
                 </TableCell>

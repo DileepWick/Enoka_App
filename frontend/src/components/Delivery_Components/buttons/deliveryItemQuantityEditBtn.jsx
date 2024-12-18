@@ -45,7 +45,7 @@ const DeliveryItemQuantityEditBtn = ({
       const response = await axiosInstance.put(
         `/api/deliveryItems/editDeliveryItemQuantity/${deliveryItemId}`,
         {
-          quantity: quantity,
+          delivery_quantity: quantity,
         }
       );
 
@@ -94,7 +94,7 @@ const DeliveryItemQuantityEditBtn = ({
 
   return (
     <>
-      <Button onPress={onOpen}>Change Quantity</Button>
+      <Button onPress={onOpen} size="sm" className="bg-black text-white">Change Quantity</Button>
       <Modal isOpen={isOpen} onOpenChange={onClose} size="lg">
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1 font-f1">

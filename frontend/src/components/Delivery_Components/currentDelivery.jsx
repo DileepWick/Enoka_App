@@ -237,12 +237,10 @@ const CurrentDelivery = () => {
               <table className="min-w-full table-auto text-xs sm:text-sm border-collapse">
                 <thead>
                   <tr className="bg-gray-200 text-gray-700">
-                    <th className="border px-4 py-2 text-center w-12">
-                      Select
-                    </th>
-                    <th className="border px-4 py-2 text-left">Item</th>
+                    <th className="border px-4 py-2 text-left" colSpan={2}>Item</th>
                     <th className="border px-4 py-2 text-center">Quantity</th>
                     <th className="border px-4 py-2 text-center">Actions</th>
+                    <th className="border px-4 py-2 text-center">Sending Stock</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -262,36 +260,43 @@ const CurrentDelivery = () => {
                       </td>
 
                       {/* Stock Column */}
-                      <td className="border px-4 py-2 text-left font-medium">
-                        {item.item.engine?.engine_name}
+                      <td className="border px-4 py-2 text-left">
+                        {item.item.packing_type} {item.item.material_type}
                       </td>
 
                       {/* Quantity Column */}
                       <td className="border px-4 py-2 text-center">
-                        {item.quantity}
+                        {item.delivery_quantity}
                       </td>
 
                       {/* Actions Column */}
                       <td className="border px-4 py-2 text-center">
                         <div className="flex items-center justify-center space-x-2">
+                          <EditQtyBtn
+                            deliveryItemId={item._id}
+                            stockId={item.stock._id}
+                            currentQuantity={item.delivery_quantity}
+                          />
                           <Button
-                            className="bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700"
+                            color="danger"
+                            size="sm"
+                            variant="bordered"
                             onClick={() =>
                               handleRemoveItem(
                                 item._id,
-                                item.stock,
-                                item.quantity
+                                item.stock._id,
+                                item.delivery_quantity
                               )
                             }
                           >
                             Remove
                           </Button>
-                          <EditQtyBtn
-                            deliveryItemId={item._id}
-                            stockId={item.stock}
-                            currentQuantity={item.quantity}
-                          />
                         </div>
+                      </td>
+
+                      {/* Sending Stock Column */}
+                      <td className="border px-4 py-2 text-center">
+                        {item.stock._id}
                       </td>
                     </tr>
                   ))}

@@ -25,9 +25,8 @@ const App = () => {
   const handleLogout = () => {
     const auth = getAuth();
     signOut(auth);
-    window.location.href = '/login'; // Redirect to login after logout
+    window.location.href = "/login"; // Redirect to login after logout
   };
-
 
   return (
     <AuthProvider>
@@ -36,6 +35,8 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/signupwg" element={<SignupWG />} />
+        <Route path="/deliveryManagement" element={<DeliveryManagement />} />
+        <Route path="/inventory" element={<Inventory />} />
 
         {/* Protected Routes */}
         <Route
@@ -46,27 +47,12 @@ const App = () => {
             </PrivateRoute>
           }
         />
-        <Route
-          path="/deliveryManagement"
-          element={
-            <PrivateRoute>
-              <DeliveryManagement />
-            </PrivateRoute>
-          }
-        />
+
         <Route
           path="/crb"
           element={
             <PrivateRoute>
               <CRB />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/inventory"
-          element={
-            <PrivateRoute>
-              <Inventory />
             </PrivateRoute>
           }
         />
@@ -76,15 +62,20 @@ const App = () => {
       {promptExtendSession && (
         <div
           style={{
-            position: 'fixed',
+            position: "fixed",
             top: 0,
             left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
             zIndex: 999,
           }}
-        ><SessionPrompt onExtend={handleExtendSession} onLogout={handleLogout} /></div>
+        >
+          <SessionPrompt
+            onExtend={handleExtendSession}
+            onLogout={handleLogout}
+          />
+        </div>
       )}
     </AuthProvider>
   );

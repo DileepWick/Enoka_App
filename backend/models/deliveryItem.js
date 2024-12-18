@@ -22,7 +22,7 @@ const deliveryItemSchema = new mongoose.Schema({
   },
   status: { 
     type: String, 
-    enum: ['Pending', 'Received', 'Count mismatch'], 
+    enum: ['Pending', 'Received', 'Count mismatch','Returned'], 
     default: 'Pending', 
     required: true 
   },

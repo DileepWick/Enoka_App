@@ -1,5 +1,3 @@
-// src/hooks/useAuth.js
-
 import { useState, useEffect } from "react";
 import {
   getAuth,
@@ -7,12 +5,12 @@ import {
   signOut,
   getIdToken,
 } from "firebase/auth";
-import axios from "axios";
 import axiosInstance from "@/config/axiosInstance";
 
 const useAuth = () => {
   const [user, setUser] = useState(null);
   const [promptExtendSession, setPromptExtendSession] = useState(false);
+  const [loading, setLoading] = useState(true); // Add loading state
   const auth = getAuth();
 
   useEffect(() => {
@@ -33,6 +31,7 @@ const useAuth = () => {
       } else {
         setUser(null);
       }
+      setLoading(false); // Mark loading as complete
     });
 
     return () => unsubscribe();
@@ -52,7 +51,7 @@ const useAuth = () => {
     }
   };
 
-  return { user, promptExtendSession, extendSession };
+  return { user, loading, promptExtendSession, extendSession };
 };
 
 export default useAuth;

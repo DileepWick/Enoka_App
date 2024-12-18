@@ -4,6 +4,7 @@ import { doSignInWithEmailAndPassword, doSignInWithGoogle } from '../../firebase
 import { useAuth } from '../contexts/authContext';
 import { getFirebaseErrorMessage } from '@@/firebase/firebaseErrorMessages';
 
+
 const Login = () => {
     const { userLoggedIn } = useAuth();
     const navigate = useNavigate();

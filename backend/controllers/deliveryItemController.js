@@ -126,7 +126,8 @@ export const getDeliveryItemsByDeliveryId = async (req, res) => {
     // Fetch all delivery items for the given deliveryId and populate the 'item' field
     const deliveryItems = await DeliveryItem.find({ deliveryId })
       .populate("item") // Populate the item reference (this dynamically depends on the itemType)
-      .exec();
+      .populate("stock") // Populate the stock reference
+      .populate("deliveryId") // Populate the delivery reference;
 
     if (!deliveryItems || deliveryItems.length === 0) {
       return res.status(404).json({

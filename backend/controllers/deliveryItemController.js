@@ -1,6 +1,10 @@
 import DeliveryItem from "../models/deliveryItem.js";
 import mongoose from "mongoose";
 
+import Gasket from "../models/Gasket.js";
+import Stock from "../models/Stock.js";
+import Branch from "../models/Branch.js";
+
 // Create a new delivery item
 export const createDeliveryItem = async (req, res) => {
   const { item, quantity, deliveryId, stock } = req.body; // Destructure item, quantity, and deliveryId
@@ -236,5 +240,43 @@ export const updateStatusOfDeliveryItem = async (req, res) => {
   } catch (error) {
     console.error("Error updating delivery item status:", error.message);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+// Controller function to find and update stock - Gasket Only
+export const updateStockForBranchAndItem = async (req, res) => {
+  try {
+    const { branchName, itemId, quantity } = req.body; // Get the branch name, item ID, and quantity from the request
+
+    // Find the branch by name
+    const branch = await Branch.findOne({ name: branchName });
+    if (!branch) {
+      return res.status(404).json({ message: "Branch not found" });
+    }
+
+    // Find the gasket (item) by its ID
+    const gasket = await Gasket.findById(itemId);
+    if (!gasket) {
+      return res.status(404).json({ message: "Item (Gasket) not found" });
+    }
+
+    // Find the stock associated with the branch and item (gasket)
+    const stock = await Stock.findOne({ branch: branch._id, _id: { $in: gasket.stock } });
+
+    if (!stock) {
+      return res.status(404).json({ message: "Stock not found for this branch and item" });
+    }
+
+    // Update the stock quantity
+    stock.quantity += quantity; // Add the quantity (could be positive or negative based on the operation)
+
+    // Save the updated stock
+    await stock.save();
+
+    return res.status(200).json({ message: "Stock updated successfully", stock });
+  } catch (error) {
+    console.error("Error updating stock:", error);
+    res.status(500).json({ message: "Error updating stock", error: error.message });
   }
 };

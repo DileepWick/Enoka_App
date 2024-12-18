@@ -1,5 +1,5 @@
 import express from 'express';
-import { createDeliveryItem ,getAllDeliveryItems ,getDeliveryItemsByDeliveryId ,editDeliveryItemQuantity ,deleteDeliveryItem ,  updateStatusOfDeliveryItem} from '../controllers/deliveryItemController.js';
+import { createDeliveryItem ,getAllDeliveryItems ,getDeliveryItemsByDeliveryId ,editDeliveryItemQuantity ,deleteDeliveryItem ,  updateStatusOfDeliveryItem ,updateStockForBranchAndItem} from '../controllers/deliveryItemController.js';
 
 const router = express.Router();
 
@@ -10,6 +10,7 @@ router.get('/getDeliveryItemsByDeliveryId/:deliveryId', getDeliveryItemsByDelive
 router.put('/editDeliveryItemQuantity/:deliveryItemId', editDeliveryItemQuantity);
 router.delete('/deleteDeliveryItem/:deliveryItemId', deleteDeliveryItem);
 router.put('/updateStatusOfDeliveryItem/:id', updateStatusOfDeliveryItem);
+router.put('/updateStockForBranchAndItem', updateStockForBranchAndItem);
 
 
 export default router;

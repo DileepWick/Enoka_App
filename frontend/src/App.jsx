@@ -1,7 +1,7 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./contexts/authContext";
-import useAuth from "./hooks/useAuth"; // Import the custom hook
+import useAuth from "./contexts/authContext/hooks/useAuth"; // Import the custom hook
 import PrivateRoute from "./components/PrivateRoute"; // Import PrivateRoute
 import SessionPrompt from "./components/SessionPrompt"; // Import SessionPrompt
 // Pages
@@ -32,13 +32,53 @@ const App = () => {
   return (
     <AuthProvider>
       <Routes>
-        <Route path="/" element={<DeliveryManagement />} />
+        {/* <Route path="/signup" element={<Signup />} />
+        <Route path="/signupwg" element={<SignupWG />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/" element={<DeliveryManagement />} />
         <Route path="/deliveryManagement" element={<DeliveryManagement />} />
+        <Route path="/crb" element={<CRB />} />
+        <Route path="/inventory" element={<Inventory />} /> */}
+
+        {/* Public routes */}
         <Route path="/signup" element={<Signup />} />
         <Route path="/signupwg" element={<SignupWG />} />
-        <Route path="/crb" element={<CRB />} />
-        <Route path="/inventory" element={<Inventory />} />
+        <Route path="/login" element={<Login />} />
+
+        {/* Protected routes */}
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <DeliveryManagement />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/deliveryManagement"
+          element={
+            <PrivateRoute>
+              <DeliveryManagement />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/crb"
+          element={
+            <PrivateRoute>
+              <CRB />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/inventory"
+          element={
+            <PrivateRoute>
+              <Inventory />
+            </PrivateRoute>
+          }
+        />
+
       </Routes>
 
       {/* Render SessionPrompt if session is about to expire */}

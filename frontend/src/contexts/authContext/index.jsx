@@ -1,74 +1,48 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import {
-  getAuth,
-  onAuthStateChanged,
-  signOut,
-} from "firebase/auth";
-import axiosInstance from "@/config/axiosInstance";
+import React, { useContext, useEffect, useState } from "react";
+import { auth } from "@@/firebase/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
-const AuthContext = createContext();
+const AuthContext = React.createContext();
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export function useAuth() {
+    return useContext(AuthContext);
+}
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [promptExtendSession, setPromptExtendSession] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const auth = getAuth();
+export function AuthProvider({ children }) {
+    const [currentUser, setCurrentUser] = useState(null);
+    const [userLoggedIn, setUserLoggedIn] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        setUser(firebaseUser);
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, initializeUser);
+        return unsubscribe;
+    }, []);
 
-        // Check token validity periodically
+    async function initializeUser(user) {
         try {
-          const idToken = await firebaseUser.getIdToken(true);
-          const decodedToken = await auth.currentUser.getIdTokenResult();
-          const sessionExpiryTime = decodedToken.exp * 1000;
-          const currentTime = Date.now();
-
-          if (sessionExpiryTime - currentTime < 300000) {
-            // 5 minutes before expiration
-            setPromptExtendSession(true);
-          }
+            if (user) {
+                setCurrentUser({ ...user });
+                setUserLoggedIn(true);
+            } else {
+                setCurrentUser(null);
+                setUserLoggedIn(false);
+            }
         } catch (error) {
-          console.error("Error fetching token:", error);
+            console.error("Error initializing user:", error);
+        } finally {
+            setLoading(false);
         }
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [auth]);
-
-  const extendSession = async () => {
-    try {
-      const response = await axiosInstance.post("/api/extend", {});
-      const newToken = response.data.newToken;
-      setUser({ ...user, idToken: newToken });
-      setPromptExtendSession(false);
-    } catch (error) {
-      console.error("Error extending session:", error);
-      signOut(auth);
     }
-  };
 
-  const value = {
-    user,
-    promptExtendSession,
-    extendSession,
-    loading,
-    userLoggedIn: !!user,
-  };
+    const value = {
+        currentUser,
+        userLoggedIn,
+        loading,
+    };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {loading ? <div>Loading...</div> : children}
-    </AuthContext.Provider>
-  );
-};
+    return (
+        <AuthContext.Provider value={value}>
+            {loading ? <div>Loading...</div> : children}
+        </AuthContext.Provider>
+    );
+}

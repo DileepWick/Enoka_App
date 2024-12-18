@@ -5,7 +5,7 @@ import { fetchGaskets } from "../../services/inventoryServices";
 import axiosInstance from "@/config/axiosInstance";
 
 import ItemAddToDeliveryButton from "./buttons/itemAddToDeliveryButton";
-import { Chip, Spinner } from "@nextui-org/react";
+import { Chip, Progress } from "@nextui-org/react";
 import {
   Table,
   TableHeader,
@@ -45,6 +45,7 @@ const GasketList = ({}) => {
   // Fetch the latest pending delivery
   useEffect(() => {
     const fetchLatestDelivery = async () => {
+      setLoading(true);
       try {
         const latestDelivery = await axiosInstance.get(
           "/api/delivery/deliveries/latest"
@@ -59,6 +60,8 @@ const GasketList = ({}) => {
         }
       } catch (error) {
         console.error("Error fetching the latest pending delivery:", error);
+      }finally{
+        setLoading(false);
       }
     };
 
@@ -123,37 +126,45 @@ const GasketList = ({}) => {
   // Search logic to filter gaskets based on the search term
   useEffect(() => {
     const filterGaskets = () => {
-      if (searchTerm) {
-        const filtered = gaskets.filter(
-          (gasket) =>
-            gasket.part_number
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase()) ||
-            gasket.material_type
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase()) ||
-            gasket.packing_type
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase()) ||
-            gasket.engine?.engine_name
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase()) ||
-            gasket.brand?.brand_name
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase()) ||
-            gasket.vendor?.vendor_name
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase())
-        );
-        setFilteredGaskets(filtered);
+      // Apply branch filtering first
+      let branchFilteredGaskets = gaskets;
+  
+      if (senderBranch) {
+        branchFilteredGaskets = gaskets.map((gasket) => ({
+          ...gasket,
+          stock: gasket.stock.filter(
+            (stock) => stock.branch?.name === senderBranch
+          ),
+        })).filter((gasket) => gasket.stock.length > 0); // Keep only gaskets with stock in the selected branch
+      }
+  
+      // Apply search filtering on the branch-filtered gaskets
+      if (searchTerm.trim()) {
+        const searchWords = searchTerm.toLowerCase().split(/\s+/); // Split by spaces and convert to lowercase
+  
+        const searchFilteredGaskets = branchFilteredGaskets.filter((gasket) => {
+          const itemContent = [
+            gasket.engine?.engine_name,
+            gasket.packing_type,
+            gasket.material_type,
+            gasket.vendor?.vendor_name,
+          ]
+            .filter(Boolean) // Remove null or undefined values
+            .join(" ")
+            .toLowerCase();
+  
+          return searchWords.every((word) => itemContent.includes(word));
+        });
+  
+        setFilteredGaskets(searchFilteredGaskets);
       } else {
-        setFilteredGaskets(gaskets);
+        setFilteredGaskets(branchFilteredGaskets); // If no search term, show only branch-filtered gaskets
       }
     };
-
+  
     filterGaskets();
-  }, [searchTerm, gaskets]);
-
+  }, [searchTerm, senderBranch, gaskets]);
+  
   // Filter gaskets by sender branch
   useEffect(() => {
     if (senderBranch) {
@@ -174,7 +185,19 @@ const GasketList = ({}) => {
     setSearchTerm(e.target.value);
   };
 
-  if (loading) return <Spinner />;
+  if (loading)
+    return (
+      <div>
+        {" "}
+        <Progress
+          isIndeterminate
+          aria-label="Loading data..."
+          className="w-full font-f1"
+          size="sm"
+          label="Retrieving information, just a moment..."
+        />
+      </div>
+    );
   if (error)
     return <div className="text-center py-4 text-red-500">{error}</div>;
 
@@ -182,53 +205,31 @@ const GasketList = ({}) => {
     <div className="container mx-auto px-4 py-8 font-f1">
       {delivery ? (
         <>
-          <h1 className="text-xl sm:text-2xl font-bold mb-4">Gaskets</h1>
-
-          <Input
-            type="text"
-            size="lg"
-            placeholder="Search gaskets"
-            value={searchTerm}
-            onChange={handleSearch}
-            className="p-2 mb-4"
-            variant="bordered"
-          />
+          <div className="mb-6">
+            <h2 className="text-sm font-f1 mb-2 w-[300px]">Search Gaskets</h2>
+            <Input
+              type="text"
+              placeholder="Search gaskets"
+              value={searchTerm}
+              onChange={handleSearch}
+              variant="bordered"
+              className="font-f1 w-[300px]"
+              fullWidth
+              size="md"
+            />
+          </div>
 
           {/* Scrollable Table */}
           <div className="overflow-x-auto">
-            <div
-              className="max-h-64 overflow-y-auto rounded border border-gray-300"
-              style={{
-                scrollbarWidth: "thin", // Firefox scrollbar
-                msOverflowStyle: "none", // IE/Edge scrollbar
-              }}
-            >
-              <style>
-                {`
-        /* Chrome, Safari scrollbar */
-        .max-h-64::-webkit-scrollbar {
-          width: 6px;
-        }
-        .max-h-64::-webkit-scrollbar-thumb {
-          background-color: #c0c0c0;
-          border-radius: 8px;
-        }
-        .max-h-64::-webkit-scrollbar-track {
-          background-color: #f0f0f0;
-        }
-      `}
-              </style>
-
+            <div className="max-h-64 overflow-y-auto rounded border border-gray-300">
               {/* Table */}
-              <table className="font-f1 w-full border-collapse border border-gray-300">
+              <table className="font-f1 w-full border-collapse border border-gray-300 text-sm">
                 <thead className="border border-gray-300">
                   <tr>
                     <th className="border border-gray-300 px-4 py-2">
                       Part Number
                     </th>
-                    <th className="border border-gray-300 px-4 py-2">
-                      Item
-                    </th>
+                    <th className="border border-gray-300 px-4 py-2">Item</th>
                     <th className="border border-gray-300 px-4 py-2">Brand</th>
                     <th className="border border-gray-300 px-4 py-2">Branch</th>
                     <th className="border border-gray-300 px-4 py-2">
@@ -249,7 +250,16 @@ const GasketList = ({}) => {
 
                       {/* Description */}
                       <td className="border border-gray-300 px-4 py-2">
-                        {gasket.engine?.engine_name || "N/A"}  {gasket.packing_type || "N/A"} {gasket.material_type || "N/A"} <Chip className="ml-8" variant="bordered" color="primary">{gasket.vendor?.vendor_name || "N/A"}</Chip>
+                        {gasket.engine?.engine_name || "N/A"}{" "}
+                        {gasket.packing_type || "N/A"}{" "}
+                        {gasket.material_type || "N/A"}{" "}
+                        <Chip
+                          className="ml-8"
+                          variant="bordered"
+                          color="primary"
+                        >
+                          {gasket.vendor?.vendor_name || "N/A"}
+                        </Chip>
                       </td>
 
                       {/* Brand */}

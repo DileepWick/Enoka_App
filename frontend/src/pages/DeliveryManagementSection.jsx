@@ -19,16 +19,15 @@ export function DeliveryManagement() {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
-        <Chip className="ml-8 font-f1 text-2xl p-4" variant="dot" size="lg">Delivery Management</Chip>
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
-          <Tabs className="font-f1" size="md" variant="bordered" color="danger">
-            <Tab key="deliverySystem" title="New Delivery">
+          <Tabs className="font-f1 mb-8 text-lg" size="lg" variant="underlined">
+            <Tab key="deliverySystem" title="NEW DELIVERY" className="text-2xl">
               <DeliverySystem />
             </Tab>
-            <Tab key="ondelivery" title="On Delivery">
+            <Tab key="ondelivery" title="ON GOING" className="text-2xl">
               <OnDeliveryTable />
             </Tab>
-            <Tab key="Received" title="Received">
+            <Tab key="Received" title="RECEIVED" className="text-2xl">
               <ReceivedDeliveryTable />
             </Tab>
           </Tabs>

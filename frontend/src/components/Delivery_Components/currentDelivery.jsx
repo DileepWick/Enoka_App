@@ -180,49 +180,52 @@ const CurrentDelivery = () => {
   };
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 font-f1 text-black">
-      <div className="max-w-3xl mx-auto">
+    <div className="w-full  font-f1 text-black">
+      <div className=" mx-auto">
         {newDelivery ? (
           <div className="bg-white text-black shadow-md rounded-lg p-4 sm:p-6">
-            <h2 className="text-2xl font-f1 mb-4 sm:mb-6 ">Delivery Details</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm sm:text-base">
-              <p>
-                <strong>From - </strong> {newDelivery.senderBranch}{" "}
-                <strong>To - </strong> {newDelivery.receiverBranch}
-                <br></br>
-                <strong>Total Items - </strong> {totalItemsDelivered} -{" "}
-                <strong>Item Types - </strong> {deliveryItems.length}
-              </p>
+            <h2 className="text-2xl font-f1 mb-4 sm:mb-6 ">DELIVERY DETAILS</h2>
+            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm sm:text-base">
+                <div className="space-y-2">
+                  <p className="flex justify-between items-center">
+                    <span className="font-semibold text-gray-600">From:</span>
+                    <span className="text-black">
+                      {newDelivery.senderBranch}
+                    </span>
+                  </p>
+                  <p className="flex justify-between items-center">
+                    <span className="font-semibold text-gray-600">To:</span>
+                    <span className="text-black">
+                      {newDelivery.receiverBranch}
+                    </span>
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="flex justify-between items-center">
+                    <span className="font-semibold text-gray-600">
+                      Total Items:
+                    </span>
+                    <span className="text-black">{totalItemsDelivered}</span>
+                  </p>
+                  <p className="flex justify-between items-center">
+                    <span className="font-semibold text-gray-600">
+                      Item Types:
+                    </span>
+                    <span className="text-black">{deliveryItems.length}</span>
+                  </p>
+                </div>
+              </div>
             </div>
             <Divider className="my-4 border-gray-700" />
 
-            <div className="flex flex-col sm:flex-row justify-between mt-4">
-              <Button
-                className="w-full sm:w-auto mb-4 sm:mb-0 bg-black text-white"
-                isDisabled={
-                  checkedCount < deliveryItems.length ||
-                  deliveryItems.length === 0
-                }
-                onClick={handleStartDelivery}
-              >
-                Start Delivery
-              </Button>
-              <Button
-                color="danger"
-                className="w-full sm:w-auto"
-                onClick={handleRemoveDelivery}
-              >
-                Cancel Delivery
-              </Button>
-            </div>
-
             {/* Delivery Items */}
-            <Divider className="my-6 border-black" />
-            <h2 className="text-2xl font-f1 mb-4 sm:mb-6 ">Delivery Items</h2>
+            <h2 className="text-2xl font-f1 mb-4 sm:mb-6 ">DELIVERY LIST</h2>
             <div className="my-6">
               <Progress
                 value={progressPercentage}
-                color="danger"
+                color="primary"
+                size="sm"
                 className="h-4 rounded-lg "
               />
               <p className="mt-2 text-center text-sm">
@@ -237,10 +240,12 @@ const CurrentDelivery = () => {
               <table className="min-w-full table-auto text-xs sm:text-sm border-collapse">
                 <thead>
                   <tr className="bg-gray-200 text-gray-700">
-                    <th className="border px-4 py-2 text-left" colSpan={2}>Item</th>
+                    <th className="border px-4 py-2 text-center" colSpan={2}>
+                      Item
+                    </th>
+                    <th className="border px-4 py-2 text-center">Brand</th>
                     <th className="border px-4 py-2 text-center">Quantity</th>
                     <th className="border px-4 py-2 text-center">Actions</th>
-                    <th className="border px-4 py-2 text-center">Sending Stock</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -252,16 +257,25 @@ const CurrentDelivery = () => {
                       {/* Checkbox Column */}
                       <td className="border px-4 py-2 text-center">
                         <Checkbox
-                          color="danger"
-                          size="md"
+                          color="primary"
+                          size="sm"
                           isSelected={checkedItems[item._id] || false}
                           onValueChange={() => handleCheckboxChange(item._id)}
                         />
                       </td>
 
                       {/* Stock Column */}
-                      <td className="border px-4 py-2 text-left">
-                        {item.item.packing_type} {item.item.material_type}
+                      <td className="border px-4 py-2 text-center whitespace-nowrap overflow-x-auto">
+                        {item.item.engine?.engine_name}-{item.item.packing_type}{" "}
+                        {item.item.material_type}{" "}
+                        <Chip variant="bordered" color="primary" size="sm">
+                          {item.item.vendor?.vendor_name}
+                        </Chip>{" "}
+                      </td>
+
+                      {/* Quantity Column */}
+                      <td className="border px-4 py-2 text-center">
+                        {item.item.brand?.brand_name}
                       </td>
 
                       {/* Quantity Column */}
@@ -293,15 +307,27 @@ const CurrentDelivery = () => {
                           </Button>
                         </div>
                       </td>
-
-                      {/* Sending Stock Column */}
-                      <td className="border px-4 py-2 text-center">
-                        {item.stock._id}
-                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              <Divider className="my-6 border-black mt-8" />
+              <div className="flex flex-col sm:flex-row justify-between mt-4">
+                <Button
+                  className=" bg-black text-white"
+                  size="sm"
+                  isDisabled={
+                    checkedCount < deliveryItems.length ||
+                    deliveryItems.length === 0
+                  }
+                  onClick={handleStartDelivery}
+                >
+                  START
+                </Button>
+                <Button color="danger" size="sm" onClick={handleRemoveDelivery}>
+                  CANCEL
+                </Button>
+              </div>
             </div>
           </div>
         ) : (

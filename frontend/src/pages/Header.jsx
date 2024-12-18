@@ -9,7 +9,7 @@ const Header = () => {
     const { userLoggedIn } = useAuth()
     
     return (
-        <nav className="flex items-center justify-between w-full  top-0 left-0 h-16 px-4 md:px-6 ">
+        <nav className="flex items-center justify-between w-full  top-0 left-0 h-16 px-4 md:px-6 bg-black">
             <div className="flex items-center">
                 <Link to="/" className="text-xl font-bold text-blue-600"></Link>
             </div>
@@ -17,7 +17,9 @@ const Header = () => {
                 {userLoggedIn ? (
                     <Button 
                         onClick={() => { doSignOut().then(() => { navigate('/login') }) }}
-                        className="px-4 py-2 text-sm font-medium text-white bg-black rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                        size='sm'
+                        className='font-f1 bg-black text-white'
+
                     >
                         Logout
                     </Button>

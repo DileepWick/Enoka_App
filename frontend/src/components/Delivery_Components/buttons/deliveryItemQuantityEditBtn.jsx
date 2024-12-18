@@ -6,7 +6,7 @@ import {
   Button,
   ModalHeader,
   ModalBody,
-  ModalFooter,
+  Progress,
   useDisclosure,
 } from "@nextui-org/react";
 
@@ -27,6 +27,7 @@ const DeliveryItemQuantityEditBtn = ({
   const [quantity, setQuantity] = useState("");
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // Handle quantity input change
   const handleQuantityChange = (e) => {
@@ -35,6 +36,7 @@ const DeliveryItemQuantityEditBtn = ({
 
   // Handle edit quantity action
   const handleEditQuantity = async () => {
+    setLoading(true);
     // Validate quantity input
     if (!quantity || isNaN(quantity) || quantity <= 0) {
       setError("Please provide a valid quantity.");
@@ -83,56 +85,61 @@ const DeliveryItemQuantityEditBtn = ({
     } catch (error) {
       console.error("Error updating delivery item:", error.message);
       setError("Failed to update item quantity. Please try again.");
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const handleClose = () => {
-    setQuantity(""); // Reset quantity
-    setError(""); // Reset error message
-    setSuccessMessage(""); // Reset success message
   };
 
   return (
     <>
-      <Button onPress={onOpen} size="sm" className="bg-black text-white">Change Quantity</Button>
-      <Modal isOpen={isOpen} onOpenChange={onClose} size="lg">
+      <Button onPress={onOpen} size="sm" className="bg-black text-white">
+        Edit
+      </Button>
+      <Modal isOpen={isOpen} onOpenChange={onClose} size="sm">
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1 font-f1">
             <h1 className="text-2xl font-bold">Edit Quantity</h1>
           </ModalHeader>
           <ModalBody>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault(); // Prevent default form submission
-                handleEditQuantity();
-              }}
-            >
-              <Input
-                type="number"
-                size="lg"
-                value={quantity}
-                onChange={handleQuantityChange}
-                className="font-f1"
-                label="Enter New Quantity"
-                required
-              />
-              {error && <p className="text-red-500">{error}</p>}
-              {successMessage && (
-                <p className="text-green-500">{successMessage}</p>
-              )}
-              <Button
-                type="submit"
-                className="mt-8 mb-8 font-f1 bg-black text-white"
+            {loading ? (
+              <div className="flex justify-center items-center h-full">
+                <Progress
+                  isIndeterminate
+                  aria-label="Loading data..."
+                  className="w-full mb-4 font-f1"
+                  size="sm"
+                  label="Changing Quantity..."
+                />
+              </div>
+            ) : (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault(); // Prevent default form submission
+                  handleEditQuantity();
+                }}
               >
-                Update Quantity
-              </Button>
-            </form>
+                <Input
+                  type="number"
+                  size="lg"
+                  value={quantity}
+                  onChange={handleQuantityChange}
+                  className="font-f1"
+                  label="Enter New Quantity"
+                  required
+                />
+                {error && <p className="text-red-500">{error}</p>}
+                {successMessage && (
+                  <p className="text-green-500">{successMessage}</p>
+                )}
+                <Button
+                  type="submit"
+                  className="mt-8 mb-8 font-f1 bg-black text-white"
+                >
+                  Update Quantity
+                </Button>
+              </form>
+            )}
           </ModalBody>
-          <ModalFooter>
-            <Button auto flat color="error" onPress={handleClose}>
-              Close
-            </Button>
-          </ModalFooter>
         </ModalContent>
       </Modal>
     </>

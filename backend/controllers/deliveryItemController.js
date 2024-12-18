@@ -84,15 +84,20 @@ export const createDeliveryItem = async (req, res) => {
   }
 };
 
-
-//Get all delivery items
+// Get all delivery items
 export const getAllDeliveryItems = async (req, res) => {
   try {
-    // Fetch all delivery items from the database
+    // Fetch all delivery items from the database and populate fields
     const deliveryItems = await DeliveryItem.find()
-      .populate("item") // Populate the item reference if needed
-      .exec();
-
+      .populate("item") // Populate the item reference
+      .populate({
+        path: "stock", // Populate the 'stock' array
+        populate: {
+          path: "branch", // Further populate the 'branch' field inside each stock
+        },
+      }) // Populate the stock reference
+      .populate("deliveryId") // Populate the delivery reference
+      
     if (!deliveryItems || deliveryItems.length === 0) {
       return res.status(404).json({
         message: "No delivery items found",
@@ -111,6 +116,7 @@ export const getAllDeliveryItems = async (req, res) => {
     });
   }
 };
+
 
 //Get delivery items by deliveryId
 export const getDeliveryItemsByDeliveryId = async (req, res) => {

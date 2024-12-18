@@ -7,11 +7,11 @@ import Branch from "../models/Branch.js";
 
 // Create a new delivery item
 export const createDeliveryItem = async (req, res) => {
-  const { item, quantity, deliveryId, stock } = req.body; // Destructure item, quantity, and deliveryId
+  const { item, delivery_quantity, deliveryId, stock } = req.body; // Destructure item, quantity, and deliveryId
 
   try {
     // Validate input
-    if (!item || !quantity || !deliveryId || !stock) {
+    if (!item || !delivery_quantity || !deliveryId || !stock) {
       return res.status(400).json({
         message: "All fields are required",
       });
@@ -67,7 +67,7 @@ export const createDeliveryItem = async (req, res) => {
     const newDeliveryItem = new DeliveryItem({
       item,
       itemType, // Dynamically set itemType
-      quantity,
+      delivery_quantity,
       deliveryId, // Set the deliveryId
       stock,
     });
@@ -87,6 +87,96 @@ export const createDeliveryItem = async (req, res) => {
     });
   }
 };
+
+//Set received quantity
+export const setReceivedQuantity = async (req, res) => {
+  const { deliveryItemId, received_quantity } = req.body; // Destructure item, quantity, and deliveryId
+
+  try {
+    // Validate input
+    if (!deliveryItemId || !received_quantity) {
+      return res.status(400).json({
+        message: "All fields are required",
+      });
+    }
+
+    // Check if the delivery item exists
+    const deliveryItem = await mongoose
+      .model("DeliveryItem")
+      .findById(deliveryItemId);
+    if (!deliveryItem) {
+      return res.status(404).json({
+        message: "Delivery item not found",
+      });
+    }
+
+   //Use find by id and update
+    const updatedDeliveryItem = await mongoose
+      .model("DeliveryItem")
+      .findOneAndUpdate(
+        { _id: deliveryItemId },
+        { received_quantity },  // Only update received_quantity
+        { new: true }
+      )
+
+    res.status(200).json({
+      message: "Received quantity updated successfully",
+      updatedDeliveryItem,
+    });
+  } catch (error) {
+    console.error("Error updating received quantity:", error);
+    res.status(500).json({
+      message: "Error updating received quantity",
+      error: error.message,
+    });
+  }
+};
+
+//Set returned quantity
+export const setReturnedQuantity = async (req, res) => {
+  const { deliveryItemId, returned_quantity } = req.body;
+
+  try {
+    // Validate input
+    if (!deliveryItemId || returned_quantity === undefined) {
+      return res.status(400).json({
+        message: "All fields are required",
+      });
+    }
+
+    // Check if the delivery item exists
+    const deliveryItem = await mongoose
+      .model("DeliveryItem")
+      .findById(deliveryItemId);
+
+    if (!deliveryItem) {
+      return res.status(404).json({
+        message: "Delivery item not found",
+      });
+    }
+
+    // Update the returned quantity directly
+    const updatedDeliveryItem = await mongoose
+      .model("DeliveryItem")
+      .findOneAndUpdate(
+        { _id: deliveryItemId },
+        { returned_quantity },  // Only update returned_quantity
+        { new: true }  // Return the updated document
+      );
+
+    res.status(200).json({
+      message: "Returned quantity updated successfully",
+      deliveryItem: updatedDeliveryItem,
+    });
+  } catch (error) {
+    console.error("Error updating returned quantity:", error);
+    res.status(500).json({
+      message: "Error updating returned quantity",
+      error: error.message,
+    });
+  }
+};
+
 
 // Get all delivery items
 export const getAllDeliveryItems = async (req, res) => {
@@ -243,7 +333,6 @@ export const updateStatusOfDeliveryItem = async (req, res) => {
   }
 };
 
-
 // Controller function to find and update stock - Gasket Only
 export const updateStockForBranchAndItem = async (req, res) => {
   try {
@@ -262,10 +351,15 @@ export const updateStockForBranchAndItem = async (req, res) => {
     }
 
     // Find the stock associated with the branch and item (gasket)
-    const stock = await Stock.findOne({ branch: branch._id, _id: { $in: gasket.stock } });
+    const stock = await Stock.findOne({
+      branch: branch._id,
+      _id: { $in: gasket.stock },
+    });
 
     if (!stock) {
-      return res.status(404).json({ message: "Stock not found for this branch and item" });
+      return res
+        .status(404)
+        .json({ message: "Stock not found for this branch and item" });
     }
 
     // Update the stock quantity
@@ -274,9 +368,13 @@ export const updateStockForBranchAndItem = async (req, res) => {
     // Save the updated stock
     await stock.save();
 
-    return res.status(200).json({ message: "Stock updated successfully", stock });
+    return res
+      .status(200)
+      .json({ message: "Stock updated successfully", stock });
   } catch (error) {
     console.error("Error updating stock:", error);
-    res.status(500).json({ message: "Error updating stock", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error updating stock", error: error.message });
   }
 };

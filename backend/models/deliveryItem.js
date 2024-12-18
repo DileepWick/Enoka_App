@@ -15,10 +15,18 @@ const deliveryItemSchema = new mongoose.Schema({
     type: String, 
     required: true 
   },
-  quantity: { 
+  delivery_quantity: { 
     type: Number, 
     required: true, 
     min: 1 
+  },
+  received_quantity: { 
+    type: Number, 
+    default: 0 
+  },
+  returned_quantity: { 
+    type: Number, 
+    default: 0 
   },
   status: { 
     type: String, 

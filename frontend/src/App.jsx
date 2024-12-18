@@ -32,44 +32,13 @@ const App = () => {
   return (
     <AuthProvider>
       <Routes>
-        {/* Public Routes */}
+        <Route path="/" element={<DeliveryManagement />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/deliveryManagement" element={<DeliveryManagement />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/signupwg" element={<SignupWG />} />
-
-        {/* Protected Routes */}
-        <Route
-          path="/"
-          element={
-            <PrivateRoute>
-              <DeliveryManagement />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/deliveryManagement"
-          element={
-            <PrivateRoute>
-              <DeliveryManagement />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/crb"
-          element={
-            <PrivateRoute>
-              <CRB />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/inventory"
-          element={
-            <PrivateRoute>
-              <Inventory />
-            </PrivateRoute>
-          }
-        />
+        <Route path="/crb" element={<CRB />} />
+        <Route path="/inventory" element={<Inventory />} />
       </Routes>
 
       {/* Render SessionPrompt if session is about to expire */}

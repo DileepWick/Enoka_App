@@ -19,12 +19,13 @@ import emitter from "../../../../util/emitter.js";
 
 export default function App({
   deliveryItemId,
+  SenderStock,
   Item,
   quantity,
   itemId,
   itemType,
-  receivingBranchId,
-  senderBranchId,
+  receivingBranch,
+  deliveryId,
 }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [isConfirmed, setIsConfirmed] = useState(false); // State to track if confirmation is completed
@@ -33,47 +34,60 @@ export default function App({
   // Handle the confirmation of marking the delivery as received
   const handleConfirm = async () => {
     try {
+      // Calculate returned items
       const returnedQuantity = quantity - receivedQuantity;
+      console.log(
+        `Received Quantity: ${receivedQuantity}, Returned Quantity: ${returnedQuantity}`
+      );
 
       // Update the received items
       const receivedStatus = "Received";
       const returnedStatus = "Returned";
 
+      // Update stock for received items
       if (receivedQuantity > 0) {
-        // Mark the delivery as received
-        await axiosInstance.put(
-          `/api/deliveryItems/updateStatusOfDeliveryItem/${deliveryItemId}`,
-          { status: receivedStatus, quantity: receivedQuantity }
+        console.log(
+          `Updating stock for received items: ${receivedQuantity} of ${Item}`
         );
 
-        // Add received items to the receiving branch stock
-        if (itemType === "Gasket") {
-          await axiosInstance.put(`/api/gaskets/increaseGasketQty/${itemId}`, {
-            quantity: receivedQuantity,
-            branchId: receivingBranchId,
-          });
-        } else {
-          alert("Unknown Item Type : " + itemType);
-        }
+        // Call the new route for updating stock
+        const response = await axiosInstance.put(
+          `/api/deliveryItems/updateStockForBranchAndItem`,
+          {
+            branchName: receivingBranch, // Branch name where items are received
+            itemId: itemId, // Item ID
+            quantity: receivedQuantity, // Received quantity
+          }
+        );
+        console.log("Received stock update response:", response.data);
+
+        //Update the delivery Item status
+        const deliveryItemResponse = await axiosInstance.put(
+          `/api/deliveryItems/updateStatusOfDeliveryItem/${deliveryItemId}`,
+          {
+            status: receivedStatus,
+          }
+        );
+        console.log("Delivery item response:", deliveryItemResponse.data);
       }
 
       if (returnedQuantity > 0) {
-        // Create a new delivery item for returned items
-        await axiosInstance.post(`/api/deliveryItems`, {
-          itemId,
-          itemType,
-          quantity: returnedQuantity,
-          status: returnedStatus,
-          senderBranchId,
-          receivingBranchId,
-        });
+        console.log(
+          `Returning ${returnedQuantity} of ${Item} to sender branch`
+        );
 
         // Add returned items to the sender branch stock
         if (itemType === "Gasket") {
-          await axiosInstance.put(`/api/gaskets/increaseGasketQty/${itemId}`, {
-            quantity: returnedQuantity,
-            branchId: senderBranchId,
-          });
+          const senderStockResponse = await axiosInstance.put(
+            `/api/stocks/increaseStockQuantity/${SenderStock}`,
+            {
+              quantity: returnedQuantity,
+            }
+          );
+          console.log(
+            "Returned items added to sender stock:",
+            senderStockResponse.data
+          );
         }
       }
 
@@ -87,7 +101,11 @@ export default function App({
 
   return (
     <>
-      <Button onPress={onOpen} disabled={isConfirmed} className="bg-black text-white">
+      <Button
+        onPress={onOpen}
+        disabled={isConfirmed}
+        className="bg-black text-white"
+      >
         Mark as Received
       </Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -99,7 +117,8 @@ export default function App({
               </ModalHeader>
               <ModalBody className="font-f1">
                 <p>
-                  You have <Chip color="danger">{quantity}</Chip> items of <Chip>{Item}</Chip>.
+                  You have <Chip color="danger">{quantity}</Chip> items of{" "}
+                  <Chip>{Item}</Chip>.
                   <br />
                   How many would you like to mark as received?
                 </p>
@@ -117,11 +136,18 @@ export default function App({
                 <Button
                   color="primary"
                   onPress={() => {
+                    console.log(
+                      `Confirming received quantity: ${receivedQuantity}`
+                    );
                     handleConfirm();
                     onClose();
                   }}
                   className="bg-black"
-                  disabled={isConfirmed || receivedQuantity <= 0 || receivedQuantity > quantity}
+                  disabled={
+                    isConfirmed ||
+                    receivedQuantity <= 0 ||
+                    receivedQuantity > quantity
+                  }
                 >
                   Confirm
                 </Button>

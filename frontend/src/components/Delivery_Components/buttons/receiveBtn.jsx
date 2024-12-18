@@ -172,10 +172,10 @@ const ReceiveBtn = ({ deliveryId }) => {
                       className="font-f1"
                     >
                       <TableHeader>
-                        <TableColumn>Item</TableColumn>
+                        <TableColumn>Item Id</TableColumn>
                         <TableColumn>Item Type</TableColumn>
                         <TableColumn>Quantity</TableColumn>
-                        <TableColumn>Stock</TableColumn>
+                        <TableColumn>Stock of the sender</TableColumn>
                         <TableColumn>Sender</TableColumn>
                         <TableColumn>Receiver</TableColumn>
                         <TableColumn>Checking Status</TableColumn>
@@ -184,7 +184,7 @@ const ReceiveBtn = ({ deliveryId }) => {
                       <TableBody>
                         {filteredItems.map((item) => (
                           <TableRow key={item._id}>
-                            <TableCell>{item.item.description}</TableCell>
+                            <TableCell>{item.item._id}</TableCell>
                             <TableCell>{item.itemType}</TableCell>
                             <TableCell>{item.quantity}</TableCell>
                             <TableCell>{item.stock._id}</TableCell>

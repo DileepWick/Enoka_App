@@ -110,14 +110,14 @@ export const setReceivedQuantity = async (req, res) => {
       });
     }
 
-   //Use find by id and update
+    //Use find by id and update
     const updatedDeliveryItem = await mongoose
       .model("DeliveryItem")
       .findOneAndUpdate(
         { _id: deliveryItemId },
-        { received_quantity },  // Only update received_quantity
+        { received_quantity }, // Only update received_quantity
         { new: true }
-      )
+      );
 
     res.status(200).json({
       message: "Received quantity updated successfully",
@@ -160,8 +160,8 @@ export const setReturnedQuantity = async (req, res) => {
       .model("DeliveryItem")
       .findOneAndUpdate(
         { _id: deliveryItemId },
-        { returned_quantity },  // Only update returned_quantity
-        { new: true }  // Return the updated document
+        { returned_quantity }, // Only update returned_quantity
+        { new: true } // Return the updated document
       );
 
     res.status(200).json({
@@ -176,7 +176,6 @@ export const setReturnedQuantity = async (req, res) => {
     });
   }
 };
-
 
 // Get all delivery items
 export const getAllDeliveryItems = async (req, res) => {
@@ -220,12 +219,23 @@ export const getDeliveryItemsByDeliveryId = async (req, res) => {
     const deliveryItems = await DeliveryItem.find({ deliveryId })
       .populate({
         path: "item", // Populate item
-        populate: {
-          path: "stock", // Populate stocks within item
-          populate: {
-            path: "branch", // Populate branch within stock
+        populate: [
+          {
+            path: "stock", // Populate stocks within item
+            populate: {
+              path: "branch", // Populate branch within stock
+            },
           },
-        },
+          {
+            path: "brand", // Populate brand within item
+          },
+          {
+            path: "engine", // Populate engine within item
+          },
+          {
+            path: "vendor", // Populate vendor within item
+          },
+        ],
       })
       .populate({
         path: "stock", // Populate stock directly for DeliveryItem
@@ -234,7 +244,7 @@ export const getDeliveryItemsByDeliveryId = async (req, res) => {
         },
       })
       .populate("deliveryId") // Populate deliveryId with all attributes
-      .exec(); // Populate the delivery reference;
+      .exec();
 
     if (!deliveryItems || deliveryItems.length === 0) {
       return res.status(404).json({
@@ -260,11 +270,13 @@ export const getDeliveryItemsByDeliveryId = async (req, res) => {
 //Edit delivery item quantity
 export const editDeliveryItemQuantity = async (req, res) => {
   const { deliveryItemId } = req.params; // DeliveryItem ID
-  const { quantity } = req.body;
+  const { delivery_quantity } = req.body;
 
   try {
-    if (quantity < 1) {
-      return res.status(400).json({ message: "Quantity must be at least 1." });
+    if (delivery_quantity < 1) {
+      return res
+        .status(400)
+        .json({ message: "Delivery_quantity must be at least 1." });
     }
 
     const deliveryItem = await DeliveryItem.findById(deliveryItemId);
@@ -272,7 +284,7 @@ export const editDeliveryItemQuantity = async (req, res) => {
       return res.status(404).json({ message: "Delivery item not found." });
     }
 
-    deliveryItem.quantity = quantity; // Update the quantity
+    deliveryItem.delivery_quantity = delivery_quantity; // Update the quantity
     await deliveryItem.save(); // Save the updated delivery item
 
     res

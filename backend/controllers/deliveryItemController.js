@@ -65,7 +65,7 @@ export const createDeliveryItem = async (req, res) => {
       itemType, // Dynamically set itemType
       quantity,
       deliveryId, // Set the deliveryId
-      stock
+      stock,
     });
 
     // Save the new delivery item
@@ -96,8 +96,8 @@ export const getAllDeliveryItems = async (req, res) => {
           path: "branch", // Further populate the 'branch' field inside each stock
         },
       }) // Populate the stock reference
-      .populate("deliveryId") // Populate the delivery reference
-      
+      .populate("deliveryId"); // Populate the delivery reference
+
     if (!deliveryItems || deliveryItems.length === 0) {
       return res.status(404).json({
         message: "No delivery items found",
@@ -117,7 +117,6 @@ export const getAllDeliveryItems = async (req, res) => {
   }
 };
 
-
 //Get delivery items by deliveryId
 export const getDeliveryItemsByDeliveryId = async (req, res) => {
   try {
@@ -125,9 +124,23 @@ export const getDeliveryItemsByDeliveryId = async (req, res) => {
 
     // Fetch all delivery items for the given deliveryId and populate the 'item' field
     const deliveryItems = await DeliveryItem.find({ deliveryId })
-      .populate("item") // Populate the item reference (this dynamically depends on the itemType)
-      .populate("stock") // Populate the stock reference
-      .populate("deliveryId") // Populate the delivery reference;
+      .populate({
+        path: "item", // Populate item
+        populate: {
+          path: "stock", // Populate stocks within item
+          populate: {
+            path: "branch", // Populate branch within stock
+          },
+        },
+      })
+      .populate({
+        path: "stock", // Populate stock directly for DeliveryItem
+        populate: {
+          path: "branch", // Populate branch within stock
+        },
+      })
+      .populate("deliveryId") // Populate deliveryId with all attributes
+      .exec(); // Populate the delivery reference;
 
     if (!deliveryItems || deliveryItems.length === 0) {
       return res.status(404).json({
@@ -193,22 +206,23 @@ export const deleteDeliveryItem = async (req, res) => {
   } catch (error) {
     // Ensure a proper error message is sent to the client
     console.error(error); // Logging error for server-side debugging
-    res.status(500).json({ message: "Error deleting delivery item.", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error deleting delivery item.", error: error.message });
   }
 };
 
-
 // Update the status of a delivery item
 export const updateStatusOfDeliveryItem = async (req, res) => {
-  const { id } = req.params;  // DeliveryItem ID from request parameters
-  const { status } = req.body;  // New status from request body
+  const { id } = req.params; // DeliveryItem ID from request parameters
+  const { status } = req.body; // New status from request body
 
   try {
     // Find and update the delivery item by its ID
     const updatedItem = await DeliveryItem.findByIdAndUpdate(
-      id, 
+      id,
       { status },
-      { new: true }  // Return the updated document
+      { new: true } // Return the updated document
     );
 
     if (!updatedItem) {
@@ -216,12 +230,11 @@ export const updateStatusOfDeliveryItem = async (req, res) => {
     }
 
     res.status(200).json({
-      message: 'Delivery item status updated successfully',
-      updatedItem
+      message: "Delivery item status updated successfully",
+      updatedItem,
     });
   } catch (error) {
     console.error("Error updating delivery item status:", error.message);
     res.status(500).json({ message: "Server error" });
   }
 };
-

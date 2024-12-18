@@ -2,8 +2,8 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./contexts/authContext";
 import useAuth from "./hooks/useAuth"; // Import the custom hook
-import SessionPrompt from "./components/SessionPrompt";
-
+import PrivateRoute from "./components/PrivateRoute"; // Import PrivateRoute
+import SessionPrompt from "./components/SessionPrompt"; // Import SessionPrompt
 // Pages
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -32,18 +32,59 @@ const App = () => {
   return (
     <AuthProvider>
       <Routes>
-        <Route path="/" element={<DeliveryManagement />} />
+        {/* Public Routes */}
         <Route path="/login" element={<Login />} />
-        <Route path="/deliveryManagement" element={<DeliveryManagement />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/signupwg" element={<SignupWG />} />
-        <Route path="/crb" element={<CRB />} />
-        <Route path="/inventory" element={<Inventory />} />
+
+        {/* Protected Routes */}
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <DeliveryManagement />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/deliveryManagement"
+          element={
+            <PrivateRoute>
+              <DeliveryManagement />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/crb"
+          element={
+            <PrivateRoute>
+              <CRB />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/inventory"
+          element={
+            <PrivateRoute>
+              <Inventory />
+            </PrivateRoute>
+          }
+        />
       </Routes>
 
       {/* Render SessionPrompt if session is about to expire */}
       {promptExtendSession && (
-        <SessionPrompt onExtend={handleExtendSession} onLogout={handleLogout} />
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 999,
+          }}
+        ><SessionPrompt onExtend={handleExtendSession} onLogout={handleLogout} /></div>
       )}
     </AuthProvider>
   );

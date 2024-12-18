@@ -176,6 +176,8 @@ const ReceiveBtn = ({ deliveryId }) => {
                         <TableColumn>Item Type</TableColumn>
                         <TableColumn>Quantity</TableColumn>
                         <TableColumn>Stock</TableColumn>
+                        <TableColumn>Sender</TableColumn>
+                        <TableColumn>Receiver</TableColumn>
                         <TableColumn>Checking Status</TableColumn>
                         <TableColumn>Mark As Received</TableColumn>
                       </TableHeader>
@@ -186,6 +188,8 @@ const ReceiveBtn = ({ deliveryId }) => {
                             <TableCell>{item.itemType}</TableCell>
                             <TableCell>{item.quantity}</TableCell>
                             <TableCell>{item.stock._id}</TableCell>
+                            <TableCell>{item.deliveryId.senderBranch}</TableCell>
+                            <TableCell>{item.deliveryId.receiverBranch}</TableCell>
                             <TableCell>
                               {item.status === "Received" ? (
                                 <Chip className="font-f1 bg-black text-white">

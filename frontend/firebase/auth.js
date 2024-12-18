@@ -61,9 +61,7 @@ export const doCreateUserWithEmailAndPassword = async (
     const userDetails = { uid, email, firstName, lastName, telephone, branchId, image };
 
     // Send user details to your backend
-    const response = await axiosInstance.post("/api/users", userDetails, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await axiosInstance.post("/api/users", userDetails);
 
     if (response.status === 201) {
       return { success: true, message: "User created successfully", user: response.data };
@@ -88,10 +86,12 @@ export const doUpdateUserSignInWithGoogle = async (
 
     const uUid=sessionStorage.getItem('userLoggedInUid');
     const uEmail=sessionStorage.getItem('userLoggedInEmail');
-    const uStatus=0;
 
 
-    if (uStatus === 0) {
+    const uStatus = JSON.parse(sessionStorage.getItem("userStatus"));
+
+
+    if (!uStatus) {
       // Prepare user details for API
       const userDetails = {
         uid : uUid,
@@ -113,7 +113,9 @@ export const doUpdateUserSignInWithGoogle = async (
       );
 
       if (response.status === 201) {
-        userSessionEmitter.emit("userStatus", 1);
+
+        sessionStorage.setItem("userStatus", JSON.stringify(true));
+
         return {
           success: true,
           message: "User updated successfully",
@@ -151,14 +153,14 @@ export const doSignInWithGoogle = async () => {
 
     // API Call Example
     const userResponse = await axiosInstance.get(`/api/users/?id=${uid}`);
-    const user = userResponse.data;
+    const users = userResponse.data.users
 
-    if (!user) {
-      sessionStorage.setItem("userStatus", "0"); // Not registered
-      return { success: false, redirect: "signupwg", uid, email };
+    if (!users || users.length === 0) {
+      sessionStorage.setItem("userStatus", JSON.stringify(false)); // Not registered
+      return { success: false, redirect: "signupwg"};
     } else {
-      sessionStorage.setItem("userStatus", "1"); // Registered
-      return { success: true, user };
+      sessionStorage.setItem("userStatus", JSON.stringify(true)); // Registered
+      return { success: true, users };
     }
   } catch (error) {
     console.error("Error signing in with Google:", error);

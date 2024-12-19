@@ -25,8 +25,9 @@ const App = () => {
   const handleLogout = () => {
     const auth = getAuth();
     signOut(auth);
-    window.location.href = "/login"; // Redirect to login after logout
+    window.location.href = '/login'; // Redirect to login after logout
   };
+
 
   return (
     <AuthProvider>
@@ -42,11 +43,25 @@ const App = () => {
         {/* Public routes */}
         <Route path="/signup" element={<Signup />} />
         <Route path="/signupwg" element={<SignupWG />} />
-        <Route path="/deliveryManagement" element={<DeliveryManagement />} />
-        <Route path="/inventory" element={<Inventory />} />
         <Route path="/login" element={<Login />} />
 
         {/* Protected routes */}
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <DeliveryManagement />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/deliveryManagement"
+          element={
+            <PrivateRoute>
+              <DeliveryManagement />
+            </PrivateRoute>
+          }
+        />
         <Route
           path="/crb"
           element={
@@ -55,26 +70,30 @@ const App = () => {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/inventory"
+          element={
+            <PrivateRoute>
+              <Inventory />
+            </PrivateRoute>
+          }
+        />
+
       </Routes>
 
       {/* Render SessionPrompt if session is about to expire */}
       {promptExtendSession && (
         <div
           style={{
-            position: "fixed",
+            position: 'fixed',
             top: 0,
             left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
             zIndex: 999,
           }}
-        >
-          <SessionPrompt
-            onExtend={handleExtendSession}
-            onLogout={handleLogout}
-          />
-        </div>
+        ><SessionPrompt onExtend={handleExtendSession} onLogout={handleLogout} /></div>
       )}
     </AuthProvider>
   );

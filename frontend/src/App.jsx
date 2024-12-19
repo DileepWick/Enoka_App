@@ -11,6 +11,9 @@ import Signup from "./pages/Signup";
 import SignupWG from "./pages/SignupWG";
 import CRB from "./pages/crb";
 
+//Admin
+import AdminUsers from "./pages/Admin/AdminUsers";
+
 // Sections
 import { DeliveryManagement } from "./pages/DeliveryManagementSection";
 import Inventory from "./pages/Inventory-Management";
@@ -44,6 +47,7 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/signupwg" element={<SignupWG />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/admin" element={<AdminUsers />} />
 
         {/* Protected routes */}
         <Route

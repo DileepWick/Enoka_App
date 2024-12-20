@@ -23,6 +23,16 @@ const menuItems = [
       { label: 'Manage Recipients', href: '/deliveryManagement/recipients' },
     ]
   },
+  { 
+    label: 'Bills Management', 
+    href: '/billsManagement',
+    subItems: [
+      { label: 'View Bills', href: '/billsManagement/view' },
+      { label: 'Add Bill', href: '/billsManagement/add' },
+      { label: 'Edit Bill', href: '/billsManagement/edit' },
+      { label: 'Delete Bill', href: '/billsManagement/delete' },
+    ]
+  },
 ];
 
 export function Sidebar() {

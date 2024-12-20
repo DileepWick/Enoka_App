@@ -4,12 +4,14 @@ import { AuthProvider } from "./contexts/authContext";
 import useAuth from "./contexts/authContext/hooks/useAuth"; // Import the custom hook
 import PrivateRoute from "./components/PrivateRoute"; // Import PrivateRoute
 import SessionPrompt from "./components/SessionPrompt"; // Import SessionPrompt
+
 // Pages
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import SignupWG from "./pages/SignupWG";
 import CRB from "./pages/crb";
+import BillsManagement from "./pages/Bills_Management";
 
 //Admin
 import AdminUsers from "./pages/Admin/AdminUsers";
@@ -79,6 +81,14 @@ const App = () => {
           element={
             <PrivateRoute>
               <Inventory />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/billsManagement"
+          element={
+            <PrivateRoute>
+              <BillsManagement />
             </PrivateRoute>
           }
         />

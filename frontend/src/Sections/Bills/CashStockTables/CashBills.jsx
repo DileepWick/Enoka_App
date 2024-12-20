@@ -7,7 +7,7 @@ import CashInvoice from "./cash_Invoice";
 const CashBills = () => {
   return (
     <div className="relative">
-      <CashInvoice />
+      
       <Tabs
         aria-label="Items"
         className="font-f1 ml-2 mt-8"
@@ -30,6 +30,7 @@ const CashBills = () => {
       </Tabs>
 
       <CreateCashBillButton />
+      <CashInvoice />
     </div>
   );
 };

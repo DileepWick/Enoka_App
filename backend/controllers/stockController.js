@@ -111,10 +111,26 @@ export const decreaseStockQuantity = async (req, res) => {
 //Get all stocks
 export const getAllStocks = async (req, res) => {
   try {
-    //Get all stocks
-    const stocks = await Stock.find().populate("branch").populate("gasket");
-    res.json(stocks);
+    // Fetch all stocks and populate references
+    const stocks = await Stock.find()
+      .populate("branch")
+      .populate("item");
+
+    // If no stocks found, return a 404 status code
+    if (!stocks.length) {
+      return res.status(404).json({ message: "No stocks found." });
+    }
+
+    // Return the stocks with a success status code
+    res.status(200).json(stocks);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    // Log error details for debugging
+    console.error("Error retrieving stocks:", err);
+
+    // Respond with a 500 status code and a descriptive error message
+    res.status(500).json({ 
+      message: "An error occurred while fetching stocks.", 
+      error: err.message 
+    });
   }
-};  
+};

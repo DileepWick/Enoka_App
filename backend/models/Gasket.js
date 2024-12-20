@@ -28,7 +28,6 @@ const gasketSchema = new mongoose.Schema({
   part_number: {
     type: String,
     default: "Unspecified",
-    unique: true,
     trim: true,
   },
   material_type: {
@@ -76,8 +75,21 @@ const gasketSchema = new mongoose.Schema({
 
 // Add a unique composite index to enforce the uniqueness constraint
 gasketSchema.index(
-  { material_type: 1, packing_type: 1, engine: 1, brand: 1, vendor: 1 },
-  { unique: true, partialFilterExpression: { material_type: { $exists: true } } }
+  {
+    material_type: 1,
+    packing_type: 1,
+    engine: 1,
+    brand: 1,
+    vendor: 1,
+    part_number: 1, // Include part_number in the composite index
+  },
+  {
+    unique: true,
+    partialFilterExpression: {
+      material_type: { $exists: true },
+      part_number: { $ne: "Unspecified" }, // Ensure part_number is not "Unspecified"
+    },
+  }
 );
 
 // Middleware to create stocks for all branches on gasket creation
@@ -95,7 +107,8 @@ gasketSchema.post("save", async function (doc, next) {
     // Create stock for each branch
     const stockEntries = branches.map((branch) => ({
       branch: branch._id,
-      gasket: doc._id, // Associate the gasket with the stock
+      item: doc._id, // Associate the gasket with the stock
+      itemModel: "Gasket", // Specify the item type as 'Gasket'
       quantity: 100, // Default quantity for new gasket
       updated_by: doc.added_by, // Use the gasket's "added_by" field
     }));
@@ -112,6 +125,5 @@ gasketSchema.post("save", async function (doc, next) {
     next(error); // Pass any error to the next middleware
   }
 });
-
 
 export default mongoose.model("Gasket", gasketSchema);

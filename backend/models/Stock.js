@@ -21,6 +21,11 @@ const StocksSchema = new mongoose.Schema({
         type: Date,
         default: Date.now, // Automatically sets the latest update date
     },
+    gasket: {
+        type: mongoose.Schema.Types.ObjectId, // Reference to the Gasket schema
+        ref: "Gasket",
+        required: true, // Ensure a gasket is always associated with the stock
+    },
 });
 
 const Stock = mongoose.model("Stock", StocksSchema);

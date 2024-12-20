@@ -35,30 +35,50 @@ export const createGasket = async (req, res) => {
       added_by,
     } = req.body;
 
-        // Check if part number already exists
-        const existingGasket = await Gasket.findOne({ part_number });
-        if (existingGasket) {
-          return res
-            .status(409)
-            .json({ error: `Part number ${part_number} already exists.` });
-        }
+    // Check if a gasket with the same composite unique fields already exists
+    const existingGasket = await Gasket.findOne({
+      material_type,
+      packing_type,
+      engine,
+      brand,
+      vendor,
+    });
+
+    if (existingGasket) {
+      return res.status(409).json({
+        error: `A gasket with the same material type, packing type, engine, brand, and vendor already exists.`,
+      });
+    }
+
+    // Check if part number already exists, but only if part_number is provided
+    if (part_number) {
+      const existingPartNumber = await Gasket.findOne({ part_number });
+      if (existingPartNumber) {
+        return res.status(409).json({
+          error: `Part number ${part_number} already exists.`,
+        });
+      }
+    }
 
     // Validate references (Vendor, Engine, and Brand)
-    const vendorExists = await Vendor.findById(vendor);
+    const [vendorExists, engineExists, brandExists] = await Promise.all([
+      Vendor.findById(vendor),
+      Engine.findById(engine),
+      Brand.findById(brand),
+    ]);
+
     if (!vendorExists) {
       return res
         .status(400)
         .json({ error: `Vendor with ID ${vendor} does not exist.` });
     }
 
-    const engineExists = await Engine.findById(engine);
     if (!engineExists) {
       return res
         .status(400)
         .json({ error: `Engine with ID ${engine} does not exist.` });
     }
 
-    const brandExists = await Brand.findById(brand);
     if (!brandExists) {
       return res
         .status(400)
@@ -67,7 +87,7 @@ export const createGasket = async (req, res) => {
 
     // Create a new gasket
     const gasket = new Gasket({
-      part_number,
+      part_number: part_number || undefined, // Only include part_number if provided
       material_type,
       packing_type,
       engine,
@@ -92,10 +112,18 @@ export const createGasket = async (req, res) => {
       return res.status(400).json({ error: error.message });
     }
 
+    // Handle duplicate key errors (e.g., composite index violations)
+    if (error.code === 11000) {
+      return res.status(409).json({
+        error: "A duplicate entry exists for the provided fields.",
+      });
+    }
+
     // Handle other errors
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 // Update a gasket
 export const updateGasket = async (req, res) => {

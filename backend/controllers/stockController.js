@@ -106,3 +106,15 @@ export const decreaseStockQuantity = async (req, res) => {
     return res.status(500).json({ error: "Internal server error." });
   }
 };
+
+
+//Get all stocks
+export const getAllStocks = async (req, res) => {
+  try {
+    //Get all stocks
+    const stocks = await Stock.find().populate("branch").populate("gasket");
+    res.json(stocks);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};  

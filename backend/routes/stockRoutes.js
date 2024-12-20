@@ -1,5 +1,5 @@
 import express from 'express';
-import { updateStockQuantity ,increaseStockQuantity ,decreaseStockQuantity} from '../controllers/stockController.js';
+import { updateStockQuantity ,increaseStockQuantity ,decreaseStockQuantity ,getAllStocks} from '../controllers/stockController.js';
 
 const router = express.Router();
 
@@ -11,5 +11,8 @@ router.put('/increaseStockQuantity/:stockId', increaseStockQuantity);
 
 //Decrease stock quantity
 router.put('/decreaseStockQuantity/:stockId', decreaseStockQuantity);
+
+//Get all stocks
+router.get('/getAllStocks', getAllStocks);
 
 export default router;

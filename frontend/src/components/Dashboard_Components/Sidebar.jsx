@@ -1,17 +1,44 @@
 import { useState, useEffect } from 'react';
 
 const menuItems = [
-  { icon: '🏠', label: 'Dashboard', href: '#' },
-  { icon: '🚗', label: 'Vehicles', href: '#' },
-  { icon: '📊', label: 'Analytics', href: '#' },
-  { icon: '👥', label: 'Customers', href: '#' },
-  { icon: '📄', label: 'Reports', href: '#' },
-  { icon: '⚙️', label: 'Settings', href: '#' },
+  { 
+    label: 'Inventory Management', 
+    href: '/inventory', 
+    subItems: [
+      { label: 'View Inventory', href: '/inventory/view' },
+      { label: 'Add Item', href: '/inventory/add' },
+      { label: 'Edit Item', href: '/inventory/edit' },
+      { label: 'Delete Item', href: '/inventory/delete' },
+      { label: 'Manage Categories', href: '/inventory/categories' },
+    ] 
+  },
+  { 
+    label: 'Delivery Management', 
+    href: '/deliveryManagement',
+    subItems: [
+      { label: 'View Deliveries', href: '/deliveryManagement/view' },
+      { label: 'Add Delivery', href: '/deliveryManagement/add' },
+      { label: 'Track Delivery', href: '/deliveryManagement/track' },
+      { label: 'Edit Delivery', href: '/deliveryManagement/edit' },
+      { label: 'Manage Recipients', href: '/deliveryManagement/recipients' },
+    ]
+  },
+  { 
+    label: 'Bills Management', 
+    href: '/billsManagement',
+    subItems: [
+      { label: 'View Bills', href: '/billsManagement/view' },
+      { label: 'Add Bill', href: '/billsManagement/add' },
+      { label: 'Edit Bill', href: '/billsManagement/edit' },
+      { label: 'Delete Bill', href: '/billsManagement/delete' },
+    ]
+  },
 ];
 
 export function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(null); // To track which dropdown is open
 
   useEffect(() => {
     const handleResize = () => {
@@ -31,6 +58,10 @@ export function Sidebar() {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
+  const toggleDropdown = (index) => {
+    setOpenDropdown(openDropdown === index ? null : index); // Toggle dropdown open state
+  };
+
   return (
     <>
       {/* Mobile menu button */}
@@ -40,17 +71,15 @@ export function Sidebar() {
           onClick={toggleMobileMenu}
           aria-label="Toggle menu"
         >
-          {isMobileMenuOpen ? '✕' : '☰'}
+          {isMobileMenuOpen ? '' : '☰'}
         </button>
       )}
 
       {/* Sidebar */}
       <aside
-        className={`
-          ${isMobile ? (isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full') : 'translate-x-0'}
-          fixed md:static inset-y-0 left-0 z-20 w-64 bg-black text-white p-4
-          transition-transform duration-300 ease-in-out overflow-y-auto
-        `}
+        className={`${
+          isMobile ? (isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full') : 'translate-x-0'
+        } fixed md:static inset-y-0 left-0 z-20 w-64 bg-black text-white p-4 transition-transform duration-300 ease-in-out overflow-y-auto`}
       >
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-2xl font-f1">Enoka Motors</h2>
@@ -73,9 +102,24 @@ export function Sidebar() {
                   className="flex items-center space-x-2 p-2 rounded-md hover:bg-black transition-colors duration-200"
                   onClick={isMobile ? toggleMobileMenu : undefined}
                 >
-                  
                   <span className="flex-1">{item.label}</span>
                 </a>
+                {/* Dropdown */}
+                {item.subItems && (
+                  <ul className={`${openDropdown === index ? 'block' : 'hidden'} pl-4 space-y-1`}>
+                    {item.subItems.map((subItem, subIndex) => (
+                      <li key={subIndex}>
+                        <a
+                          href={subItem.href}
+                          className="block p-2 rounded-md hover:bg-black transition-colors duration-200"
+                          onClick={isMobile ? toggleMobileMenu : undefined}
+                        >
+                          {subItem.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
           </ul>

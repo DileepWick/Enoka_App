@@ -7,9 +7,15 @@ import Vendor from "../models/Vendor.js";
 export const getAllGaskets = async (req, res) => {
   try {
     const gaskets = await Gasket.find()
-      .populate("engine")
-      .populate("brand")
-      .populate("vendor");
+    .populate("engine")
+    .populate("brand")
+    .populate("vendor")
+    .populate({
+      path: "stock", // Populate the 'stock' array
+      populate: {
+        path: "branch", // Further populate the 'branch' field inside each stock
+      },
+    });
     res.json(gaskets);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -26,51 +32,71 @@ export const createGasket = async (req, res) => {
       engine,
       brand,
       vendor,
-      description,
-      stock,
-      minstock,
-      year,
       added_by,
     } = req.body;
 
-    // Validate references (check if vendor, engine, and brand exist by their ObjectIds)
-    const vendorExists = await Vendor.findById(vendor);
+    // Check if a gasket with the same composite unique fields already exists
+    const existingGasket = await Gasket.findOne({
+      material_type,
+      packing_type,
+      engine,
+      brand,
+      vendor,
+    });
+
+    if (existingGasket) {
+      return res.status(409).json({
+        error: `A gasket with the same material type, packing type, engine, brand, and vendor already exists.`,
+      });
+    }
+
+    // Check if part number already exists, but only if part_number is provided
+    if (part_number) {
+      const existingPartNumber = await Gasket.findOne({ part_number });
+      if (existingPartNumber) {
+        return res.status(409).json({
+          error: `Part number ${part_number} already exists.`,
+        });
+      }
+    }
+
+    // Validate references (Vendor, Engine, and Brand)
+    const [vendorExists, engineExists, brandExists] = await Promise.all([
+      Vendor.findById(vendor),
+      Engine.findById(engine),
+      Brand.findById(brand),
+    ]);
+
     if (!vendorExists) {
       return res
         .status(400)
         .json({ error: `Vendor with ID ${vendor} does not exist.` });
     }
 
-    const engineExists = await Engine.findById(engine);
     if (!engineExists) {
       return res
         .status(400)
         .json({ error: `Engine with ID ${engine} does not exist.` });
     }
 
-    const brandExists = await Brand.findById(brand);
     if (!brandExists) {
       return res
         .status(400)
         .json({ error: `Brand with ID ${brand} does not exist.` });
     }
 
-    // Create the Gasket document with ObjectId references
+    // Create a new gasket
     const gasket = new Gasket({
-      part_number,
+      part_number: part_number || undefined, // Only include part_number if provided
       material_type,
       packing_type,
-      engine,  // Reference to Engine
-      brand,   // Reference to Brand
-      vendor,  // Reference to Vendor
-      description,
-      stock,
-      minstock,
-      year,
+      engine,
+      brand,
+      vendor,
       added_by,
     });
 
-    // Save the gasket to the database
+    // Save the gasket to trigger post-save middleware
     const savedGasket = await gasket.save();
 
     // Return success response
@@ -86,10 +112,18 @@ export const createGasket = async (req, res) => {
       return res.status(400).json({ error: error.message });
     }
 
+    // Handle duplicate key errors (e.g., composite index violations)
+    if (error.code === 11000) {
+      return res.status(409).json({
+        error: "A duplicate entry exists for the provided fields.",
+      });
+    }
+
     // Handle other errors
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 // Update a gasket
 export const updateGasket = async (req, res) => {

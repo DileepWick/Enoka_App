@@ -14,6 +14,7 @@ import {
   TableRow,
   TableCell,
   Chip,
+  Progress,
 } from "@nextui-org/react";
 import { getDeliveryItemsByDeliveryId } from "../../../services/deliveryServices";
 
@@ -21,11 +22,13 @@ const ViewDetailsBtn = ({ deliveryId }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [deliveryItems, setDeliveryItems] = useState([]);
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Fetch Delivery Items when the modal opens
   useEffect(() => {
     if (isOpen) {
       const fetchDeliveryItems = async () => {
+        setIsLoading(true);
         try {
           const response = await getDeliveryItemsByDeliveryId(deliveryId);
           setDeliveryItems(response.data.data);
@@ -33,6 +36,8 @@ const ViewDetailsBtn = ({ deliveryId }) => {
         } catch (err) {
           setError("Failed to fetch delivery items.");
           console.error("Error fetching delivery items:", err.message);
+        } finally {
+          setIsLoading(false);
         }
       };
 
@@ -40,20 +45,9 @@ const ViewDetailsBtn = ({ deliveryId }) => {
     }
   }, [isOpen, deliveryId]);
 
-  // Print the table as a report
-  const handlePrintReport = () => {
-    const printContent = document.getElementById("printableTable");
-    const newWindow = window.open("", "_blank");
-    newWindow.document.write("<html><head><title>Delivery Report</title></head><body>");
-    newWindow.document.write(printContent.outerHTML);
-    newWindow.document.write("</body></html>");
-    newWindow.document.close();
-    newWindow.print();
-  };
-
   return (
     <>
-      <Button onPress={onOpen}  className="mr-2 bg-black text-white">
+      <Button onPress={onOpen} className="mr-2 bg-black text-white">
         View Items
       </Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="full" className="font-f1">
@@ -64,7 +58,17 @@ const ViewDetailsBtn = ({ deliveryId }) => {
                 <h3>Delivery Information</h3>
               </ModalHeader>
               <ModalBody>
-                {error ? (
+                {isLoading ? (
+                  <div>
+                    <Progress
+                      isIndeterminate
+                      aria-label="Loading data..."
+                      className="w-full"
+                      size="sm"
+                      label="Retrieving information, just a moment..."
+                    />
+                  </div>
+                ) : error ? (
                   <p>{error}</p>
                 ) : (
                   <div
@@ -77,18 +81,38 @@ const ViewDetailsBtn = ({ deliveryId }) => {
                   >
                     <Table aria-label="Delivery Items Table" className="font-f1">
                       <TableHeader>
-                        <TableColumn>Item</TableColumn>
-                        <TableColumn>Item Type</TableColumn>
-                        <TableColumn>Quantity</TableColumn>
-                        <TableColumn>Checking Status</TableColumn>
+                        <TableColumn>PART NUMBER</TableColumn>
+                        <TableColumn>ITEM</TableColumn>
+                        <TableColumn>TYPE</TableColumn>
+                        <TableColumn>BRAND</TableColumn>
+                        <TableColumn>DELIVERED</TableColumn>
+                        <TableColumn>RECEIVED</TableColumn>
+                        <TableColumn>RETURNED</TableColumn>
+                        <TableColumn>STATUS</TableColumn>
                       </TableHeader>
                       <TableBody>
                         {deliveryItems.map((item) => (
                           <TableRow key={item._id}>
-                            <TableCell>{item.item.description}</TableCell>
+                            <TableCell>{item.item.part_number}</TableCell>
+                            <TableCell>
+                              {item.item.engine.engine_name} -{" "}
+                              {item.item.packing_type} {item.item.material_type}
+                              <Chip
+                                color="primary"
+                                variant="bordered"
+                                className="ml-4"
+                              >
+                                {item.item.vendor.vendor_name}
+                              </Chip>
+                            </TableCell>
+                            <TableCell>{item.item.brand.brand_name}</TableCell>
                             <TableCell>{item.itemType}</TableCell>
-                            <TableCell>{item.quantity}</TableCell>
-                            <TableCell><Chip color="warning" variant="dot">{item.status}</Chip></TableCell>
+                            <TableCell>{item.delivery_quantity}</TableCell>
+                            <TableCell>{item.received_quantity}</TableCell>
+                            <TableCell>{item.returned_quantity}</TableCell>
+                            <TableCell>
+                              <Chip color="primary">{item.status}</Chip>
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -99,9 +123,6 @@ const ViewDetailsBtn = ({ deliveryId }) => {
               <ModalFooter>
                 <Button onPress={onClose} color="danger" variant="bordered">
                   Close
-                </Button>
-                <Button onPress={handlePrintReport} className="bg-black text-white" >
-                  Print Report
                 </Button>
               </ModalFooter>
             </>

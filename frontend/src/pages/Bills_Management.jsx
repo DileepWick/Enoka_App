@@ -4,7 +4,7 @@ import Header from "./Header";
 import { Tabs, Tab } from "@nextui-org/react";
 
 //Cash bills
-import CashBills from "@/Sections/Bills/CashBills";
+import CashBills from "@/Sections/Bills/CashStockTables/CashBills";
 
 
 

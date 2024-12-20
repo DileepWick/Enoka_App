@@ -1,4 +1,7 @@
 import Stock from "../models/Stock.js";
+import Gasket from "../models/Gasket.js";
+
+
 
 // Update stock quantity
 export const updateStockQuantity = async (req, res) => {
@@ -107,30 +110,45 @@ export const decreaseStockQuantity = async (req, res) => {
   }
 };
 
-
-//Get all stocks
+// Get all stocks and populate references based on itemModel
 export const getAllStocks = async (req, res) => {
   try {
-    // Fetch all stocks and populate references
-    const stocks = await Stock.find()
-      .populate("branch")
-      .populate("item");
+    // Fetch all stocks and populate the branch
+    const stocks = await Stock.find().populate('branch');
 
-    // If no stocks found, return a 404 status code
     if (!stocks.length) {
-      return res.status(404).json({ message: "No stocks found." });
+      return res.status(404).json({ message: 'No stocks found.' });
     }
 
-    // Return the stocks with a success status code
-    res.status(200).json(stocks);
+    // Manually populate the item field based on itemModel
+    const populatedStocks = await Promise.all(stocks.map(async (stock) => {
+      let item = null;
+
+      if (stock.itemModel === 'Gasket') {
+        // For Gasket, populate the fields
+        item = await Gasket.findById(stock.item).populate('brand').populate('vendor').populate('engine');
+      } else {
+        // For other item models, just return the basic item with ID
+        item = { _id: stock.item }; // Only return the item ID
+      }
+
+      // Return a new object with populated item (for Gasket) and its fields
+      return {
+        ...stock.toObject(),
+        item: item
+      };
+    }));
+
+    // Return the populated stocks data
+    res.status(200).json(populatedStocks);
   } catch (err) {
     // Log error details for debugging
-    console.error("Error retrieving stocks:", err);
+    console.error('Error retrieving stocks:', err);
 
     // Respond with a 500 status code and a descriptive error message
-    res.status(500).json({ 
-      message: "An error occurred while fetching stocks.", 
-      error: err.message 
+    res.status(500).json({
+      message: 'An error occurred while fetching stocks.',
+      error: err.message,
     });
   }
 };

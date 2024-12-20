@@ -11,8 +11,9 @@ import branchRoutes from "./routes/branchRoutes.js";
 import deliveryItemRoutes from "./routes/deliveryItemRoutes.js";
 import deliveryRoutes from "./routes/deliveryRoutes.js";
 import stockRoutes from "./routes/stockRoutes.js";
-
 import whitelistRoutes from "./routes/wluserRoutes.js";
+import cashBillRoutes from "./routes/cashBillRoute.js";
+import cashBillItemRoutes from "./routes/cash_bill_item_route.js";
 
 //Protected routes
 import {
@@ -91,8 +92,9 @@ app.use("/api/users", userRoutes);
 app.use("/api/deliveries", deliveryRoutes);
 app.use("/api/delivery", deliveryRoutes);
 app.use("/api/deliveryItems", deliveryItemRoutes);
-
+app.use("/api/cashbills", cashBillRoutes);
 app.use("/api/wlusers", whitelistRoutes);
+app.use("/api/cashbillitems", cashBillItemRoutes);
 
 // Use the sessionRouter for the /extend-session route
 app.use('/api/extend', sessionRouter);

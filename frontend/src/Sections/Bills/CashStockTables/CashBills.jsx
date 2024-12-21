@@ -30,6 +30,7 @@ const CashBills = () => {
       </Tabs>
 
       <CreateCashBillButton />
+
       <CashInvoice />
     </div>
   );

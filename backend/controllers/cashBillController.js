@@ -1,29 +1,38 @@
 import CashBill from "../models/CashBill.js";
 import CashBillItem from "../models/CashBillItem.js";
+import Gasket from "../models/Gasket.js";
 
 // Controller to create a new CashBill (without items initially)
 export const createCashBill = async (req, res) => {
-    try {
-      const { billType, status } = req.body;
-  
-      // Create the CashBill instance without any items
-      const newCashBill = new CashBill({
-        billType,
-        status,
-      });
-  
-      // Save the new CashBill
-      await newCashBill.save();
-  
-      res.status(201).json({
-        message: "CashBill created successfully",
-        cashBill: newCashBill,
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Error creating CashBill", error: error.message });
+  try {
+    // Fetch the latest CashBill to get the last invoice number
+    const latestCashBill = await CashBill.findOne().sort({ createdDate: -1 }); // Sort by createdDate to get the latest
+
+    let invoiceNumber = 'CSH0000001'; // Default value if no CashBill exists
+
+    if (latestCashBill) {
+      // Ensure latestCashBill.invoiceNumber exists
+      const lastInvoiceNumber = latestCashBill.invoiceNumber ? parseInt(latestCashBill.invoiceNumber.slice(3)) : 0;
+      invoiceNumber = `CSH${String(lastInvoiceNumber + 1).padStart(7, '0')}`; // Increment and pad to 7 digits
     }
-  };
+
+    // Create a new CashBill with the generated invoice number
+    const newCashBill = new CashBill({
+      status: "Pending", // or based on your requirements
+      billType: "E-Bill", // or based on your requirements
+      invoiceNumber: invoiceNumber, // Set the generated invoice number
+    });
+
+    // Save the new CashBill document
+    const savedCashBill = await newCashBill.save();
+    
+    // Return the saved CashBill as the response
+    res.status(201).json(savedCashBill);
+  } catch (error) {
+    console.error("Error creating CashBill:", error);
+    res.status(500).json({ message: "Error creating CashBill", error: error.message });
+  }
+};
 
 // Controller to delete a CashBill by its ID
 export const deleteCashBill = async (req, res) => {
@@ -45,29 +54,90 @@ export const deleteCashBill = async (req, res) => {
 
 // Controller to get the latest pending CashBill
 export const getLatestPendingCashBill = async (req, res) => {
-    try {
-      // Find the latest CashBill with status "Pending"
-      const latestPendingCashBill = await CashBill.findOne({ status: "Pending" })
-        .sort({ createdDate: -1 }); // Sort by createdDate in descending order to get the latest one
-  
-      // If no pending CashBill is found
-      if (!latestPendingCashBill) {
-        return res.status(404).json({ message: "No pending CashBill found" });
-      }
-  
-      // Find all CashBillItems associated with the latest pending CashBill
-      const cashBillItems = await CashBillItem.find({ cashBill: latestPendingCashBill._id });
-  
-      // Return the CashBill along with its CashBillItems
-      res.status(200).json({
-        cashBill: latestPendingCashBill,
-        cashBillItems: cashBillItems,
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({
-        message: "Error retrieving latest pending CashBill",
-        error: error.message,
-      });
+  try {
+    // Find the latest CashBill with status "Pending"
+    const latestPendingCashBill = await CashBill.findOne({ status: "Pending" })
+      .sort({ createdDate: -1 });
+
+    // If no pending CashBill is found
+    if (!latestPendingCashBill) {
+      return res.status(404).json({ message: "No pending CashBill found" });
     }
-  };
+
+    // Find all CashBillItems associated with the latest pending CashBill and populate the stock field
+    const cashBillItems = await CashBillItem.find({ cashBill: latestPendingCashBill._id }).populate('stock');
+
+    // Manually populate the item field within the stock for each CashBillItem
+    const populatedCashBillItems = await Promise.all(
+      cashBillItems.map(async (cashBillItem) => {
+        if (cashBillItem.stock) {
+          let populatedItem = null;
+
+          // Dynamically populate the item field based on the itemModel
+          if (cashBillItem.stock.itemModel === 'Gasket') {
+            populatedItem = await Gasket.findById(cashBillItem.stock.item)
+              .populate('brand')
+              .populate('vendor')
+              .populate('engine');
+          } else {
+            // For other item models, only include the basic item
+            populatedItem = { _id: cashBillItem.stock.item };
+          }
+
+          // Return the updated CashBillItem with populated stock and item
+          return {
+            ...cashBillItem.toObject(),
+            stock: {
+              ...cashBillItem.stock.toObject(),
+              item: populatedItem,
+            },
+          };
+        }
+        return cashBillItem.toObject(); // Return as-is if no stock is present
+      })
+    );
+
+    // Return the CashBill along with its populated CashBillItems
+    res.status(200).json({
+      cashBill: latestPendingCashBill,
+      cashBillItems: populatedCashBillItems,
+    });
+  } catch (error) {
+    console.error('Error retrieving latest pending CashBill:', error);
+    res.status(500).json({
+      message: 'Error retrieving latest pending CashBill',
+      error: error.message,
+    });
+  }
+};
+
+// Controller to update the status of the latest pending CashBill
+const updateCashBillStatus = async (req, res) => {
+  try {
+    // Find the latest cash bill with status 'Pending'
+    const pendingCashBill = await CashBill.findOne({ status: "Pending" })
+      .sort({ createdAt: -1 }) // Sort by creation date in descending order to get the latest
+      .exec();
+
+    if (!pendingCashBill) {
+      return res.status(404).json({ error: "No pending cash bills found" });
+    }
+
+    // Update the status of the latest pending cash bill to "Completed"
+    const updatedCashBill = await CashBill.findByIdAndUpdate(
+      pendingCashBill._id,
+      { status: "Completed" },
+      { new: true } // Return the updated document
+    );
+
+    res.status(200).json({
+      message: "Cash bill status updated successfully",
+      updatedCashBill,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error while updating status" });
+  }
+};
+
+export { updateCashBillStatus };

@@ -8,9 +8,11 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { useState } from "react";
-import axios from "axios"; // Ensure you import axios for API calls
 import axiosInstance from "@/config/axiosInstance";
 import { toast } from "react-toastify"; // Ensure you import toast for notifications
+
+// Emitter
+import emitter from "../../../../util/emitter.js";
 
 export default function App() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -29,6 +31,7 @@ export default function App() {
       if (response.status === 201) {
         toast.success("Bill created successfully!");
         onOpenChange(false); // Close modal on success
+        emitter.emit("CashBillCreated");
       }
     } catch (error) {
       console.error(error);
@@ -42,7 +45,7 @@ export default function App() {
 
   return (
     <>
-      <Button onPress={onOpen} size="lg" className="bg-black text-white font-f1">
+      <Button onPress={onOpen} size="lg" className="bg-black text-white font-f1 absolute top-0 right-0 m-4">
         NEW CASH BILL +
       </Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>

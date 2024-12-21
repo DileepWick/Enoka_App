@@ -152,7 +152,7 @@ export const doSignInWithGoogle = async () => {
     sessionStorage.setItem("userLoggedInEmail", email);
 
     // API Call Example
-    const userResponse = await axiosInstance.get(`/api/users/?id=${uid}`);
+    const userResponse = await axiosInstance.get(`/api/users/${uid}`);
     const users = userResponse.data.users
 
     if (!users || users.length === 0) {

@@ -118,6 +118,10 @@ const CashInvoice = () => {
   const handleIssueCashBill = async () => {
     await updateCashBillStatus(); // Issue the cash bill
     setNewInvoiceCreated(true); // Set the flag to trigger fetching new data
+
+    setCashBill(null);
+    setInvoiceData([]);
+    fetchInvoiceData();
   };
 
   // Calculate subtotal
@@ -142,7 +146,11 @@ const CashInvoice = () => {
   }
 
   if (cashBill === null) {
-    return <div className="text-2xl font-f1 ml-2 italic" >Create New Cash Bill To Add Items</div>;
+    return (
+      <div className="text-2xl font-f1 ml-2 italic">
+        Create New Cash Bill To Add Items
+      </div>
+    );
   }
 
   return (
@@ -232,7 +240,7 @@ const CashInvoice = () => {
 
       {/* Issue and Delete Buttons */}
       <div className="mt-6 flex justify-between font-f1">
-        <Button onClick={handleIssueCashBill} color="primary" >
+        <Button onClick={handleIssueCashBill} color="primary">
           Issue Cash Bill
         </Button>
         <DeleteCashBillButton cashBillId={cashBill._id} />

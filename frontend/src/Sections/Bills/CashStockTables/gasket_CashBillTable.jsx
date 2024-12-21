@@ -11,6 +11,9 @@ import {
 import { Button, Input } from "@nextui-org/react";
 import { Chip } from "@nextui-org/react";
 
+//Buttons
+import AddButton from "./add_cashbillitem_btn.jsx";
+
 const Gasket_CashBillTable = () => {
   const [stocks, setStocks] = useState([]); // State to hold the stock data
   const [loading, setLoading] = useState(true); // State to manage loading status
@@ -35,6 +38,8 @@ const Gasket_CashBillTable = () => {
         setError("An error occurred while fetching stocks.");
         setLoading(false);
       });
+
+      
   }, [userBranch]); // Re-fetch data when userBranch changes
 
   // Handle search functionality
@@ -110,7 +115,7 @@ const Gasket_CashBillTable = () => {
               <TableCell>{stock.item.brand.brand_name}</TableCell>
               <TableCell>{stock.quantity}</TableCell>
               <TableCell>
-                <Button size="sm">Add</Button>
+                <AddButton StockId={stock._id} />
               </TableCell>
             </TableRow>
           ))}

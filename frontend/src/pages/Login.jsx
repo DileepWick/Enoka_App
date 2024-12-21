@@ -21,7 +21,13 @@ const Login = () => {
         if (!isSigningIn) {
             setIsSigningIn(true);
             try {
-                await doSignInWithEmailAndPassword(email, password);
+                const response = await doSignInWithEmailAndPassword(email, password);
+                if (response.redirect === "home") {
+                    setuserStatus(false);
+                    navigate('/');
+                } else {
+                    setuserStatus(true);
+                }
             } catch (error) {
                 console.error(error);
                 const message = getFirebaseErrorMessage(error.code);

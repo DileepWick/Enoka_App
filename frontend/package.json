@@ -23,6 +23,7 @@
     "dotenv": "^16.4.7",
     "firebase": "^11.0.2",
     "framer-motion": "^11.13.1",
+    "https": "^1.0.0",
     "lucide-react": "^0.462.0",
     "mitt": "^3.0.1",
     "next": "^15.0.3",

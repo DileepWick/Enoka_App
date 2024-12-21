@@ -133,8 +133,18 @@ export const doUpdateUserSignInWithGoogle = async (
   }
 };
 
-export const doSignInWithEmailAndPassword = (email, password) => {
-  return signInWithEmailAndPassword(auth, email, password);
+export const doSignInWithEmailAndPassword =async (email, password) => {
+  try {
+    // Sign in with Firebase
+    await signInWithEmailAndPassword(auth, email, password);
+    
+    // Redirect to the home page after successful sign-in
+    return { success: true, redirect: "home"}; // Redirects to the home page (or root)
+
+  } catch (error) {
+    throw new Error(`User cannot sign in.`);
+    // Handle error (e.g., show an error message to the user)
+  }
 };
 
 export const doSignInWithGoogle = async () => {
@@ -152,7 +162,7 @@ export const doSignInWithGoogle = async () => {
     sessionStorage.setItem("userLoggedInEmail", email);
 
     // API Call Example
-    const userResponse = await axiosInstance.get(`/api/users/?id=${uid}`);
+    const userResponse = await axiosInstance.get(`/api/users/${uid}`);
     const users = userResponse.data.users
 
     if (!users || users.length === 0) {

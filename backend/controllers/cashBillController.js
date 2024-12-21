@@ -1,9 +1,12 @@
 import CashBill from "../models/CashBill.js";
 import CashBillItem from "../models/CashBillItem.js";
 import Gasket from "../models/Gasket.js";
+import { deleteCashBillItem } from "./cash_bill_item_controller.js";
 
 // Controller to create a new CashBill (without items initially)
 export const createCashBill = async (req, res) => {
+
+  const { billType } = req.body;
   try {
     // Fetch the latest CashBill to get the last invoice number
     const latestCashBill = await CashBill.findOne().sort({ createdDate: -1 }); // Sort by createdDate to get the latest
@@ -19,7 +22,7 @@ export const createCashBill = async (req, res) => {
     // Create a new CashBill with the generated invoice number
     const newCashBill = new CashBill({
       status: "Pending", // or based on your requirements
-      billType: "E-Bill", // or based on your requirements
+      billType, // or based on your requirements
       invoiceNumber: invoiceNumber, // Set the generated invoice number
     });
 
@@ -34,23 +37,44 @@ export const createCashBill = async (req, res) => {
   }
 };
 
+
 // Controller to delete a CashBill by its ID
 export const deleteCashBill = async (req, res) => {
-  const { id } = req.params; // Get the ID from the request parameters
+  const { id } = req.params; // Get the CashBill ID from the request parameters
 
   try {
-    const cashBill = await CashBill.findByIdAndDelete(id);
+    // Step 1: Find the CashBill by its ID
+    const cashBill = await CashBill.findById(id); 
 
     if (!cashBill) {
       return res.status(404).json({ message: "CashBill not found" });
     }
 
-    res.status(200).json({ message: "CashBill deleted successfully" });
+    // Step 2: Find all associated CashBillItems using the CashBill ID
+    const cashBillItems = await CashBillItem.find({ cashBill: id });
+
+    // Step 3: Delete each CashBillItem and update their stocks
+    for (const cashBillItem of cashBillItems) {
+      // Reuse deleteCashBillItem logic by simulating a request
+      const fakeReq = { params: { cashBillItemId: cashBillItem._id } }; // Simulated request object
+      const fakeRes = {
+        status: () => ({
+          json: () => {}, // No actual response needed here
+        }),
+      };
+      await deleteCashBillItem(fakeReq, fakeRes); // Call the controller for each CashBillItem
+    }
+
+    // Step 4: Delete the CashBill itself
+    await CashBill.findByIdAndDelete(id);
+
+    res.status(200).json({ message: "CashBill and associated items deleted successfully." });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error deleting CashBill", error: error.message });
   }
 };
+
 
 // Controller to get the latest pending CashBill
 export const getLatestPendingCashBill = async (req, res) => {

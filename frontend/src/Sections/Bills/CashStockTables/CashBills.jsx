@@ -10,7 +10,7 @@ const CashBills = () => {
       
       <Tabs
         aria-label="Items"
-        className="font-f1 ml-2 mt-8"
+        className="font-f1 ml-2"
         size="sm"
         variant="bordered"
         color="primary"

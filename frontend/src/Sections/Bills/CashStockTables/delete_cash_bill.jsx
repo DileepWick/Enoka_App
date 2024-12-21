@@ -10,6 +10,7 @@ import {
 } from "@nextui-org/react";
 import axiosInstance from '@/config/axiosInstance'; // Adjust the path to where axiosInstance is configured
 import { toast } from 'react-toastify';
+import emitter from '@/../util/emitter';
 
 const deleteCashBill = async (cashBillId) => {
   try {
@@ -18,6 +19,7 @@ const deleteCashBill = async (cashBillId) => {
     if (response.status === 200) {
       console.log('CashBill deleted successfully');
       toast.success('CashBill deleted successfully');
+      emitter.emit('CashBillDeleted');
     } else {
       console.error('Error deleting CashBill');
     }

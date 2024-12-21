@@ -16,14 +16,19 @@ import emitter from "../../../../util/emitter.js";
 
 export default function App() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [billType, setBillType] = useState("E-Bill"); // Default selected value
+  const [billType, setBillType] = useState(""); // Default selected value (empty)
 
   // Call backend API to create the bill
   const handleCreateBill = async () => {
+    if (!billType) {
+      toast.error("Please select a bill type!");
+      return; // Ensure billType is selected before proceeding
+    }
+
     try {
       const response = await axiosInstance.post("api/cashbills/createCashBill", {
         status: "Pending",
-        billType,
+        billType: billType,
       });
 
       console.log(response.data);
@@ -40,7 +45,7 @@ export default function App() {
   };
 
   const handleBillTypeChange = (event) => {
-    setBillType(event.target.value);
+    setBillType(event.target.value); // Update state with selected value
   };
 
   return (
@@ -63,10 +68,11 @@ export default function App() {
                   onChange={handleBillTypeChange}
                   className="w-full p-2 border rounded"
                 >
+                  <option value="">Select Bill Type</option>
                   <option value="E-Bill">E-Bill</option>
                   <option value="I-Bill">I-Bill</option>
                 </select>
-                <p>Selected Bill Type: {billType}</p>
+                <p>Selected Bill Type: {billType || "None selected"}</p>
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>

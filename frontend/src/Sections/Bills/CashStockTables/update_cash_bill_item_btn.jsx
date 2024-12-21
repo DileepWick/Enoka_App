@@ -11,6 +11,7 @@ import {
 } from "@nextui-org/react";
 import axiosInstance from "@/config/axiosInstance"; // Assuming axiosInstance is configured correctly
 import { toast } from "react-toastify";
+import emitter from "../../../../util/emitter.js";
 
 const UpdateCashBillItemBtn = ({ stockId, cashBillItemId, quantity: initialQuantity, unitPrice: initialUnitPrice, discount: initialDiscount }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -32,6 +33,7 @@ const UpdateCashBillItemBtn = ({ stockId, cashBillItemId, quantity: initialQuant
       .put(`/api/cashbillitems/updateCashBillItem/${cashBillItemId}`, data)
       .then((response) => {
         toast.success("CashBillItem updated successfully");
+        emitter.emit("CashBillItemUpdated");
         onOpenChange(false); // Close modal
       })
       .catch((error) => {

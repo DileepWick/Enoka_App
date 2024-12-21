@@ -11,6 +11,7 @@ import {
 } from "@nextui-org/react";
 import axiosInstance from "@/config/axiosInstance";
 import { toast } from "react-toastify";
+import emitter from "../../../../util/emitter.js";
 
 const AddCashBillItemBtn = ({ StockId }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -20,21 +21,24 @@ const AddCashBillItemBtn = ({ StockId }) => {
 
   const handleSubmit = async () => {
     try {
-      const response = await axiosInstance.post("/api/cashbillitems/createCashBillItem", {
-        stockId: StockId,
-        unitPrice,
-        discount,
-        quantity,
-      });
+      const response = await axiosInstance.post(
+        "/api/cashbillitems/createCashBillItem",
+        {
+          stockId: StockId,
+          unitPrice,
+          discount,
+          quantity,
+        }
+      );
       toast.success("Item added successfully!");
       console.log(response.data); // Handle success if needed
       onOpenChange(false); // Close the modal
+      emitter.emit("CashBillItemAdded");
     } catch (error) {
-
-        if(error.response.status === 400) {
-            toast.error(error.response.data.message);
-            return;
-        }
+      if (error.response.status === 400) {
+        toast.error(error.response.data.message);
+        return;
+      }
 
       toast.error("Error adding item to the bill.");
       console.error(error);
@@ -43,7 +47,9 @@ const AddCashBillItemBtn = ({ StockId }) => {
 
   return (
     <>
-      <Button onPress={onOpen} className="font-f1 bg-black text-white">ADD</Button>
+      <Button onPress={onOpen} className="font-f1 bg-black text-white">
+        ADD
+      </Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">
@@ -73,7 +79,11 @@ const AddCashBillItemBtn = ({ StockId }) => {
             />
           </ModalBody>
           <ModalFooter>
-            <Button color="danger" variant="light" onPress={() => onOpenChange(false)}>
+            <Button
+              color="danger"
+              variant="light"
+              onPress={() => onOpenChange(false)}
+            >
               Close
             </Button>
             <Button color="primary" onPress={handleSubmit}>

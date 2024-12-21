@@ -38,6 +38,8 @@ const Gasket_CashBillTable = () => {
         setError("An error occurred while fetching stocks.");
         setLoading(false);
       });
+
+      
   }, [userBranch]); // Re-fetch data when userBranch changes
 
   // Handle search functionality
@@ -96,7 +98,6 @@ const Gasket_CashBillTable = () => {
       <Table aria-label="Example static collection table" >
         <TableHeader>
           <TableColumn>Description</TableColumn>
-          <TableColumn>Stock Id</TableColumn>
           <TableColumn>Brand</TableColumn>
           <TableColumn>Quantity</TableColumn>
           <TableColumn>Actions</TableColumn>
@@ -111,7 +112,6 @@ const Gasket_CashBillTable = () => {
                   {stock.item.vendor.vendor_name}
                 </Chip>
               </TableCell>
-              <TableCell>{stock._id}</TableCell>
               <TableCell>{stock.item.brand.brand_name}</TableCell>
               <TableCell>{stock.quantity}</TableCell>
               <TableCell>

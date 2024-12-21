@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Modal,
   ModalContent,
@@ -9,7 +9,10 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import axiosInstance from "@/config/axiosInstance"; // Assuming axiosInstance is already set up
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
+
+//Emitter
+import emitter from "../../../../util/emitter.js";
 
 const RemoveButton = ({ StockId, cashBillItemId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -19,12 +22,18 @@ const RemoveButton = ({ StockId, cashBillItemId }) => {
     setLoading(true);
 
     try {
-      const response = await axiosInstance.delete(`/api/cashbillitems/deleteCashBillItem/${cashBillItemId}`);
+      const response = await axiosInstance.delete(
+        `/api/cashbillitems/deleteCashBillItem/${cashBillItemId}`
+      );
+
+      emitter.emit("CashBillItemRemoved");
       toast.success("Item Removed Successfully!");
       onClose(); // Close modal on success
     } catch (error) {
       console.error(error);
-      toast.error("Error removing CashBillItem: " + error?.response?.data?.message);
+      toast.error(
+        "Error removing CashBillItem: " + error?.response?.data?.message
+      );
     } finally {
       setLoading(false);
     }
@@ -32,11 +41,15 @@ const RemoveButton = ({ StockId, cashBillItemId }) => {
 
   return (
     <>
-      <Button onPress={onOpen} className="font-f1 bg-black text-white">Remove</Button>
+      <Button onPress={onOpen} className="font-f1 bg-black text-white">
+        Remove
+      </Button>
 
       <Modal isOpen={isOpen} onOpenChange={onClose}>
         <ModalContent>
-          <ModalHeader className="flex flex-col gap-1">Remove Item - {StockId}</ModalHeader>
+          <ModalHeader className="flex flex-col gap-1">
+            Remove Item - {StockId}
+          </ModalHeader>
           <ModalBody>
             <p>Are you sure you want to remove this item from the bill?</p>
           </ModalBody>

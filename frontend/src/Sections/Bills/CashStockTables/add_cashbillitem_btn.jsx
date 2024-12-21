@@ -13,7 +13,7 @@ import axiosInstance from "@/config/axiosInstance";
 import { toast } from "react-toastify";
 import emitter from "../../../../util/emitter.js";
 
-const AddCashBillItemBtn = ({ StockId }) => {
+const AddCashBillItemBtn = ({ StockId ,description}) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [unitPrice, setUnitPrice] = useState("");
   const [discount, setDiscount] = useState("");
@@ -47,45 +47,43 @@ const AddCashBillItemBtn = ({ StockId }) => {
 
   return (
     <>
-      <Button onPress={onOpen} className="font-f1 bg-black text-white">
-        ADD
+      <Button onPress={onOpen} className="font-f1 bg-black text-white" size="sm">
+        Add To Bill
       </Button>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} className="font-f1">
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">
-            Add Item To This Bill - {StockId}
+            {description}
           </ModalHeader>
           <ModalBody>
-            <Input
-              label="Unit Price"
-              type="number"
-              value={unitPrice}
-              onChange={(e) => setUnitPrice(e.target.value)}
-              fullWidth
-            />
-            <Input
-              label="Discount"
-              type="number"
-              value={discount}
-              onChange={(e) => setDiscount(e.target.value)}
-              fullWidth
-            />
-            <Input
-              label="Quantity"
-              type="number"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              fullWidth
-            />
+            <div className="flex flex-row gap-4">
+              <Input
+                label="Unit Price"
+                type="number"
+                value={unitPrice}
+                onChange={(e) => setUnitPrice(e.target.value)}
+                fullWidth
+                labelPlacement="outside"
+              />
+              <Input
+                label="Discount"
+                type="number"
+                labelPlacement="outside"
+                value={discount}
+                onChange={(e) => setDiscount(e.target.value)}
+                fullWidth
+              />
+              <Input
+                label="Quantity"
+                type="number"
+                value={quantity}
+                labelPlacement="outside"
+                onChange={(e) => setQuantity(e.target.value)}
+                fullWidth
+              />
+            </div>
           </ModalBody>
           <ModalFooter>
-            <Button
-              color="danger"
-              variant="light"
-              onPress={() => onOpenChange(false)}
-            >
-              Close
-            </Button>
             <Button color="primary" onPress={handleSubmit}>
               Add Item
             </Button>

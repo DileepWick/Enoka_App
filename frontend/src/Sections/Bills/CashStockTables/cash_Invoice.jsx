@@ -7,10 +7,20 @@ import {
   TableRow,
   TableCell,
 } from "@nextui-org/table";
-import { Button } from "@nextui-org/react";
+import { Button, Divider } from "@nextui-org/react";
 import { Chip } from "@nextui-org/react";
 import axiosInstance from "@/config/axiosInstance";
 import { toast } from "react-toastify";
+
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+} from "@nextui-org/react";
+import { Progress } from "@nextui-org/react";
 
 // Emitter
 import emitter from "../../../../util/emitter";
@@ -26,6 +36,12 @@ const CashInvoice = () => {
   const [error, setError] = useState(null);
   const [cashBill, setCashBill] = useState(null);
   const [newInvoiceCreated, setNewInvoiceCreated] = useState(false); // New state to handle re-fetch
+
+  //Loadins
+  const [isNewItemAdding, setisNewItemAdding] = useState(false);
+
+  //Prin confirmation
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   // Function to fetch invoice data
   const fetchInvoiceData = async () => {
@@ -141,14 +157,17 @@ const CashInvoice = () => {
     }
   }, [newInvoiceCreated]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
   if (cashBill === null) {
     return (
-      <div className="text-2xl font-f1 ml-2 italic">
-        Create New Cash Bill To Add Items
+      <div className="text-sm font-f1 ml-2 italic mt-8">
+        <Progress
+          color="danger"
+          isIndeterminate
+          aria-label="Loading..."
+          className="max-w-md"
+          size="sm"
+          label="*** Please Create New Cash Bill To Add Items ***"
+        />
       </div>
     );
   }
@@ -163,7 +182,7 @@ const CashInvoice = () => {
         </Chip>
       </div>
 
-      <h1 className="text-2xl font-f1 mb-6 text-center">
+      <h1 className="text-2xl font-f1 mb-6 text-center ">
         Invoice - {cashBill.invoiceNumber}
       </h1>
       <Table aria-label="Invoice Table" className="font-f1">
@@ -224,6 +243,7 @@ const CashInvoice = () => {
                     quantity={item.quantity}
                     unitPrice={item.unitPrice}
                     discount={item.discount}
+                    description={itemName}
                   />
                 </TableCell>
               </TableRow>
@@ -240,11 +260,49 @@ const CashInvoice = () => {
 
       {/* Issue and Delete Buttons */}
       <div className="mt-6 flex justify-between font-f1">
-        <Button onClick={handleIssueCashBill} color="primary">
-          Issue Cash Bill
+        <Button className="bg-black text-white" onPress={onOpen} size="lg">
+          Complete
         </Button>
+
         <DeleteCashBillButton cashBillId={cashBill._id} />
       </div>
+
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1 font-f1">
+                Invoice Completion Confirmation
+              </ModalHeader>
+              <ModalFooter>
+                {/* Print Button */}
+                <Button
+                  color="primary"
+                  variant="ghost"
+                  className="font-f1"
+                  onPress={() => {
+                    onClose();
+                    handleIssueCashBill();
+                  }}
+                >
+                  Complete & Print
+                </Button>
+                <Button
+                  color="danger"
+                  className="font-f1"
+                  variant="ghost"
+                  onPress={() => {
+                    onClose();
+                    handleIssueCashBill();
+                  }}
+                >
+                  Complete Only
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

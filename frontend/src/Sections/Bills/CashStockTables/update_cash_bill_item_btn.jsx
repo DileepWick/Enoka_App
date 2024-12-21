@@ -13,7 +13,13 @@ import axiosInstance from "@/config/axiosInstance"; // Assuming axiosInstance is
 import { toast } from "react-toastify";
 import emitter from "../../../../util/emitter.js";
 
-const UpdateCashBillItemBtn = ({ stockId, cashBillItemId, quantity: initialQuantity, unitPrice: initialUnitPrice, discount: initialDiscount }) => {
+const UpdateCashBillItemBtn = ({
+  description,
+  cashBillItemId,
+  quantity: initialQuantity,
+  unitPrice: initialUnitPrice,
+  discount: initialDiscount,
+}) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   // Initialize state with the values passed from props
@@ -44,17 +50,18 @@ const UpdateCashBillItemBtn = ({ stockId, cashBillItemId, quantity: initialQuant
 
   return (
     <>
-      <Button onPress={onOpen}>Open Modal</Button>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} className="font-f1" >
+      <Button onPress={onOpen} size="sm" className="bg-black text-white">
+        Edit
+      </Button>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} className="font-f1">
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">
-                Update CashBillItem - {cashBillItemId}
+              <ModalHeader className="flex flex-col gap-1 font-f1">
+                {description}
               </ModalHeader>
               <ModalBody>
-                <div className="flex flex-col gap-3">
-
+                <div className="flex flex-col gap-3 font-f1">
                   <Input
                     label="Unit Price"
                     type="number"
@@ -67,7 +74,7 @@ const UpdateCashBillItemBtn = ({ stockId, cashBillItemId, quantity: initialQuant
                     value={discount}
                     onChange={(e) => setDiscount(e.target.value)}
                   />
-                                    <Input
+                  <Input
                     label="Quantity"
                     type="number"
                     value={quantity}
@@ -76,10 +83,8 @@ const UpdateCashBillItemBtn = ({ stockId, cashBillItemId, quantity: initialQuant
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Close
-                </Button>
-                <Button color="primary" onPress={handleUpdate}>
+
+                <Button color="primary" onPress={handleUpdate} className="font-f1">
                   Update
                 </Button>
               </ModalFooter>

@@ -13,7 +13,7 @@ const CashBills = () => {
         className="font-f1 ml-2"
         size="sm"
         variant="bordered"
-        color="primary"
+        color="danger"
       >
         <Tab key="gaskets" title="GASKETS">
           <Gasket_CashBillTable />

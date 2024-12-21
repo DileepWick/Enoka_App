@@ -38,19 +38,16 @@ const DeleteCashBillModal = ({ cashBillId }) => {
 
   return (
     <>
-      <Button onPress={onOpen}>Delete Invoice</Button>
+      <Button onPress={onOpen} size='lg' color='danger' variant='ghost'>Delete Bill</Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">Delete Invoice</ModalHeader>
-              <ModalBody>
+              <ModalHeader className="flex flex-col gap-1 font-f1">Delete Invoice</ModalHeader>
+              <ModalBody className='font-f1'>
                 Are you sure you want to delete this invoice?
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Close
-                </Button>
                 <Button color="primary" onPress={handleDelete}>
                   Delete
                 </Button>

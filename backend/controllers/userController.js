@@ -61,13 +61,13 @@ export const getUserById = async (req, res) => {
   try {
     const { id } = req.params;  // Extract id from req.params
     console.log(id);
-    const user = await User.findOne({ uid: id }).populate("branchId");  // Use the id to search for the user by uid
+    const users = await User.findOne({ uid: id }).populate("branchId");  // Use the id to search for the user by uid
 
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+    if (!users) {
+      return res.status(200).json({ success: false, users ,message: "User not found" });
     }
 
-    return res.status(200).json({ success: true, user });
+    return res.status(200).json({ success: true, users });
   } catch (error) {
     console.error("Error fetching user by UID:", error);
     return res.status(500).json({

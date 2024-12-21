@@ -70,7 +70,7 @@ const GoogleSignIn = () => {
             setIsRegistering(true);
             try {
                 await doUpdateUserSignInWithGoogle(firstName, lastName, telephone, branchId);
-                navigate('/home'); // Redirect after successful registration
+                navigate('/'); // Redirect after successful registration
             } catch (error) {
                 setErrorMessage(error.message);
             } finally {

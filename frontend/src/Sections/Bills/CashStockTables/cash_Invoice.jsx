@@ -217,9 +217,11 @@ const CashInvoice = () => {
                 " " +
                 item.stock.item.vendor.vendor_name +
                 " " +
-                item.stock.item.brand.brand_name; // Show relevant name for Gasket
-            } else {
-              itemName = item.stock.item.part_number; // Default item name (can be customized based on your data)
+                item.stock.item.brand.brand_name +
+                " " +
+                item.stock.itemModel; // Show relevant name for Gasket
+            } else if (item.stock.itemModel === "Ring") {
+              itemName = item.stock.item.engine?.engine_name + " " + item.stock.item.sizes + " " + item.stock.item.vendor?.vendor_name + " " + item.stock.item.brand+ " Piston Ring" ; // Default item name (can be customized based on your data)
             }
 
             return (

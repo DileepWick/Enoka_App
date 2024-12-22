@@ -2,6 +2,7 @@ import React from "react";
 import CreateCashBillButton from "./CreateCashBill";
 import { Tabs, Tab } from "@nextui-org/tabs";
 import Gasket_CashBillTable from "./gasket_CashBillTable";
+import Ring_CashBillTable from "./rings_CashBillTable";
 import CashInvoice from "./cash_Invoice";
 
 const CashBills = () => {
@@ -18,8 +19,8 @@ const CashBills = () => {
         <Tab key="gaskets" title="GASKETS">
           <Gasket_CashBillTable />
         </Tab>
-        <Tab key="pistons" title="PISTONS">
-          NO DATA
+        <Tab key="rings" title="RINGS">
+          <Ring_CashBillTable />
         </Tab>
         <Tab key="bearings" title="BEARINGS">
           NO DATA

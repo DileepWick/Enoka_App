@@ -6,7 +6,10 @@ import { Chip } from "@nextui-org/react";
 import { Tabs, Tab } from "@nextui-org/react";
 
 import AddItemForm from "./Add_gasket";
+import AddRingForm from "./Add_new_ring";
+
 import AllGaskets from "@/Sections/Inventory/AllGaskets";
+import AllRings from "../Sections/Inventory/AllRings.jsx";
 
 const Inventory = () => {
   return (
@@ -28,8 +31,8 @@ const Inventory = () => {
                 <Tab key="gaskets" title="GASKETS">
                   <AllGaskets />
                 </Tab>
-                <Tab key="pistons" title="PISTONS">
-                  No Data
+                <Tab key="rings" title="RINGS">
+                  <AllRings />
                 </Tab>
                 <Tab key="razors" title="RAZORS">
                   No Data
@@ -49,8 +52,8 @@ const Inventory = () => {
                 <Tab key="gaskets" title="GASKET" className="text-sm">
                   <AddItemForm />
                 </Tab>
-                <Tab key="pistons" title="PISTON">
-                  No Data
+                <Tab key="rings" title="RINGS" className="text-sm">
+                  <AddRingForm />
                 </Tab>
                 <Tab key="razors" title="RAZOR">
                   No Data

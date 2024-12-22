@@ -15,32 +15,32 @@ import {
 } from "@nextui-org/react";
 import axiosInstance from "@/config/axiosInstance";
 import { User, Link } from "@nextui-org/react";
-import Delete_Gasket from "@/components/Inventory_Components/DeleteGasket.jsx";
 import { toast } from "react-toastify";
 
-//Buttons
+// Buttons
 import Adjust_Stock_Button from "@/components/Inventory_Components/Adjust_Stock_Button";
+import Delete_Ring from "../../components/Inventory_Components/RingsDeleteButton.jsx";
 
-//Emitter
+// Emitter
 import emitter from "../../../util/emitter.js";
 
-const AllGaskets = () => {
-  const [gaskets, setGaskets] = useState([]);
+const AllRings = () => {
+  const [rings, setRings] = useState([]);
   const [branches, setBranches] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch the list of gaskets
+  // Fetch the list of rings
   useEffect(() => {
-    const fetchGaskets = async () => {
+    const fetchRings = async () => {
       setIsLoading(true);
       try {
-        const response = await axiosInstance.get("/api/gaskets");
-        setGaskets(response.data);
+        const response = await axiosInstance.get("/api/rings");
+        setRings(response.data);
         setIsLoading(false);
       } catch (error) {
-        console.error("Error fetching gaskets:", error);
+        console.error("Error fetching rings:", error);
       }
     };
 
@@ -54,47 +54,59 @@ const AllGaskets = () => {
       }
     };
 
-    fetchGaskets();
+    fetchRings();
     fetchBranches();
 
-    //Show toast when gasket is deleted
-    const gasketDeletedListener = () => {
-      fetchGaskets();
-      toast.success("Gasket deleted successfully!");
+    // Show toast when ring is deleted
+    const ringDeletedListener = () => {
+      fetchRings();
+      toast.success("Ring deleted successfully!");
     };
 
     // Register the stockUpdated event listener
-    emitter.on("stockUpdated", fetchGaskets);
-    emitter.on("gasketDeleted", gasketDeletedListener);
+    emitter.on("stockUpdated", fetchRings);
+    emitter.on("ringDeleted", ringDeletedListener);
 
     // Cleanup the event listener on component unmount
     return () => {
-      emitter.off("stockUpdated", fetchGaskets);
-      emitter.off("gasketDeleted", gasketDeletedListener);
+      emitter.off("stockUpdated", fetchRings);
+      emitter.off("ringDeleted", ringDeletedListener);
     };
   }, []);
 
-  // Filter gaskets based on branch and search term
-  const filteredGaskets = gaskets.filter((gasket) => {
+  // Filter rings based on branch and search term
+  const filteredRings = rings.filter((ring) => {
     const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
     const matchesBranch =
       !selectedBranch ||
-      gasket.stock.some((stock) => stock.branch?.name === selectedBranch);
-    const matchesSearchTerm = searchWords.every(
-      (word) =>
-        gasket.part_number.toLowerCase().includes(word) ||
-        gasket.engine?.engine_name.toLowerCase().includes(word) ||
-        gasket.packing_type.toLowerCase().includes(word) ||
-        gasket.material_type.toLowerCase().includes(word) ||
-        gasket.vendor?.vendor_name.toLowerCase().includes(word)
-    );
+      ring.stock.some((stock) => stock.branch?.name === selectedBranch);
+
+    // Ensure that all properties are defined before calling toLowerCase
+    const matchesSearchTerm = searchWords.every((word) => {
+      const partNumber = ring.part_number ? ring.part_number.toLowerCase() : "";
+      const size = ring.sizes ? ring.sizes.toLowerCase() : "";
+      const engine = ring.engine?.engine_name
+        ? ring.engine.engine_name.toLowerCase()
+        : "";
+      const vendorName = ring.vendor?.vendor_name
+        ? ring.vendor.vendor_name.toLowerCase()
+        : "";
+
+      return (
+        partNumber.includes(word) ||
+        engine.includes(word) ||
+        vendorName.includes(word) ||
+        size.includes(word)
+      );
+    });
+
     return matchesBranch && matchesSearchTerm;
   });
 
   // Render stock details
-  const renderStockDetails = (gasket) => {
+  const renderStockDetails = (ring) => {
     if (selectedBranch) {
-      const selectedStock = gasket.stock.find(
+      const selectedStock = ring.stock.find(
         (stock) => stock.branch?.name === selectedBranch
       );
       return (
@@ -104,6 +116,19 @@ const AllGaskets = () => {
       );
     }
 
+    if (isLoading)
+      return (
+        <div>
+          {isLoading && (
+            <Progress
+              isIndeterminate
+              aria-label="Loading rings..."
+              size="sm"
+              label="Loading . . ."
+            />
+          )}
+        </div>
+      );
     return (
       <Table aria-label="Stock details" className="min-w-[300px]" isStriped>
         <TableHeader>
@@ -112,7 +137,7 @@ const AllGaskets = () => {
           <TableColumn>Last Updated</TableColumn>
         </TableHeader>
         <TableBody>
-          {gasket.stock.map((stock) => (
+          {ring.stock.map((stock) => (
             <TableRow key={stock._id}>
               <TableCell>{stock.branch?.name || "N/A"}</TableCell>
               <TableCell>{stock.quantity}</TableCell>
@@ -129,9 +154,9 @@ const AllGaskets = () => {
       {isLoading ? (
         <Progress
           isIndeterminate
-          aria-label="Deleting gasket..."
+          aria-label="Loading Rings"
           size="sm"
-          label="Loading Gaskets"
+          label="Loading Rings"
           className="font-f1"
         />
       ) : (
@@ -155,12 +180,12 @@ const AllGaskets = () => {
             </div>
 
             <div className="mb-6">
-              <h2 className="text-sm font-f1 mb-2 w-[300px]">Search Gaskets</h2>
+              <h2 className="text-sm font-f1 mb-2 w-[300px]">Search Rings</h2>
               <Input
-                aria-label="Search Gaskets"
+                aria-label="Search Rings"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search by Part Number, Description..."
+                placeholder="Search by Part Number, Material Type..."
                 variant="bordered"
                 className="font-f1"
                 fullWidth
@@ -169,7 +194,7 @@ const AllGaskets = () => {
             </div>
           </div>
 
-          <Table aria-label="Gaskets inventory" className="mb-6">
+          <Table aria-label="Rings inventory" className="mb-6">
             <TableHeader>
               <TableColumn className="text-sm font-f1">Part Number</TableColumn>
               <TableColumn className="text-sm font-f1">Description</TableColumn>
@@ -186,23 +211,22 @@ const AllGaskets = () => {
               <TableColumn className="text-sm font-f1">Deletions</TableColumn>
             </TableHeader>
             <TableBody>
-              {filteredGaskets.map((gasket) => (
-                <TableRow key={gasket._id} className="font-f1">
-                  <TableCell>{gasket.part_number}</TableCell>
+              {filteredRings.map((ring) => (
+                <TableRow key={ring._id} className="font-f1">
+                  <TableCell>{ring.part_number}</TableCell>
                   <TableCell>
-                    {gasket.engine?.engine_name} {gasket.packing_type}{" "}
-                    {gasket.material_type}{" "}
+                    {ring.engine?.engine_name} {ring.sizes}
                     <Chip
                       color="primary"
                       size="sm"
                       variant="bordered"
                       className="ml-4"
                     >
-                      {gasket.vendor?.vendor_name}
+                      {ring.vendor?.vendor_name}
                     </Chip>
                   </TableCell>
-                  <TableCell>{gasket.brand?.brand_name}</TableCell>
-                  <TableCell>{renderStockDetails(gasket)}</TableCell>
+                  <TableCell>{ring.brand}</TableCell>
+                  <TableCell>{renderStockDetails(ring)}</TableCell>
                   <TableCell>
                     <User
                       avatarProps={{
@@ -222,11 +246,10 @@ const AllGaskets = () => {
                   </TableCell>
                   <TableCell>
                     {selectedBranch ? (
-                      // If a branch is selected, find the stock for that branch
-                      gasket.stock.some(
+                      ring.stock.some(
                         (stock) => stock.branch?.name === selectedBranch
                       ) ? (
-                        gasket.stock
+                        ring.stock
                           .filter(
                             (stock) => stock.branch?.name === selectedBranch
                           )
@@ -241,8 +264,7 @@ const AllGaskets = () => {
                         <p>No stock available for {selectedBranch}</p>
                       )
                     ) : (
-                      // If no branch is selected, display all stock options with action buttons
-                      gasket.stock.map((stock) => (
+                      ring.stock.map((stock) => (
                         <Adjust_Stock_Button
                           key={stock._id}
                           stockid={stock._id}
@@ -252,14 +274,7 @@ const AllGaskets = () => {
                     )}
                   </TableCell>
                   <TableCell>
-                    <Delete_Gasket
-                      gasketId={gasket._id}
-                      engine={gasket.engine?.engine_name}
-                      brand={gasket.brand?.brand_name}
-                      packing={gasket.packing_type}
-                      material={gasket.material_type}
-                      vendor={gasket.vendor?.vendor_name}
-                    />
+                    <Delete_Ring ringId={ring._id} />
                   </TableCell>
                 </TableRow>
               ))}
@@ -271,4 +286,4 @@ const AllGaskets = () => {
   );
 };
 
-export default AllGaskets;
+export default AllRings;

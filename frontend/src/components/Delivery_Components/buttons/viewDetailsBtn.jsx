@@ -50,7 +50,12 @@ const ViewDetailsBtn = ({ deliveryId }) => {
       <Button onPress={onOpen} className="mr-2 bg-black text-white">
         View Items
       </Button>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="full" className="font-f1">
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        size="full"
+        className="font-f1"
+      >
         <ModalContent>
           {(onClose) => (
             <>
@@ -79,12 +84,13 @@ const ViewDetailsBtn = ({ deliveryId }) => {
                       padding: "10px",
                     }}
                   >
-                    <Table aria-label="Delivery Items Table" className="font-f1">
+                    <Table
+                      aria-label="Delivery Items Table"
+                      className="font-f1"
+                    >
                       <TableHeader>
                         <TableColumn>PART NUMBER</TableColumn>
                         <TableColumn>ITEM</TableColumn>
-                        <TableColumn>TYPE</TableColumn>
-                        <TableColumn>BRAND</TableColumn>
                         <TableColumn>DELIVERED</TableColumn>
                         <TableColumn>RECEIVED</TableColumn>
                         <TableColumn>RETURNED</TableColumn>
@@ -95,18 +101,30 @@ const ViewDetailsBtn = ({ deliveryId }) => {
                           <TableRow key={item._id}>
                             <TableCell>{item.item.part_number}</TableCell>
                             <TableCell>
-                              {item.item.engine.engine_name} -{" "}
-                              {item.item.packing_type} {item.item.material_type}
-                              <Chip
-                                color="primary"
-                                variant="bordered"
-                                className="ml-4"
-                              >
-                                {item.item.vendor.vendor_name}
-                              </Chip>
+                              {item.itemType === "Gasket" ? (
+                                <>
+                                  {item.item.engine?.engine_name}{" "}
+                                  {item.item.packing_type}{" "}
+                                  {item.item.material_type}{" "}
+                                  {item.item.vendor?.vendor_name}{" "}
+                                  {item.itemType}
+                                  <Chip color="primary" className="ml-4" variant="bordered">
+                                    {item.item.brand?.brand_name}
+                                  </Chip>
+                                </>
+                              ) : item.itemType === "Ring" ? (
+                                <>
+                                  {item.item.engine?.engine_name}{" "}
+                                  {item.item.sizes}{" "} {item.item.material}
+                                  {item.item.vendor?.vendor_name}{" "}
+                                  {item.itemType}
+                                  <Chip color="primary" className="ml-4" variant="bordered">
+                                    {item.item.brand}
+                                  </Chip>
+                                </>
+                              ) : null}
                             </TableCell>
-                            <TableCell>{item.item.brand.brand_name}</TableCell>
-                            <TableCell>{item.itemType}</TableCell>
+
                             <TableCell>{item.delivery_quantity}</TableCell>
                             <TableCell>{item.received_quantity}</TableCell>
                             <TableCell>{item.returned_quantity}</TableCell>

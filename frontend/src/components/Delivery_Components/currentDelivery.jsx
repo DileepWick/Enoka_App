@@ -266,32 +266,16 @@ const CurrentDelivery = () => {
 
                       {/* Stock Column */}
                       <td className="border px-4 py-2 text-center whitespace-nowrap overflow-x-auto">
-                        {item.itemType === "Gasket" ? (
-                          <>
-                            {item.item.engine?.engine_name}{" "}
-                            {item.item.packing_type} {item.item.material_type}{" "}
-                            {item.item.vendor?.vendor_name} {item.itemType}
-                          </>
-                        ) : item.itemType === "Ring" ? (
-                          <>
-                            {item.item.engine?.engine_name} {item.item.sizes}{" "}
-                            {item.item.material} {item.item.vendor?.vendor_name} {" "}
-                            {item.itemType}
-                          </>
-                        ) : null}
+                        {item.item.engine?.engine_name}-{item.item.packing_type}{" "}
+                        {item.item.material_type}{" "}
+                        <Chip variant="bordered" color="primary" size="sm">
+                          {item.item.vendor?.vendor_name}
+                        </Chip>{" "}
                       </td>
 
-                      {/* Render according to itemType */}
+                      {/* Quantity Column */}
                       <td className="border px-4 py-2 text-center">
-                        {
-                          item.itemType === "Gasket"
-                            ? item.item.brand?.brand_name // Render brand name for gasket items
-                            : item.itemType === "Ring"
-                            ? item.item.brand // Render material type for ring items
-                            : item.itemType === "piston"
-                            ? item.item.engine?.engine_name // Render engine name for piston items
-                            : "No item data available" // Default message if itemType is unknown
-                        }
+                        {item.item.brand?.brand_name}
                       </td>
 
                       {/* Quantity Column */}

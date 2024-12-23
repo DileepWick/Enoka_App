@@ -41,22 +41,24 @@ const RemoveButton = ({ StockId, cashBillItemId }) => {
 
   return (
     <>
-      <Button onPress={onOpen} className="font-f1" size="sm" color="danger" variant="ghost">
+      <Button onPress={onOpen} className="font-f1 bg-black text-white">
         Remove
       </Button>
 
       <Modal isOpen={isOpen} onOpenChange={onClose}>
         <ModalContent>
-          <ModalHeader className="flex flex-col gap-1 font-f1">
-            Remove Item From Bill
+          <ModalHeader className="flex flex-col gap-1">
+            Remove Item - {StockId}
           </ModalHeader>
-          <ModalBody className="font-f1">
+          <ModalBody>
             <p>Are you sure you want to remove this item from the bill?</p>
           </ModalBody>
           <ModalFooter>
+            <Button color="danger" variant="light" onPress={onClose}>
+              Close
+            </Button>
             <Button
               color="primary"
-              className="font-f1"
               onPress={handleRemove}
               isLoading={loading}
               disabled={loading}

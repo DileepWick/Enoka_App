@@ -13,7 +13,6 @@ import { updateStock } from "@/services/inventoryServices"; // Import your servi
 
 //Emiiter
 import emitter from "../../../util/emitter.js";
-import { toast } from "react-toastify";
 
 const Adjust_Stock_Button = ({ stockid, currentStock }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -44,7 +43,6 @@ const Adjust_Stock_Button = ({ stockid, currentStock }) => {
 
       // Handle the successful update (e.g., show a success message)
       console.log("Stock updated successfully:", response);
-      toast.success("Stock updated successfully!");
 
       // Emit an event to notify other components
       emitter.emit("stockUpdated");

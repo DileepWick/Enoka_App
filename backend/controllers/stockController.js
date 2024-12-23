@@ -1,6 +1,5 @@
 import Stock from "../models/Stock.js";
 import Gasket from "../models/Gasket.js";
-import Ring from "../models/Ring.js";
 
 
 
@@ -128,9 +127,9 @@ export const getAllStocks = async (req, res) => {
       if (stock.itemModel === 'Gasket') {
         // For Gasket, populate the fields
         item = await Gasket.findById(stock.item).populate('brand').populate('vendor').populate('engine');
-      } else if (stock.itemModel === 'Ring') {
-        // For Ring, populate the fields
-        item = await Ring.findById(stock.item).populate('brand').populate('engine');
+      } else {
+        // For other item models, just return the basic item with ID
+        item = { _id: stock.item }; // Only return the item ID
       }
 
       // Return a new object with populated item (for Gasket) and its fields
@@ -149,84 +148,6 @@ export const getAllStocks = async (req, res) => {
     // Respond with a 500 status code and a descriptive error message
     res.status(500).json({
       message: 'An error occurred while fetching stocks.',
-      error: err.message,
-    });
-  }
-};
-
-
-// Get all stocks for Gasket only and populate references based on itemModel
-export const getAllStocksForGasket = async (req, res) => {
-  try {
-    // Fetch all stocks for Gasket only and populate the branch
-    const stocks = await Stock.find({ itemModel: 'Gasket' }).populate('branch');
-
-    if (!stocks.length) {
-      return res.status(404).json({ message: 'No gasket stocks found.' });
-    }
-
-    // Manually populate the item field based on itemModel
-    const populatedStocks = await Promise.all(stocks.map(async (stock) => {
-      // For Gasket, populate the fields
-      const item = await Gasket.findById(stock.item)
-        .populate('brand')
-        .populate('vendor')
-        .populate('engine');
-
-      // Return a new object with populated item (Gasket) and its fields
-      return {
-        ...stock.toObject(),
-        item: item
-      };
-    }));
-
-    // Return the populated stocks data
-    res.status(200).json(populatedStocks);
-  } catch (err) {
-    // Log error details for debugging
-    console.error('Error retrieving gasket stocks:', err);
-
-    // Respond with a 500 status code and a descriptive error message
-    res.status(500).json({
-      message: 'An error occurred while fetching gasket stocks.',
-      error: err.message,
-    });
-  }
-};
-
-//Get all stocks for Ring only and populate references based on itemModel
-export const getAllStocksForRing = async (req, res) => {
-  try {
-    // Fetch all stocks for Ring only and populate the branch
-    const stocks = await Stock.find({ itemModel: 'Ring' }).populate('branch');
-
-    if (!stocks.length) {
-      return res.status(404).json({ message: 'No ring stocks found.' });
-    }
-
-    // Manually populate the item field based on itemModel
-    const populatedStocks = await Promise.all(stocks.map(async (stock) => {
-      // For Ring, populate the fields
-      const item = await Ring.findById(stock.item)
-        .populate('vendor')
-        .populate('engine');
-
-      // Return a new object with populated item (Ring) and its fields
-      return {
-        ...stock.toObject(),
-        item: item
-      };
-    }));
-
-    // Return the populated stocks data
-    res.status(200).json(populatedStocks);
-  } catch (err) {
-    // Log error details for debugging
-    console.error('Error retrieving ring stocks:', err);
-
-    // Respond with a 500 status code and a descriptive error message
-    res.status(500).json({
-      message: 'An error occurred while fetching ring stocks.',
       error: err.message,
     });
   }

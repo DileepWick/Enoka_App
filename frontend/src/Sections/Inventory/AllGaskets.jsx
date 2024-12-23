@@ -104,6 +104,21 @@ const AllGaskets = () => {
       );
     }
 
+    if (isLoading)
+      return (
+        <div>
+          {" "}
+          {/* Inline Progress Bar for Modal */}
+          {isLoading && (
+            <Progress
+              isIndeterminate
+              aria-label="Adding Gasket..."
+              size="sm"
+              label="Loading . . ."
+            />
+          )}
+        </div>
+      );
     return (
       <Table aria-label="Stock details" className="min-w-[300px]" isStriped>
         <TableHeader>

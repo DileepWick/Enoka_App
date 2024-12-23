@@ -124,6 +124,7 @@ export const createGasket = async (req, res) => {
   }
 };
 
+
 // Update a gasket
 export const updateGasket = async (req, res) => {
   try {

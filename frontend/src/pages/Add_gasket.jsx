@@ -339,32 +339,6 @@ export default function AddItemForm() {
           Add Gasket
         </Button>
       </form>
-
-      <Modal isOpen={!!currentModal} onRequestClose={closeModal}>
-        <h2 className="text-lg font-bold mb-4">Add New {currentModal}</h2>
-        <input
-          type="text"
-          value={newItemName}
-          onChange={(e) => setNewItemName(e.target.value)}
-          placeholder={`Enter ${currentModal} name`}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md mb-4"
-        />
-        <div className="flex justify-end">
-          <button
-            onClick={handleAddNew}
-            disabled={isAddingItem}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mr-2"
-          >
-            Add
-          </button>
-          <button
-            onClick={closeModal}
-            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-          >
-            Cancel
-          </button>
-        </div>
-      </Modal>
     </div>
   );
 }

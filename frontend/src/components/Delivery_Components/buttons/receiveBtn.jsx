@@ -172,7 +172,6 @@ const ReceiveBtn = ({ deliveryId }) => {
                     >
                       <TableHeader>
                         <TableColumn>Item </TableColumn>
-                        <TableColumn>Item Type</TableColumn>
                         <TableColumn>Delivered Quantity</TableColumn>
                         <TableColumn>Received Quantity</TableColumn>
                         <TableColumn>Returned Quantity</TableColumn>
@@ -184,8 +183,38 @@ const ReceiveBtn = ({ deliveryId }) => {
                       <TableBody>
                         {filteredItems.map((item) => (
                           <TableRow key={item._id}>
-                            <TableCell>{item.item.part_number}</TableCell>
-                            <TableCell>{item.itemType}</TableCell>
+                            <TableCell>
+                              {item.itemType === "Gasket" ? (
+                                <>
+                                  {item.item.engine?.engine_name}{" "}
+                                  {item.item.packing_type}{" "}
+                                  {item.item.material_type}{" "}
+                                  {item.item.vendor?.vendor_name}{" "}
+                                  {item.itemType}
+                                  <Chip
+                                    color="primary"
+                                    className="ml-4"
+                                    variant="bordered"
+                                  >
+                                    {item.item.brand?.brand_name}
+                                  </Chip>
+                                </>
+                              ) : item.itemType === "Ring" ? (
+                                <>
+                                  {item.item.engine?.engine_name}{" "}
+                                  {item.item.sizes} {item.item.material}
+                                  {item.item.vendor?.vendor_name}{" "}
+                                  {item.itemType}
+                                  <Chip
+                                    color="primary"
+                                    className="ml-4"
+                                    variant="bordered"
+                                  >
+                                    {item.item.brand}
+                                  </Chip>
+                                </>
+                              ) : null}
+                            </TableCell>
                             <TableCell>{item.delivery_quantity}</TableCell>
                             <TableCell>{item.received_quantity}</TableCell>
                             <TableCell>{item.returned_quantity}</TableCell>
@@ -212,7 +241,7 @@ const ReceiveBtn = ({ deliveryId }) => {
                               ) : (
                                 <MarkAsReceive
                                   deliveryItemId={item._id}
-                                  Item={item.item.part_number}
+                                  Item={item.item._id}
                                   quantity={item.delivery_quantity}
                                   itemId={item.item._id}
                                   itemType={item.itemType}

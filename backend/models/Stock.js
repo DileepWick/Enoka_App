@@ -30,7 +30,7 @@ const StocksSchema = new mongoose.Schema({
     itemModel: {
       type: String,
       required: true,
-      enum: ["Gasket", "Piston", "Bearing", "Razor"], // Allowed item models
+      enum: ["Gasket", "Piston", "Bearing", "Razor","Ring"], // Allowed item models
     },
   });
 

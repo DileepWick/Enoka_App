@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 import Gasket from "../models/Gasket.js";
 import Stock from "../models/Stock.js";
 import Branch from "../models/Branch.js";
-import Ring from "../models/Ring.js";
 
 // Create a new delivery item
 export const createDeliveryItem = async (req, res) => {
@@ -40,7 +39,7 @@ export const createDeliveryItem = async (req, res) => {
     // Map known models to item types (e.g., Gaskets, Pistons)
     const itemModels = {
       Gasket: "Gasket", // Replace with actual model names
-      Ring: "Ring", // Replace with actual model names
+      Piston: "Piston", // Replace with actual model names
       Razor: "Razor", // Replace with actual model names
     };
 
@@ -348,7 +347,7 @@ export const updateStatusOfDeliveryItem = async (req, res) => {
 // Controller function to find and update stock - Gasket Only
 export const updateStockForBranchAndItem = async (req, res) => {
   try {
-    const { branchName, itemId, quantity, itemType } = req.body; // Get the branch name, item ID, quantity, and item type from the request
+    const { branchName, itemId, quantity } = req.body; // Get the branch name, item ID, and quantity from the request
 
     // Find the branch by name
     const branch = await Branch.findOne({ name: branchName });
@@ -356,26 +355,16 @@ export const updateStockForBranchAndItem = async (req, res) => {
       return res.status(404).json({ message: "Branch not found" });
     }
 
-    // Determine whether it's a Gasket or Ring and find the item accordingly
-    let item;
-    if (itemType === "Gasket") {
-      item = await Gasket.findById(itemId);
-      if (!item) {
-        return res.status(404).json({ message: "Item (Gasket) not found" });
-      }
-    } else if (itemType === "Ring") {
-      item = await Ring.findById(itemId); // Assuming you have a Ring model for Ring items
-      if (!item) {
-        return res.status(404).json({ message: "Item (Ring) not found" });
-      }
-    } else {
-      return res.status(400).json({ message: "Invalid item type" });
+    // Find the gasket (item) by its ID
+    const gasket = await Gasket.findById(itemId);
+    if (!gasket) {
+      return res.status(404).json({ message: "Item (Gasket) not found" });
     }
 
-    // Find the stock associated with the branch and item (either Gasket or Ring)
+    // Find the stock associated with the branch and item (gasket)
     const stock = await Stock.findOne({
       branch: branch._id,
-      _id: { $in: item.stock }, // Assuming both Gaskets and Rings have a `stock` field
+      _id: { $in: gasket.stock },
     });
 
     if (!stock) {
@@ -400,4 +389,3 @@ export const updateStockForBranchAndItem = async (req, res) => {
       .json({ message: "Error updating stock", error: error.message });
   }
 };
-

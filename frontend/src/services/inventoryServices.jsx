@@ -12,17 +12,6 @@ export const fetchGaskets = async () => {
   }
 };
 
-// Function to fetch all rings
-export const fetchRings = async () => {
-  try {
-    const response = await axiosInstance.get("/api/rings");
-    return response.data; // Return the rings data
-  } catch (error) {
-    console.error("Error fetching rings:", error);
-    throw error; // Rethrow the error so it can be handled in the component
-  }
-};
-
 // Function to update stock
 export const updateStock = async (stockId, quantity, updatedBy) => {
   try {
@@ -49,16 +38,5 @@ export const deleteGasket = async (gasketId) => {
   } catch (error) {
     console.error("Error deleting gasket:", error);
     throw error; // Rethrow the error so it can be handled in the component
-  }
-};
-
-//Function to delete Ring
-export const deleteRing = async (ringId) => {
-  try {
-    const response = await axiosInstance.delete(`/api/rings/${ringId}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error deleting ring:", error);
-    throw error;
   }
 };

@@ -26,13 +26,10 @@ export default function App() {
     }
 
     try {
-      const response = await axiosInstance.post(
-        "api/cashbills/createCashBill",
-        {
-          status: "Pending",
-          billType: billType,
-        }
-      );
+      const response = await axiosInstance.post("api/cashbills/createCashBill", {
+        status: "Pending",
+        billType: billType,
+      });
 
       console.log(response.data);
 
@@ -53,14 +50,10 @@ export default function App() {
 
   return (
     <>
-      <Button
-        onPress={onOpen}
-        size="lg"
-        className="bg-black text-white font-f1 absolute top-0 right-0 m-4"
-      >
+      <Button onPress={onOpen} size="lg" className="bg-black text-white font-f1 absolute top-0 right-0 m-4">
         NEW CASH BILL +
       </Button>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} className="font-f1">
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           {(onClose) => (
             <>
@@ -73,7 +66,7 @@ export default function App() {
                 <select
                   value={billType}
                   onChange={handleBillTypeChange}
-                  className="w-full p-2 border rounded font-f1"
+                  className="w-full p-2 border rounded"
                 >
                   <option value="">Select Bill Type</option>
                   <option value="E-Bill">E-Bill</option>
@@ -82,10 +75,10 @@ export default function App() {
                 <p>Selected Bill Type: {billType || "None selected"}</p>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="ghost" onPress={onClose}>
+                <Button color="danger" variant="light" onPress={onClose}>
                   Close
                 </Button>
-                <Button className="bg-black text-white" onPress={handleCreateBill}>
+                <Button color="primary" onPress={handleCreateBill}>
                   Create Bill
                 </Button>
               </ModalFooter>

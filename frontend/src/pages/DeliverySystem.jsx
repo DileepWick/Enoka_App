@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import CreateDeliveryForm from "@/components/Delivery_Components/createDelivery";
 import GasketList from "@/components/Delivery_Components/gaskets";
 import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
-import RingsList from "@/components/Delivery_Components/rings";
 
 const DeliverySystem = () => {
   return (
@@ -19,8 +18,8 @@ const DeliverySystem = () => {
         <Tab key="gaskets" title="GASKETS">
           <GasketList />
         </Tab>
-        <Tab key="pistons" title="RINGS">
-          <RingsList />
+        <Tab key="pistons" title="PISTONS">
+          No Data
         </Tab>
         <Tab key="razors" title="RAZORS">
           No Data

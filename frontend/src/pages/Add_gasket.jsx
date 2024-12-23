@@ -1,45 +1,66 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "@/config/axiosInstance";
+
 import Select from "react-select";
 import Modal from "react-modal";
-import { Button ,Input} from "@nextui-org/react";
+import { Button } from "@nextui-org/react";
+import { Input } from "@nextui-org/react";
+import { Progress } from "@nextui-org/react";
+
+//Styles
+import StyledSelect from "@/components/Inventory_Components/StyledSelect";
+import { toast } from "react-toastify";
 
 Modal.setAppElement("#root");
 
 export default function AddItemForm() {
+  // Form state
   const [formData, setFormData] = useState({
     part_number: "",
-    description: "",
-    stock: "",
-    minstock: "",
-    year: "",
     material_type: "",
     packing_type: "",
     engine: "",
     brand: "",
     vendor: "",
-    added_by: "Admin"
+    added_by: "Admin",
   });
 
+  // Fetch data
   const [vendors, setVendors] = useState([]);
   const [brands, setBrands] = useState([]);
   const [engines, setEngines] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [submitStatus, setSubmitStatus] = useState(null);
-
   const [currentModal, setCurrentModal] = useState(null);
   const [newItemName, setNewItemName] = useState("");
   const [isAddingItem, setIsAddingItem] = useState(false);
+  const [formKey, setFormKey] = useState(0); // Add this to reset the form
 
+  // Options for select dropdowns
+  const Packing_options = [
+    { value: "FULLSET", label: "Full Set" },
+    { value: "HEADSET", label: "Head Set" },
+    { value: "GASKET ONLY", label: "Gasket Only" },
+  ];
+
+  // Options for select dropdowns
+  const Material_options = [
+    { value: "STEEL", label: "STEEL" },
+    { value: "HELLITE", label: "HELLITE" },
+    { value: "WOG", label: "WOG" },
+  ];
+
+  // Fetch vendors, brands, and engines
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [vendorsResponse, brandsResponse, enginesResponse] = await Promise.all([
-          axios.get("http://localhost:8098/api/vendors"),
-          axios.get("http://localhost:8098/api/brands"),
-          axios.get("http://localhost:8098/api/engines"),
-        ]);
+        const [vendorsResponse, brandsResponse, enginesResponse] =
+          await Promise.all([
+            axiosInstance.get("/api/vendors"),
+            axiosInstance.get("/api/brands"),
+            axiosInstance.get("/api/engines"),
+          ]);
 
         setVendors(vendorsResponse.data);
         setBrands(brandsResponse.data);
@@ -54,38 +75,42 @@ export default function AddItemForm() {
     fetchData();
   }, []);
 
+  // Handle input change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Open a modal
   const openModal = (type) => {
     setCurrentModal(type);
     setNewItemName("");
     setIsAddingItem(false);
   };
 
+  // Close the modal
   const closeModal = () => {
     setCurrentModal(null);
     setNewItemName("");
     setIsAddingItem(false);
   };
 
+  // Handle adding a new item
   const handleAddNew = async () => {
     setIsAddingItem(true);
     try {
       const endpoints = {
         engine: { url: "engines", key: "engine_name", setter: setEngines },
         brand: { url: "brands", key: "brand_name", setter: setBrands },
-        vendor: { url: "vendors", key: "vendor_name", setter: setVendors }
+        vendor: { url: "vendors", key: "vendor_name", setter: setVendors },
       };
 
       const { url, key, setter } = endpoints[currentModal];
-      const response = await axios.post(`http://localhost:8098/api/${url}`, {
-        [key]: newItemName
+      const response = await axiosInstance.post(`/api/${url}`, {
+        [key]: newItemName,
       });
 
-      setter(prev => [...prev, response.data]);
+      setter((prev) => [...prev, response.data]);
       closeModal();
     } catch (err) {
       alert(err.response?.data?.message || "Failed to add item");
@@ -94,252 +119,250 @@ export default function AddItemForm() {
     }
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitStatus(null);
-    try {
-      const response = await axios.post("http://localhost:8098/api/gaskets", formData);
-      setSubmitStatus({ type: "success", message: response.data.message });
+
+    const resetForm = () => {
       setFormData({
         part_number: "",
-        description: "",
-        stock: "",
-        minstock: "",
-        year: "",
         material_type: "",
         packing_type: "",
         engine: "",
         brand: "",
         vendor: "",
-        added_by: "Admin"
       });
+      setFormKey((prevKey) => prevKey + 1); // Reset form inputs by changing the key
+    };
+
+    try {
+      const response = await axiosInstance.post("/api/gaskets", formData);
+
+      // Success: Show toast and reset the form
+      toast.success("Gasket added successfully!");
+      resetForm();
     } catch (err) {
-      setSubmitStatus({
-        type: "error",
-        message: err.response?.data?.error || "Failed to create gasket"
-      });
+      // Check if error response is available
+      if (err.response) {
+        const status = err.response.status;
+
+        if (status === 409) {
+          // Specific handling for 409 Conflict
+          toast.error(`Part number ${formData.part_number} already exists.`);
+        } else {
+          // Other server-side errors
+          const message =
+            err.response.data?.error || "An unexpected error occurred.";
+          toast.error(message);
+        }
+      } else {
+        // Handle network or client-side errors
+        toast.error("Failed to connect to the server. Please try again.");
+      }
+
+      // Reset form regardless of the error
+      resetForm();
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div>
+        {" "}
+        {/* Inline Progress Bar for Modal */}
+        {isLoading && (
+          <Progress
+            isIndeterminate
+            aria-label="Adding Gasket..."
+            size="sm"
+            label="Loading The Form..."
+          />
+        )}
+      </div>
+    );
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="max-w-4xl mx-auto p-6 mt-8">
-      <h1 className="text-2xl font-bold mb-6 text-center">Add New Gasket</h1>
-
-      {submitStatus && (
-        <div className={`mb-6 p-4 rounded-md ${submitStatus.type === "success" ? "bg-green-100" : "bg-red-100"}`}>
-          {submitStatus.message}
-        </div>
+    <div className="max-w-4xl mx-auto p-6 ">
+      {isLoading && (
+        <Progress
+          isIndeterminate
+          aria-label="Adding Gasket..."
+          size="sm"
+          label="Loading The Form..."
+        />
       )}
+      <h1 className="text-2xl font-f1 mb-6 text-center">Add New Gasket</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form key={formKey} onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="part_number" className="block text-sm font-medium text-gray-700 mb-1">Part Number</label>
+            <label
+              htmlFor="part_number"
+              className="block text-sm font-f1 text-gray-700 mb-1"
+            >
+              Part Number
+            </label>
             <input
               type="text"
               id="part_number"
               name="part_number"
               value={formData.part_number}
+              placeholder="Leave blank if unknown"
               onChange={handleInputChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              size="sm"
+              variant="bordered"
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black`}
             />
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-            <input
-              type="text"
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
-            <input
-              type="number"
-              id="stock"
-              name="stock"
-              value={formData.stock}
-              onChange={handleInputChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="minstock" className="block text-sm font-medium text-gray-700 mb-1">Minimum Stock</label>
-            <input
-              type="number"
-              id="minstock"
-              name="minstock"
-              value={formData.minstock}
-              onChange={handleInputChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="year" className="block text-sm font-medium text-gray-700 mb-1">Year</label>
-            <input
-              type="number"
-              id="year"
-              name="year"
-              value={formData.year}
-              onChange={handleInputChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="material_type" className="block text-sm font-medium text-gray-700 mb-1">Material Type</label>
-            <select
+            <label
+              htmlFor="material_type"
+              className="block text-sm font-f1 text-gray-700 mb-1"
+            >
+              Material Type
+            </label>
+            <StyledSelect
               id="material_type"
               name="material_type"
-              value={formData.material_type}
-              onChange={handleInputChange}
+              value={Material_options.find(
+                (option) => option.value === formData.material_type
+              )}
+              onChange={(selected) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  material_type: selected.value,
+                }))
+              }
+              options={Material_options}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select material type</option>
-              <option value="steel">Steel</option>
-              <option value="hellite">Hellite</option>
-              <option value="wog">WOG</option>
-            </select>
+            />
           </div>
 
           <div>
-            <label htmlFor="packing_type" className="block text-sm font-medium text-gray-700 mb-1">Packing Type</label>
-            <select
+            <label
+              htmlFor="packing_type"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Packing Type
+            </label>
+            <StyledSelect
               id="packing_type"
               name="packing_type"
-              value={formData.packing_type}
-              onChange={handleInputChange}
+              value={Packing_options.find(
+                (option) => option.value === formData.packing_type
+              )}
+              onChange={(selected) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  packing_type: selected.value,
+                }))
+              }
+              options={Packing_options}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select packing type</option>
-              <option value="fullSet">Full Set</option>
-              <option value="headSet">Head Set</option>
-              <option value="gasketOnly">Gasket Only</option>
-            </select>
+            />
           </div>
 
           <div className="flex items-end">
             <div className="flex-grow">
-              <label htmlFor="engine" className="block text-sm font-medium text-gray-700 mb-1">Engine</label>
-              <Select
+              <label
+                htmlFor="engine"
+                className="block text-xs font-medium text-gray-700 mb-1"
+              >
+                Engine
+              </label>
+              <StyledSelect
                 name="engine"
-                value={engines.find(e => e._id === formData.engine)}
-                onChange={(selected) => setFormData(prev => ({ ...prev, engine: selected._id }))}
+                value={engines.find((e) => e._id === formData.engine)}
+                onChange={(selected) =>
+                  setFormData((prev) => ({ ...prev, engine: selected._id }))
+                }
                 options={engines}
-                getOptionLabel={option => option.engine_name}
-                getOptionValue={option => option._id}
+                getOptionLabel={(option) => option.engine_name}
+                getOptionValue={(option) => option._id}
                 className="react-select-container"
                 classNamePrefix="react-select"
               />
             </div>
-            <Button 
-              type="button" 
-              onClick={() => openModal('engine')}
-              className="ml-2 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              +
-            </Button>
           </div>
 
           <div className="flex items-end">
             <div className="flex-grow">
-              <label htmlFor="brand" className="block text-sm font-medium text-gray-700 mb-1">Brand</label>
-              <Select
+              <label
+                htmlFor="brand"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Brand
+              </label>
+              <StyledSelect
                 name="brand"
-                value={brands.find(b => b._id === formData.brand)}
-                onChange={(selected) => setFormData(prev => ({ ...prev, brand: selected._id }))}
+                value={brands.find((b) => b._id === formData.brand)}
+                onChange={(selected) =>
+                  setFormData((prev) => ({ ...prev, brand: selected._id }))
+                }
                 options={brands}
-                getOptionLabel={option => option.brand_name}
-                getOptionValue={option => option.brand_id}
+                getOptionLabel={(option) => option.brand_name}
+                getOptionValue={(option) => option.brand_id}
                 className="react-select-container"
                 classNamePrefix="react-select"
               />
             </div>
-            <Button 
-              type="button" 
-              onClick={() => openModal('brand')}
-              className="ml-2 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              +
-            </Button>
           </div>
 
           <div className="flex items-end">
             <div className="flex-grow">
-              <label htmlFor="vendor" className="block text-sm font-medium text-gray-700 mb-1">Vendor</label>
-              <Select
+              <label
+                htmlFor="vendor"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Vendor
+              </label>
+              <StyledSelect
                 name="vendor"
-                value={vendors.find(v => v._id === formData.vendor)}
-                onChange={(selected) => setFormData(prev => ({ ...prev, vendor: selected._id }))}
+                value={vendors.find((v) => v._id === formData.vendor)}
+                onChange={(selected) =>
+                  setFormData((prev) => ({ ...prev, vendor: selected._id }))
+                }
                 options={vendors}
-                getOptionLabel={option => option.vendor_name}
-                getOptionValue={option => option._id}
-                className="react-select-container"
+                getOptionLabel={(option) => option.vendor_name}
+                getOptionValue={(option) => option._id}
+                className="react-select-container font-f1 text-[px]"
                 classNamePrefix="react-select"
               />
             </div>
-            <Button 
-              type="button" 
-              onClick={() => openModal('vendor')}
-              className="ml-2 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              +
-            </Button>
           </div>
         </div>
 
-        <Button type="submit" className="w-full" variant="ghost" color="primary" size="lg">
-          Submit
+        <Button type="submit" className="w-full bg-black text-white" size="lg">
+          Add Gasket
         </Button>
       </form>
 
-      <Modal
-        isOpen={!!currentModal}
-        onRequestClose={closeModal}
-        className="fixed inset-0 flex items-center justify-center"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50"
-      >
-        <div className="bg-white p-6 rounded-lg w-96">
-          <h2 className="text-xl font-semibold mb-4">Add New {currentModal}</h2>
-          <input
-            type="text"
-            value={newItemName}
-            onChange={(e) => setNewItemName(e.target.value)}
-            placeholder={`Enter new ${currentModal} name`}
-            className="w-full px-3 py-2 border rounded mb-4"
-          />
-          <div className="flex justify-end space-x-2">
-            <button 
-              onClick={closeModal} 
-              className="px-4 py-2 border rounded"
-            >
-              Cancel
-            </button>
-            <button 
-              onClick={handleAddNew} 
-              disabled={isAddingItem}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-            >
-              {isAddingItem ? 'Adding...' : 'Add'}
-            </button>
-          </div>
+      <Modal isOpen={!!currentModal} onRequestClose={closeModal}>
+        <h2 className="text-lg font-bold mb-4">Add New {currentModal}</h2>
+        <input
+          type="text"
+          value={newItemName}
+          onChange={(e) => setNewItemName(e.target.value)}
+          placeholder={`Enter ${currentModal} name`}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md mb-4"
+        />
+        <div className="flex justify-end">
+          <button
+            onClick={handleAddNew}
+            disabled={isAddingItem}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mr-2"
+          >
+            Add
+          </button>
+          <button
+            onClick={closeModal}
+            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          >
+            Cancel
+          </button>
         </div>
       </Modal>
     </div>

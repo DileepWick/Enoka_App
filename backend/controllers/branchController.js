@@ -3,7 +3,7 @@ import Branch from '../models/Branch.js';
 // Utility function to generate custom IDs with prefix
 const generateCustomId = (prefix) => `${prefix}${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
 
-// Get all branches
+// Get all branches 
 export const getAllBranches = async (req, res) => {
   try {
     const branches = await Branch.find();

@@ -36,7 +36,7 @@ export default defineConfig({
     },
     host: true, // Allow access from network devices
     port: 443, // Specify your desired port
-    // middlewareMode: true, // Enable middleware mode
+    middlewareMode: true, // Enable middleware mode
   },
   envPrefix: 'VITE_', // Vite defaults to this, but it's good to be explicit
   resolve: {

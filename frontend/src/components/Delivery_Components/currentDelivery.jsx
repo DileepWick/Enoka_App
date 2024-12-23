@@ -1,12 +1,10 @@
 "use client";
 
-//Controller for API ENDPOINT
-import axiosInstance from "@/config/axiosInstance";
-
+import axios from "axios";
 import { useState, useEffect } from "react";
 import { removeDelivery } from "@/services/deliveryServices";
 import { Button, Checkbox, Chip, Divider, Progress } from "@nextui-org/react";
-import { toast } from "react-toastify";
+
 
 //Components
 import EditQtyBtn from "./buttons/deliveryItemQuantityEditBtn";
@@ -30,20 +28,20 @@ const CurrentDelivery = () => {
         setCheckedItems({});
         // Emit the event to notify GasketList
         emitter.emit("deliveryRemoved");
+
       } catch (error) {
         console.error("Error removing delivery:", error.message);
       }
     }
   };
 
-  // Fetch latest pending delivery
   useEffect(() => {
     const fetchLatestPendingDelivery = async () => {
       try {
-        const response = await axiosInstance.get(
-          "/api/delivery/deliveries/latest"
+        const response = await axios.get(
+          "http://localhost:8098/api/delivery/deliveries/latest"
         );
-
+  
         const delivery = response.data.data;
         if (delivery) {
           setNewDelivery(delivery);
@@ -57,9 +55,9 @@ const CurrentDelivery = () => {
         console.error("Error fetching latest pending delivery:", error.message);
       }
     };
-
+  
     fetchLatestPendingDelivery();
-
+  
     // Listen for the deliveryCreated event
     const handleDeliveryCreated = () => {
       console.log(
@@ -67,7 +65,7 @@ const CurrentDelivery = () => {
       );
       fetchLatestPendingDelivery();
     };
-
+  
     // Listen for the delivery item creation
     const handleDeliveryItemCreated = () => {
       console.log(
@@ -75,24 +73,25 @@ const CurrentDelivery = () => {
       );
       fetchLatestPendingDelivery();
     };
-
+  
     // Subscribe to the events
     emitter.on("deliveryCreated", handleDeliveryCreated);
-    emitter.on("deliveryItemCreated", handleDeliveryItemCreated);
+    emitter.on("deliveryItemAdded", handleDeliveryItemCreated);
     emitter.on("deliveryItemQuantityUpdated", handleDeliveryItemCreated);
-
+  
     // Cleanup listeners on unmount
     return () => {
       emitter.off("deliveryCreated", handleDeliveryCreated);
-      emitter.off("deliveryItemCreated", handleDeliveryItemCreated);
+      emitter.off("deliveryItemAdded", handleDeliveryItemCreated);
     };
   }, []);
+  
 
   //Fetch Delivery Items
   const fetchDeliveryItems = async (deliveryId) => {
     try {
-      const response = await axiosInstance.get(
-        `/api/deliveryItems/getDeliveryItemsByDeliveryId/${deliveryId}`
+      const response = await axios.get(
+        `http://localhost:8098/api/deliveryItems/getDeliveryItemsByDeliveryId/${deliveryId}`
       );
       const items = response.data.data;
       setDeliveryItems(items);
@@ -105,6 +104,7 @@ const CurrentDelivery = () => {
       console.error("Error fetching delivery items:", error.message);
     }
   };
+
 
   //Check Box Change
   const handleCheckboxChange = (itemId) => {
@@ -137,95 +137,72 @@ const CurrentDelivery = () => {
     }
 
     try {
-      await axiosInstance.put(`/api/delivery/${newDelivery._id}/status`, {
-        status: "on delivery",
-      });
-      toast.success("Delivery started successfully!");
-
+      await axios.put(
+        `http://localhost:8098/api/delivery/${newDelivery._id}/status`,
+        { status: "on delivery" }
+      );
+      alert("Delivery started successfully.");
       emitter.emit("deliveryStarted");
       setNewDelivery(null);
       setDeliveryItems([]);
       setCheckedItems({});
+      
+
     } catch (error) {
       console.error("Error starting delivery:", error.message);
     }
   };
 
   //Remove Item
-  const handleRemoveItem = async (itemId, stockId, quantity) => {
+  const handleRemoveItem = async (itemId) => {
     try {
-      // Perform both actions simultaneously
-      await Promise.all([
-        axiosInstance.delete(`/api/deliveryItems/deleteDeliveryItem/${itemId}`),
-        axiosInstance.put(`/api/stocks/increaseStockQuantity/${stockId}`, {
-          quantity,
-        }),
-      ]);
+      // Remove item from backend
+      await axios.delete(
+        `http://localhost:8098/api/deliveryItems/deleteDeliveryItem/${itemId}`
+      );
 
-      toast.success("Item removed successfully!");
-
-      // Emit the event to notify GasketList
-      emitter.emit("deliveryItemRemoved");
-
-      // Update frontend states
+      // Remove item locally from delivery items
       const updatedItems = deliveryItems.filter((item) => item._id !== itemId);
       setDeliveryItems(updatedItems);
+
+      // Remove item from checkedItems state
       const updatedCheckedItems = { ...checkedItems };
       delete updatedCheckedItems[itemId];
       setCheckedItems(updatedCheckedItems);
     } catch (error) {
       console.error("Error removing item:", error.message);
-      toast.error("Error removing item. Please try again.");
+      alert("Failed to remove item. Please try again.");
     }
   };
 
   return (
-    <div className="w-full  font-f1 text-black">
-      <div className=" mx-auto">
+    <div className="w-full px-4 sm:px-6 lg:px-8 font-f1 text-black">
+      <div className="max-w-3xl mx-auto">
         {newDelivery ? (
           <div className="bg-white text-black shadow-md rounded-lg p-4 sm:p-6">
-            <h2 className="text-2xl font-f1 mb-4 sm:mb-6 ">DELIVERY DETAILS</h2>
-            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm sm:text-base">
-                <div className="space-y-2">
-                  <p className="flex justify-between items-center">
-                    <span className="font-semibold text-gray-600">From:</span>
-                    <span className="text-black">
-                      {newDelivery.senderBranch}
-                    </span>
-                  </p>
-                  <p className="flex justify-between items-center">
-                    <span className="font-semibold text-gray-600">To:</span>
-                    <span className="text-black">
-                      {newDelivery.receiverBranch}
-                    </span>
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <p className="flex justify-between items-center">
-                    <span className="font-semibold text-gray-600">
-                      Total Items:
-                    </span>
-                    <span className="text-black">{totalItemsDelivered}</span>
-                  </p>
-                  <p className="flex justify-between items-center">
-                    <span className="font-semibold text-gray-600">
-                      Item Types:
-                    </span>
-                    <span className="text-black">{deliveryItems.length}</span>
-                  </p>
-                </div>
-              </div>
-            </div>
+            <h2 className="text-2xl font-f1 mb-4 sm:mb-6 ">Delivery Details</h2>
             <Divider className="my-4 border-gray-700" />
-
-            {/* Delivery Items */}
-            <h2 className="text-2xl font-f1 mb-4 sm:mb-6 ">DELIVERY LIST</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm sm:text-base">
+              <p>
+                <strong>From - </strong> {newDelivery.senderBranch}
+              </p>
+              <p>
+                <strong>To - </strong> {newDelivery.receiverBranch}
+              </p>
+              <p>
+                <strong>Delivery ID - </strong> <Chip>{newDelivery._id}</Chip>
+              </p>
+              <p>
+                <strong>Item Types - </strong> {deliveryItems.length}
+              </p>
+              <p>
+                <strong>Total Items - </strong> {totalItemsDelivered}
+              </p>
+            </div>
             <div className="my-6">
               <Progress
                 value={progressPercentage}
-                color="primary"
-                size="sm"
+                color="danger"
                 className="h-4 rounded-lg "
               />
               <p className="mt-2 text-center text-sm">
@@ -233,101 +210,71 @@ const CurrentDelivery = () => {
                 {Math.round(progressPercentage)}%)
               </p>
             </div>
+            <div className="flex flex-col sm:flex-row justify-between mt-4">
+              <Button
+                className="w-full sm:w-auto mb-4 sm:mb-0 bg-black text-white"
+                isDisabled={
+                  checkedCount < deliveryItems.length ||
+                  deliveryItems.length === 0
+                }
+                onClick={handleStartDelivery}
+              >
+                Start Delivery
+              </Button>
+              <Button
+                color="danger"
+                className="w-full sm:w-auto"
+                onClick={handleRemoveDelivery}
+              >
+                Cancel Delivery
+              </Button>
+            </div>
+            <Divider className="my-6 border-black" />
+            <h2 className="text-2xl font-f1 mb-4 sm:mb-6 ">Delivery Items</h2>
             <div
               className="overflow-x-auto overflow-y-auto max-h-64  rounded-lg p-2"
               style={{ scrollbarWidth: "thin" }}
             >
-              <table className="min-w-full table-auto text-xs sm:text-sm border-collapse">
+              <table className="min-w-full table-auto text-xs sm:text-sm">
                 <thead>
-                  <tr className="bg-gray-200 text-gray-700">
-                    <th className="border px-4 py-2 text-center" colSpan={2}>
+                  <tr>
+                    <th className="border px-2 py-2 text-left " colSpan={2}>
                       Item
                     </th>
-                    <th className="border px-4 py-2 text-center">Brand</th>
-                    <th className="border px-4 py-2 text-center">Quantity</th>
-                    <th className="border px-4 py-2 text-center">Actions</th>
+                    <th className="border px-2 py-2 text-left ">Quantity</th>
+                    <th className="border px-2 py-2 text-left ">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {deliveryItems.map((item, index) => (
-                    <tr
-                      key={item._id}
-                      className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
-                    >
-                      {/* Checkbox Column */}
-                      <td className="border px-4 py-2 text-center">
+                  {deliveryItems.map((item) => (
+                    <tr key={item._id}>
+                      <td className="border px-2 py-2">
                         <Checkbox
-                          color="primary"
-                          size="sm"
+                          color="danger"
+                          size="lg"
                           isSelected={checkedItems[item._id] || false}
                           onValueChange={() => handleCheckboxChange(item._id)}
                         />
                       </td>
-
-                      {/* Stock Column */}
-                      <td className="border px-4 py-2 text-center whitespace-nowrap overflow-x-auto">
-                        {item.item.engine?.engine_name}-{item.item.packing_type}{" "}
-                        {item.item.material_type}{" "}
-                        <Chip variant="bordered" color="primary" size="sm">
-                          {item.item.vendor?.vendor_name}
-                        </Chip>{" "}
+                      <td className="border px-2 py-2">
+                        {item.item.description}
                       </td>
-
-                      {/* Quantity Column */}
-                      <td className="border px-4 py-2 text-center">
-                        {item.item.brand?.brand_name}
-                      </td>
-
-                      {/* Quantity Column */}
-                      <td className="border px-4 py-2 text-center">
-                        {item.delivery_quantity}
-                      </td>
-
-                      {/* Actions Column */}
-                      <td className="border px-4 py-2 text-center">
-                        <div className="flex items-center justify-center space-x-2">
-                          <EditQtyBtn
-                            deliveryItemId={item._id}
-                            stockId={item.stock._id}
-                            currentQuantity={item.delivery_quantity}
-                          />
+                      <td className="border px-2 py-2">{item.quantity}</td>
+                      <td className="border px-2 py-2">
+                        <div className="flex items-center space-x-2">
                           <Button
-                            color="danger"
-                            size="sm"
-                            variant="bordered"
-                            onClick={() =>
-                              handleRemoveItem(
-                                item._id,
-                                item.stock._id,
-                                item.delivery_quantity
-                              )
-                            }
+                            className="bg-black text-white text-xs"
+                            onClick={() => handleRemoveItem(item._id)}
                           >
                             Remove
                           </Button>
+                          <EditQtyBtn deliveryItemId={item._id} />
                         </div>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-              <Divider className="my-6 border-black mt-8" />
-              <div className="flex flex-col sm:flex-row justify-between mt-4">
-                <Button
-                  className=" bg-black text-white"
-                  size="sm"
-                  isDisabled={
-                    checkedCount < deliveryItems.length ||
-                    deliveryItems.length === 0
-                  }
-                  onClick={handleStartDelivery}
-                >
-                  START
-                </Button>
-                <Button color="danger" size="sm" onClick={handleRemoveDelivery}>
-                  CANCEL
-                </Button>
-              </div>
             </div>
           </div>
         ) : (

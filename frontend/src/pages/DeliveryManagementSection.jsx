@@ -1,6 +1,5 @@
 import { Sidebar } from "../components/Dashboard_Components/Sidebar";
-import  Header  from "../pages/Header";
-import { Chip } from "@nextui-org/react";
+import { Header } from "../components/Dashboard_Components/Header";
 
 //New Delivery
 import DeliverySystem from "./DeliverySystem";
@@ -20,15 +19,18 @@ export function DeliveryManagement() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
-          <Tabs className="font-f1 mb-8 text-lg" size="lg" variant="underlined">
-            <Tab key="deliverySystem" title="NEW DELIVERY" className="text-2xl">
+          <Tabs className="font-f1" size="lg" variant="bordered" color="danger">
+            <Tab key="deliverySystem" title="New Delivery">
               <DeliverySystem />
             </Tab>
-            <Tab key="ondelivery" title="ON GOING" className="text-2xl">
+            <Tab key="ondelivery" title="On Delivery">
               <OnDeliveryTable />
             </Tab>
-            <Tab key="Received" title="RECEIVED" className="text-2xl">
+            <Tab key="Received" title="Received">
               <ReceivedDeliveryTable />
+            </Tab>
+            <Tab key="Reports" title="Reports">
+              Reports
             </Tab>
           </Tabs>
         </main>

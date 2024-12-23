@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 
-//Branch schema
 const BranchSchema = new mongoose.Schema({
     branch_id: {
         type: String,

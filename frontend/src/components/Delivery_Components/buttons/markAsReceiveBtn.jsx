@@ -8,130 +8,62 @@ import {
   Button,
   useDisclosure,
   Chip,
-  Input,
 } from "@nextui-org/react";
+import axios from "axios";
 
-// Controller for API ENDPOINT
-import axiosInstance from "@/config/axiosInstance";
-
-// Emitter
+//Emitter
 import emitter from "../../../../util/emitter.js";
 
 export default function App({
   deliveryItemId,
-  SenderStock,
   Item,
   quantity,
   itemId,
   itemType,
-  receivingBranch,
-  deliveryId,
 }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [isConfirmed, setIsConfirmed] = useState(false); // State to track if confirmation is completed
-  const [receivedQuantity, setReceivedQuantity] = useState(quantity); // State for user-input quantity
 
   // Handle the confirmation of marking the delivery as received
   const handleConfirm = async () => {
     try {
-      // Calculate returned items
-      const returnedQuantity = quantity - receivedQuantity;
-      console.log(
-        `Received Quantity: ${receivedQuantity}, Returned Quantity: ${returnedQuantity}`
+      const status = "Received";
+
+      // Make the API call to change the delivery status
+      const response = await axios.put(
+        `http://localhost:8098/api/deliveryItems/updateStatusOfDeliveryItem/${deliveryItemId}`,
+        { status }
       );
 
-      // Update the received items
-      const receivedStatus = "Received";
+      // Check if the response is successful
+      if (response.status === 200) {
+        console.log("Delivery marked as received successfully.");
+        setIsConfirmed(true); // Mark the confirmation as completed
 
-      // Update stock for received items
-      if (receivedQuantity > 0) {
-        console.log(
-          `Updating stock for received items: ${receivedQuantity} of ${Item}`
-        );
-
-        // Call the new route for updating stock
-        const response = await axiosInstance.put(
-          `/api/deliveryItems/updateStockForBranchAndItem`,
-          {
-            branchName: receivingBranch, // Branch name where items are received
-            itemId: itemId, // Item ID
-            quantity: receivedQuantity, // Received quantity
-          }
-        );
-        console.log("Received stock update response:", response.data);
-
-        //Update the delivery Item status
-        const deliveryItemResponse = await axiosInstance.put(
-          `/api/deliveryItems/updateStatusOfDeliveryItem/${deliveryItemId}`,
-          {
-            status: receivedStatus,
-          }
-        );
-        console.log("Delivery item response:", deliveryItemResponse.data);
-
-        //Set received quantity by api
-        const receivedQuantityResponse = await axiosInstance.put(
-          `/api/deliveryItems/setReceivedQuantity`,
-          {
-            deliveryItemId: deliveryItemId,
-            received_quantity: receivedQuantity,
-          }
-        );
-        console.log(
-          "Received quantity update response:",
-          receivedQuantityResponse.data
-        );
-      }
-
-      // Update stock for returned items
-      if (returnedQuantity > 0) {
-        console.log(
-          `Returning ${returnedQuantity} of ${Item} to sender branch`
-        );
-
-        // Add returned items to the sender branch stock
+        // Update the quantity of the item if it's a gasket
         if (itemType === "Gasket") {
-          const senderStockResponse = await axiosInstance.put(
-            `/api/stocks/increaseStockQuantity/${SenderStock}`,
-            {
-              quantity: returnedQuantity,
-            }
+          const response = await axios.put(
+            `http://localhost:8098/api/gaskets/increaseGasketQty/${itemId}`,
+            { quantity }
           );
-          console.log(
-            "Returned items added to sender stock:",
-            senderStockResponse.data
-          );
-        }
 
-        //Set returned quantity by api
-        const returnedQuantityResponse = await axiosInstance.put(
-          `/api/deliveryItems/setReturnedQuantity`,
-          {
-            deliveryItemId: deliveryItemId,
-            returned_quantity: returnedQuantity,
+          if (response) {
+            // Emit the event to notify
+            emitter.emit("deliveryItemReceived");
           }
-        );
-        console.log(
-          "Returned quantity update response:",
-          returnedQuantityResponse.data
-        );
+        } else {
+          alert("Unknown Item Type : " + itemType);
+        }
       }
-
-      setIsConfirmed(true); // Mark the confirmation as completed
-      emitter.emit("deliveryItemProcessed");
     } catch (error) {
-      console.error("Error processing delivery item:", error);
-      alert("Failed to process delivery item.");
+      console.error("Error marking delivery as received:", error);
+      alert("Failed to mark delivery as received.");
     }
   };
 
   return (
     <>
-      <Button
-        onPress={onOpen}
-        disabled={isConfirmed}
-        className="bg-black text-white"
-      >
+      <Button onPress={onOpen} disabled={isConfirmed} className="bg-black text-white">
         Mark as Received
       </Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -139,46 +71,28 @@ export default function App({
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1 font-f1">
-                Process Delivery Item
+                Do you want to mark this item as received ?
               </ModalHeader>
               <ModalBody className="font-f1">
                 <p>
-                  You have <Chip color="danger">{quantity}</Chip> items of{" "}
-                  <Chip>{Item}</Chip>.
-                  <br />
-                  How many would you like to mark as received?
+                  Once you confirm, <Chip color="danger">{Item}</Chip> will be
+                  added to the system.
                 </p>
-                <Input
-                  type="number"
-                  value={receivedQuantity}
-                  min={0}
-                  max={quantity}
-                  onChange={(e) => setReceivedQuantity(Number(e.target.value))}
-                  fullWidth
-                  placeholder="Enter quantity to mark as received"
-                />
               </ModalBody>
               <ModalFooter className="font-f1">
                 <Button
                   color="primary"
                   onPress={() => {
-                    console.log(
-                      `Confirming received quantity: ${receivedQuantity}`
-                    );
                     handleConfirm();
                     onClose();
                   }}
                   className="bg-black"
-                  disabled={
-                    isConfirmed ||
-                    receivedQuantity <= 0 ||
-                    receivedQuantity > quantity
-                  }
+                  disabled={isConfirmed} // Disable confirm button after confirmation
                 >
                   Confirm
                 </Button>
                 <Button color="danger" variant="bordered" onPress={onClose}>
-                  Cancel
+                  No
                 </Button>
               </ModalFooter>
             </>

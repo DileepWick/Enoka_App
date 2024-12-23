@@ -7,10 +7,20 @@ import {
   TableRow,
   TableCell,
 } from "@nextui-org/table";
-import { Button } from "@nextui-org/react";
+import { Button, Divider } from "@nextui-org/react";
 import { Chip } from "@nextui-org/react";
 import axiosInstance from "@/config/axiosInstance";
 import { toast } from "react-toastify";
+
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+} from "@nextui-org/react";
+import { Progress } from "@nextui-org/react";
 
 // Emitter
 import emitter from "../../../../util/emitter";
@@ -26,6 +36,12 @@ const CashInvoice = () => {
   const [error, setError] = useState(null);
   const [cashBill, setCashBill] = useState(null);
   const [newInvoiceCreated, setNewInvoiceCreated] = useState(false); // New state to handle re-fetch
+
+  //Loadins
+  const [isNewItemAdding, setisNewItemAdding] = useState(false);
+
+  //Prin confirmation
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   // Function to fetch invoice data
   const fetchInvoiceData = async () => {
@@ -118,6 +134,10 @@ const CashInvoice = () => {
   const handleIssueCashBill = async () => {
     await updateCashBillStatus(); // Issue the cash bill
     setNewInvoiceCreated(true); // Set the flag to trigger fetching new data
+
+    setCashBill(null);
+    setInvoiceData([]);
+    fetchInvoiceData();
   };
 
   // Calculate subtotal
@@ -137,12 +157,19 @@ const CashInvoice = () => {
     }
   }, [newInvoiceCreated]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
   if (cashBill === null) {
-    return <div className="text-2xl font-f1 ml-2 italic" >Create New Cash Bill To Add Items</div>;
+    return (
+      <div className="text-sm font-f1 ml-2 italic mt-8">
+        <Progress
+          color="danger"
+          isIndeterminate
+          aria-label="Loading..."
+          className="max-w-md"
+          size="sm"
+          label="*** Please Create New Cash Bill To Add Items ***"
+        />
+      </div>
+    );
   }
 
   return (
@@ -155,7 +182,7 @@ const CashInvoice = () => {
         </Chip>
       </div>
 
-      <h1 className="text-2xl font-f1 mb-6 text-center">
+      <h1 className="text-2xl font-f1 mb-6 text-center ">
         Invoice - {cashBill.invoiceNumber}
       </h1>
       <Table aria-label="Invoice Table" className="font-f1">
@@ -190,9 +217,11 @@ const CashInvoice = () => {
                 " " +
                 item.stock.item.vendor.vendor_name +
                 " " +
-                item.stock.item.brand.brand_name; // Show relevant name for Gasket
-            } else {
-              itemName = item.stock.item.part_number; // Default item name (can be customized based on your data)
+                item.stock.item.brand.brand_name +
+                " " +
+                item.stock.itemModel; // Show relevant name for Gasket
+            } else if (item.stock.itemModel === "Ring") {
+              itemName = item.stock.item.engine?.engine_name + " " + item.stock.item.sizes + " " + item.stock.item.vendor?.vendor_name + " " + item.stock.item.brand+ " Piston Ring" ; // Default item name (can be customized based on your data)
             }
 
             return (
@@ -216,6 +245,7 @@ const CashInvoice = () => {
                     quantity={item.quantity}
                     unitPrice={item.unitPrice}
                     discount={item.discount}
+                    description={itemName}
                   />
                 </TableCell>
               </TableRow>
@@ -232,11 +262,49 @@ const CashInvoice = () => {
 
       {/* Issue and Delete Buttons */}
       <div className="mt-6 flex justify-between font-f1">
-        <Button onClick={handleIssueCashBill} color="primary" >
-          Issue Cash Bill
+        <Button className="bg-black text-white" onPress={onOpen} size="lg">
+          Complete
         </Button>
+
         <DeleteCashBillButton cashBillId={cashBill._id} />
       </div>
+
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1 font-f1">
+                Invoice Completion Confirmation
+              </ModalHeader>
+              <ModalFooter>
+                {/* Print Button */}
+                <Button
+                  color="primary"
+                  variant="ghost"
+                  className="font-f1"
+                  onPress={() => {
+                    onClose();
+                    handleIssueCashBill();
+                  }}
+                >
+                  Complete & Print
+                </Button>
+                <Button
+                  color="danger"
+                  className="font-f1"
+                  variant="ghost"
+                  onPress={() => {
+                    onClose();
+                    handleIssueCashBill();
+                  }}
+                >
+                  Complete Only
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

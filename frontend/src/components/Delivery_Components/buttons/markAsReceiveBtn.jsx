@@ -56,6 +56,7 @@ export default function App({
             branchName: receivingBranch, // Branch name where items are received
             itemId: itemId, // Item ID
             quantity: receivedQuantity, // Received quantity
+            itemType: itemType,
           }
         );
         console.log("Received stock update response:", response.data);
@@ -91,6 +92,17 @@ export default function App({
 
         // Add returned items to the sender branch stock
         if (itemType === "Gasket") {
+          const senderStockResponse = await axiosInstance.put(
+            `/api/stocks/increaseStockQuantity/${SenderStock}`,
+            {
+              quantity: returnedQuantity,
+            }
+          );
+          console.log(
+            "Returned items added to sender stock:",
+            senderStockResponse.data
+          );
+        }else if (itemType === "Ring") {
           const senderStockResponse = await axiosInstance.put(
             `/api/stocks/increaseStockQuantity/${SenderStock}`,
             {

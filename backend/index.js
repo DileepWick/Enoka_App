@@ -14,6 +14,7 @@ import stockRoutes from "./routes/stockRoutes.js";
 import whitelistRoutes from "./routes/wluserRoutes.js";
 import cashBillRoutes from "./routes/cashBillRoute.js";
 import cashBillItemRoutes from "./routes/cash_bill_item_route.js";
+import ringRoutes from "./routes/ringsRoute.js";
 
 //Protected routes
 import {
@@ -95,6 +96,7 @@ app.use("/api/deliveryItems", deliveryItemRoutes);
 app.use("/api/cashbills", cashBillRoutes);
 app.use("/api/wlusers", whitelistRoutes);
 app.use("/api/cashbillitems", cashBillItemRoutes);
+app.use("/api/rings", ringRoutes);
 
 // Use the sessionRouter for the /extend-session route
 app.use('/api/extend', sessionRouter);

@@ -7,7 +7,7 @@ import {
   TableRow,
   TableCell,
 } from "@nextui-org/table";
-import { Button, Chip, Input ,Progress} from "@nextui-org/react";
+import { Button, Chip, Input } from "@nextui-org/react";
 
 //Api
 import { getOnDeliveryDeliveries } from "@/services/deliveryServices";
@@ -76,16 +76,7 @@ const OnDeliveryTable = () => {
   };
 
   if (loading) {
-    return       <div>
-    {" "}
-    <Progress
-      isIndeterminate
-      aria-label="Loading data..."
-      className="w-full font-f1"
-      size="sm"
-      label="Retrieving information, just a moment..."
-    />
-  </div>;
+    return <p>Loading deliveries...</p>;
   }
 
   if (error) {
@@ -114,8 +105,7 @@ const OnDeliveryTable = () => {
             <TableColumn>To</TableColumn>
             <TableColumn>Started Date</TableColumn>
             <TableColumn>Status</TableColumn>
-            <TableColumn >View Delivery Items</TableColumn>
-            <TableColumn >Receive Items</TableColumn>
+            <TableColumn colSpan={2}>Actions</TableColumn>
           </TableHeader>
           <TableBody>
             {filteredDeliveries.length > 0 ? (
@@ -134,8 +124,6 @@ const OnDeliveryTable = () => {
                   </TableCell>
                   <TableCell>
                     <ViewDetailsBtn deliveryId={delivery._id} />
-                  </TableCell>
-                  <TableCell>
                     <ReceiveBtn deliveryId={delivery._id} />
                   </TableCell>
                 </TableRow>

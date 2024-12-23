@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { doUpdateUserSignInWithGoogle } from '../../firebase/auth';
+import { doUpdateUserSignInWithGoogle } from '../../../backend/firebase/auth';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance from "../config/axiosInstance";
-
+import axios from 'axios'; // For API requests
 
 const GoogleSignIn = () => {
     const navigate = useNavigate();
@@ -19,7 +18,7 @@ const GoogleSignIn = () => {
     useEffect(() => {
         const fetchBranches = async () => {
             try {
-                const response = await axiosInstance.get('/api/branches'); // Adjust the API URL
+                const response = await axios.get('http://localhost:8098/api/branches'); // Adjust the API URL
                 if (Array.isArray(response.data)) {
                     setBranches(response.data); // Set only if response is an array
                     console.log(response.data);
@@ -70,7 +69,7 @@ const GoogleSignIn = () => {
             setIsRegistering(true);
             try {
                 await doUpdateUserSignInWithGoogle(firstName, lastName, telephone, branchId);
-                navigate('/'); // Redirect after successful registration
+                navigate('/home'); // Redirect after successful registration
             } catch (error) {
                 setErrorMessage(error.message);
             } finally {

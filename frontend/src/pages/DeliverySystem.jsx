@@ -4,24 +4,22 @@ import GasketList from "@/components/Delivery_Components/gaskets";
 import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
 
 const DeliverySystem = () => {
+
+
+
+
   return (
     <div>
       <CreateDeliveryForm />
 
-      <Tabs
-        aria-label="Items"
-        className="font-f1 ml-2"
-        size="sm"
-        variant="bordered"
-        color="primary"
-      >
-        <Tab key="gaskets" title="GASKETS">
-          <GasketList />
+      <Tabs aria-label="Items" className="font-f1 ml-4" size="lg">
+        <Tab key="gaskets" title="Gaskets">
+          <GasketList/>
         </Tab>
-        <Tab key="pistons" title="PISTONS">
+        <Tab key="pistons" title="Pistons">
           No Data
         </Tab>
-        <Tab key="razors" title="RAZORS">
+        <Tab key="razors" title="Razors">
           No Data
         </Tab>
       </Tabs>

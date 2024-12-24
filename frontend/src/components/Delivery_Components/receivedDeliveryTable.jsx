@@ -7,7 +7,7 @@ import {
   TableRow,
   TableCell,
 } from "@nextui-org/table";
-import { Button, Chip, Input } from "@nextui-org/react";
+import { Button, Chip, Input ,Progress} from "@nextui-org/react";
 
 //Api
 import { getReceivedDeliveries } from "@/services/deliveryServices";
@@ -77,7 +77,9 @@ const ReceivedDeliveryTable = () => {
         : true;
 
       const matchesBranch =
-        branchFilter && (delivery.senderBranch.toLowerCase() === branchFilter.toLowerCase() || delivery.receiverBranch.toLowerCase() === branchFilter.toLowerCase())
+        branchFilter &&
+        (delivery.senderBranch.toLowerCase() === branchFilter.toLowerCase() ||
+          delivery.receiverBranch.toLowerCase() === branchFilter.toLowerCase())
           ? true
           : true;
 
@@ -105,7 +107,18 @@ const ReceivedDeliveryTable = () => {
   };
 
   if (loading) {
-    return <p>Loading deliveries...</p>;
+    return (
+      <div>
+        {" "}
+        <Progress
+          isIndeterminate
+          aria-label="Loading data..."
+          className="w-full font-f1"
+          size="sm"
+          label="Retrieving information, just a moment..."
+        />
+      </div>
+    );
   }
 
   if (error) {
@@ -125,8 +138,6 @@ const ReceivedDeliveryTable = () => {
           aria-label="Search deliveries by delivery ID, sender, or receiver branch"
         />
       </div>
-
-
 
       {filteredDeliveries.length > 0 ? (
         <Table aria-label="Received Deliveries Table">
@@ -152,7 +163,7 @@ const ReceivedDeliveryTable = () => {
                   {new Date(delivery.receivedAt).toLocaleDateString()}
                 </TableCell>
                 <TableCell>
-                  <Chip variant="dot" size="lg" color="success">
+                  <Chip size="lg" color="primary">
                     {delivery.status}
                   </Chip>
                 </TableCell>

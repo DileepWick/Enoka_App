@@ -5,11 +5,14 @@ import Header from "./Header";
 import { Chip } from "@nextui-org/react";
 import { Tabs, Tab } from "@nextui-org/react";
 
-import AddItemForm from "./Add_gasket";
-import AddRingForm from "./Add_new_ring";
+import AddItemForm from "../Sections/Inventory/pages/Add_gasket";
+import AddRingForm from "../Sections/Inventory/pages/add_new_ring";
+import AddBearing from "../Sections/Inventory/pages/add_new_bearing";
 
 import AllGaskets from "@/Sections/Inventory/AllGaskets";
 import AllRings from "../Sections/Inventory/AllRings.jsx";
+import AllBearings from "../Sections/Inventory/AllBearings.jsx";
+
 
 const Inventory = () => {
   return (
@@ -34,8 +37,8 @@ const Inventory = () => {
                 <Tab key="rings" title="RINGS">
                   <AllRings />
                 </Tab>
-                <Tab key="razors" title="RAZORS">
-                  No Data
+                <Tab key="bearings" title="BEARINGS">
+                  <AllBearings />
                 </Tab>
               </Tabs>
             </Tab>
@@ -55,8 +58,8 @@ const Inventory = () => {
                 <Tab key="rings" title="RINGS" className="text-sm">
                   <AddRingForm />
                 </Tab>
-                <Tab key="razors" title="RAZOR">
-                  No Data
+                <Tab key="bearings" title="BEARINGS">
+                <AddBearing />
                 </Tab>
               </Tabs>
             </Tab>

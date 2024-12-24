@@ -12,7 +12,7 @@ import axiosInstance from "@/config/axiosInstance";
 import { toast } from "react-toastify"; // Ensure you import toast for notifications
 
 // Emitter
-import emitter from "../../../../util/emitter.js";
+import emitter from "../../../../../util/emitter.js";
 
 export default function App() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();

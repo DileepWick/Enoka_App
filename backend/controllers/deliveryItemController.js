@@ -1,9 +1,13 @@
 import DeliveryItem from "../models/deliveryItem.js";
 import mongoose from "mongoose";
-import Gasket from "../models/Gasket.js";
+
 import Stock from "../models/Stock.js";
 import Branch from "../models/Branch.js";
+
+// Import item models
 import Ring from "../models/Ring.js";
+import Gasket from "../models/Gasket.js";
+import Bearing from "../models/Bearing.js";
 
 // Create a new delivery item
 export const createDeliveryItem = async (req, res) => {
@@ -39,9 +43,9 @@ export const createDeliveryItem = async (req, res) => {
 
     // Map known models to item types (e.g., Gaskets, Pistons)
     const itemModels = {
-      Gasket: "Gasket", // Replace with actual model names
-      Ring: "Ring", // Replace with actual model names
-      Razor: "Razor", // Replace with actual model names
+      Gasket: "Gasket",
+      Ring: "Ring",
+      Bearing: "Bearing",
     };
 
     let itemType = null;
@@ -368,6 +372,11 @@ export const updateStockForBranchAndItem = async (req, res) => {
       if (!item) {
         return res.status(404).json({ message: "Item (Ring) not found" });
       }
+    } else if (itemType === "Bearing") {
+      item = await Bearing.findById(itemId); // Assuming you have a Bearing model for Bearing items
+      if (!item) {
+        return res.status(404).json({ message: "Item (Bearing) not found" });
+      }
     } else {
       return res.status(400).json({ message: "Invalid item type" });
     }
@@ -400,4 +409,3 @@ export const updateStockForBranchAndItem = async (req, res) => {
       .json({ message: "Error updating stock", error: error.message });
   }
 };
-

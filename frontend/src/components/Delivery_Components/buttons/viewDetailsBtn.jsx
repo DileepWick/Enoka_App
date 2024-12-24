@@ -108,17 +108,39 @@ const ViewDetailsBtn = ({ deliveryId }) => {
                                   {item.item.material_type}{" "}
                                   {item.item.vendor?.vendor_name}{" "}
                                   {item.itemType}
-                                  <Chip color="primary" className="ml-4" variant="bordered">
+                                  <Chip
+                                    color="primary"
+                                    className="ml-4"
+                                    variant="bordered"
+                                  >
                                     {item.item.brand?.brand_name}
                                   </Chip>
                                 </>
                               ) : item.itemType === "Ring" ? (
                                 <>
                                   {item.item.engine?.engine_name}{" "}
-                                  {item.item.sizes}{" "} {item.item.material}
+                                  {item.item.sizes} {item.item.material}
                                   {item.item.vendor?.vendor_name}{" "}
                                   {item.itemType}
-                                  <Chip color="primary" className="ml-4" variant="bordered">
+                                  <Chip
+                                    color="primary"
+                                    className="ml-4"
+                                    variant="bordered"
+                                  >
+                                    {item.item.brand}
+                                  </Chip>
+                                </>
+                              ) : item.itemType === "Bearing" ? (
+                                <>
+                                  {item.item.engine?.engine_name}{" "}
+                                  {item.item.sizes} {item.item.material}
+                                  {item.item.vendor?.vendor_name}{" "}
+                                  {item.itemType}
+                                  <Chip
+                                    color="primary"
+                                    className="ml-4"
+                                    variant="bordered"
+                                  >
                                     {item.item.brand}
                                   </Chip>
                                 </>

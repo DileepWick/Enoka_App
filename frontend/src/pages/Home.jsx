@@ -1,5 +1,5 @@
 import React from "react";
-import AddItemForm from "./Add_gasket";
+import AddItemForm from "../Sections/Inventory/pages/Add_gasket";
 
 const Home = () => {
   return (

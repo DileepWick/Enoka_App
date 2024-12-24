@@ -2,7 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 
 //Routes
-import gasketRoutes from "./routes/gasketRoutes.js";
+
 import vendorRoutes from "./routes/vendorRoutes.js";
 import engineRoutes from "./routes/engineRoutes.js";
 import brandRoutes from "./routes/brandRoutes.js";
@@ -14,7 +14,11 @@ import stockRoutes from "./routes/stockRoutes.js";
 import whitelistRoutes from "./routes/wluserRoutes.js";
 import cashBillRoutes from "./routes/cashBillRoute.js";
 import cashBillItemRoutes from "./routes/cash_bill_item_route.js";
+
+//Item Routes
+import gasketRoutes from "./routes/gasketRoutes.js";
 import ringRoutes from "./routes/ringsRoute.js";
+import bearingRoutes from "./routes/bearingRoutes.js";
 
 //Protected routes
 import {
@@ -84,7 +88,6 @@ app.get("/public", (req, res) => {
 //app.use('/api/stocks', validateAndVerifyWhitelist, stockRoutes);
 
 app.use("/api/stocks", stockRoutes);
-app.use("/api/gaskets", gasketRoutes);
 app.use("/api/vendors", vendorRoutes);
 app.use("/api/engines", engineRoutes);
 app.use("/api/brands", brandRoutes);
@@ -96,6 +99,10 @@ app.use("/api/deliveryItems", deliveryItemRoutes);
 app.use("/api/cashbills", cashBillRoutes);
 app.use("/api/wlusers", whitelistRoutes);
 app.use("/api/cashbillitems", cashBillItemRoutes);
+
+//Item Routes
+app.use("/api/gaskets", gasketRoutes);
+app.use("/api/bearings", bearingRoutes);
 app.use("/api/rings", ringRoutes);
 
 // Use the sessionRouter for the /extend-session route

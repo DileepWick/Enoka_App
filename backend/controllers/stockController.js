@@ -1,6 +1,7 @@
 import Stock from "../models/Stock.js";
 import Gasket from "../models/Gasket.js";
 import Ring from "../models/Ring.js";
+import Bearing from "../models/Bearing.js";
 
 
 
@@ -231,3 +232,45 @@ export const getAllStocksForRing = async (req, res) => {
     });
   }
 };
+
+
+//Get all stocks for Bearing only and populate references based on itemModel
+export const getAllStocksForBearing = async (req, res) => {
+  try {
+    // Fetch all stocks for Bearing only and populate the branch
+    const stocks = await Stock.find({ itemModel: "Bearing" }).populate("branch");
+
+    if (!stocks.length) {
+      return res.status(404).json({ message: "No bearing stocks found." });
+    }
+
+    // Manually populate the item field based on itemModel
+    const populatedStocks = await Promise.all(
+      stocks.map(async (stock) => {
+        // For Bearing, populate the fields
+        const item = await Bearing.findById(stock.item)
+          .populate("vendor")
+          .populate("engine");
+
+        // Return a new object with populated item (Bearing) and its fields
+        return {
+          ...stock.toObject(),
+          item: item,
+        };
+      })
+    );
+
+    // Return the populated stocks data
+    res.status(200).json(populatedStocks);
+  } catch (err) {
+    // Log error details for debugging
+    console.error("Error retrieving bearing stocks:", err);
+
+    // Respond with a 500 status code and a descriptive error message
+    res.status(500).json({
+      message: "An error occurred while fetching bearing stocks.",
+      error: err.message,
+    });
+  }
+};
+

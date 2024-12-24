@@ -11,7 +11,7 @@ import {
 } from "@nextui-org/react";
 import axiosInstance from "@/config/axiosInstance"; // Assuming axiosInstance is configured correctly
 import { toast } from "react-toastify";
-import emitter from "../../../../util/emitter.js";
+import emitter from "../../../../../util/emitter.js";
 
 const UpdateCashBillItemBtn = ({
   description,

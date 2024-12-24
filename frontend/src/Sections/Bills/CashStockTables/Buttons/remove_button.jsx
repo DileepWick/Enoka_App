@@ -12,7 +12,7 @@ import axiosInstance from "@/config/axiosInstance"; // Assuming axiosInstance is
 import { toast } from "react-toastify";
 
 //Emitter
-import emitter from "../../../../util/emitter.js";
+import emitter from "../../../../../util/emitter.js";
 
 const RemoveButton = ({ StockId, cashBillItemId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();

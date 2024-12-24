@@ -11,7 +11,7 @@ import {
 } from "@nextui-org/react";
 import axiosInstance from "@/config/axiosInstance";
 import { toast } from "react-toastify";
-import emitter from "../../../../util/emitter.js";
+import emitter from "../../../../../util/emitter.js";
 
 const AddCashBillItemBtn = ({ StockId ,description}) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();

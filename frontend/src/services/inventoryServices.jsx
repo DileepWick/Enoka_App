@@ -23,6 +23,17 @@ export const fetchRings = async () => {
   }
 };
 
+// Function to fetch all bearings
+export const fetchBearings = async () => {
+  try {
+    const response = await axiosInstance.get("/api/bearings");
+    return response.data; // Return the bearings data
+  } catch (error) {
+    console.error("Error fetching bearings:", error);
+    throw error; // Rethrow the error so it can be handled in the component
+  }
+};
+
 // Function to update stock
 export const updateStock = async (stockId, quantity, updatedBy) => {
   try {
@@ -59,6 +70,17 @@ export const deleteRing = async (ringId) => {
     return response.data;
   } catch (error) {
     console.error("Error deleting ring:", error);
+    throw error;
+  }
+};
+
+//Function to delete Bearings
+export const deleteBearing = async (bearingId) => {
+  try {
+    const response = await axiosInstance.delete(`/api/bearings/${bearingId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting bearing:", error);
     throw error;
   }
 };

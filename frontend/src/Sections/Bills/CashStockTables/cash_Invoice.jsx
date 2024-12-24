@@ -26,9 +26,9 @@ import { Progress } from "@nextui-org/react";
 import emitter from "../../../../util/emitter";
 
 // Buttons
-import RemoveButon from "./remove_button.jsx";
-import EditButton from "./update_cash_bill_item_btn.jsx";
-import DeleteCashBillButton from "./delete_cash_bill.jsx";
+import RemoveButon from "./Buttons/remove_button.jsx";
+import EditButton from "./Buttons/update_cash_bill_item_btn.jsx";
+import DeleteCashBillButton from "./Buttons/delete_cash_bill.jsx";
 
 const CashInvoice = () => {
   const [invoiceData, setInvoiceData] = useState([]);
@@ -222,8 +222,9 @@ const CashInvoice = () => {
                 item.stock.itemModel; // Show relevant name for Gasket
             } else if (item.stock.itemModel === "Ring") {
               itemName = item.stock.item.engine?.engine_name + " " + item.stock.item.sizes + " " + item.stock.item.vendor?.vendor_name + " " + item.stock.item.brand+ " Piston Ring" ; // Default item name (can be customized based on your data)
+            } else if (item.stock.itemModel === "Bearing") {
+              itemName = item.stock.item.engine?.engine_name + " " + item.stock.item.sizes + " " + item.stock.item.vendor?.vendor_name + " " + item.stock.item.brand+ " Bearing" ;
             }
-
             return (
               <TableRow key={index}>
                 <TableCell>{itemName}</TableCell>{" "}

@@ -114,6 +114,18 @@ export default function App({
             senderStockResponse.data
           );
         }
+        else if (itemType === "Bearing") {
+          const senderStockResponse = await axiosInstance.put(
+            `/api/stocks/increaseStockQuantity/${SenderStock}`,
+            {
+              quantity: returnedQuantity,
+            }
+          );
+          console.log(
+            "Returned items added to sender stock:",
+            senderStockResponse.data
+          );
+        }
 
         //Set returned quantity by api
         const returnedQuantityResponse = await axiosInstance.put(

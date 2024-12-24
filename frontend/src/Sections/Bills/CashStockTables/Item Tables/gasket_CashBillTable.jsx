@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "@/config/axiosInstance";
 import { Button, Input, Chip } from "@nextui-org/react";
+import { Progress } from "@nextui-org/react";
 
-// Buttons
-import AddButton from "./add_cashbillitem_btn.jsx";
+//Buttons
+import AddButton from "../Buttons/add_cashbillitem_btn.jsx";
 
-// Emitter
-import emitter from "../../../../util/emitter";
+//Emitter
+import emitter from "../../../../../util/emitter.js";
 
-const Ring_CashBillTable = () => {
+const Gasket_CashBillTable = () => {
   const [stocks, setStocks] = useState([]); // State to hold the stock data
   const [loading, setLoading] = useState(true); // State to manage loading status
   const [error, setError] = useState(null); // State to manage error
@@ -20,7 +21,7 @@ const Ring_CashBillTable = () => {
   useEffect(() => {
     // Fetch stocks when the component mounts or when userBranch changes
     axiosInstance
-      .get("/api/stocks/getAllStocksForRing") // Update the API endpoint to fetch rings
+      .get("/api/stocks/getAllStocksForGasket") // Make sure this matches your backend API URL
       .then((response) => {
         setStocks(response.data); // Set the received data to state
         setFilteredStocks(
@@ -38,7 +39,7 @@ const Ring_CashBillTable = () => {
       // Re-fetch data when CashBillItemAdded event is emitted
       setLoading(true); // Optionally, set loading to true while re-fetching
       axiosInstance
-        .get("/api/stocks/getAllStocksForRing") // Update the API endpoint for rings
+        .get("/api/stocks/getAllStocksForGasket") // Make sure this matches your backend API URL
         .then((response) => {
           setStocks(response.data); // Set the received data to state
           setFilteredStocks(
@@ -63,6 +64,7 @@ const Ring_CashBillTable = () => {
       emitter.off("CashBillItemRemoved", handleCashBillItemAdded);
     };
   }, [userBranch]); // Re-run the effect whenever userBranch changes
+  // Re-fetch data when userBranch changes
 
   // Handle search functionality
   const handleSearch = (query) => {
@@ -72,8 +74,12 @@ const Ring_CashBillTable = () => {
     const filtered = stocks.filter((stock) => {
       // Filtering based on the description and the brand name, engine, and vendor fields
       const description =
-        stock.item.ring_type + " " +
-        stock.item.material + " " +
+        stock.item.engine.engine_name +
+        " " +
+        stock.item.packing_type +
+        " " +
+        stock.item.material_type +
+        " " +
         stock.item.vendor.vendor_name;
 
       return (
@@ -100,7 +106,7 @@ const Ring_CashBillTable = () => {
         clearable
         bordered
         label="Search Description"
-        placeholder="Search by description, brand, ring type, etc."
+        placeholder="Search by description, brand, engine, etc."
         className="w-[300px] mb-8"
         value={searchQuery}
         onChange={(e) => handleSearch(e.target.value)} // Handle search input change
@@ -124,20 +130,25 @@ const Ring_CashBillTable = () => {
             {filteredStocks.map((stock) => (
               <tr key={stock._id} className="hover:bg-gray-100">
                 <td className="border border-gray-300 p-2">
-                  {stock.item.engine?.engine_name} {stock.item.sizes}  
+                  {stock.item.engine.engine_name} {stock.item.packing_type}{" "}
+                  {stock.item.material_type}
                   <Chip variant="bordered" color="primary" className="ml-4">
                     {stock.item.vendor.vendor_name}
                   </Chip>
                 </td>
                 <td className="border border-gray-300 p-2">
-                  {stock.item.brand ? stock.item.brand : "N/A"}
+                  {stock.item.brand.brand_name}
                 </td>
                 <td className="border border-gray-300 p-2">{stock.quantity}</td>
                 <td className="border border-gray-300 p-2">
                   <AddButton
                     StockId={stock._id}
                     description={
-                      stock.item.engine_name + " " + stock.item.sizes
+                      stock.item.engine.engine_name +
+                      " " +
+                      stock.item.packing_type +
+                      " " +
+                      stock.item.material_type
                     }
                   />
                 </td>
@@ -150,4 +161,4 @@ const Ring_CashBillTable = () => {
   );
 };
 
-export default Ring_CashBillTable;
+export default Gasket_CashBillTable;

@@ -213,6 +213,20 @@ const ReceiveBtn = ({ deliveryId }) => {
                                     {item.item.brand}
                                   </Chip>
                                 </>
+                              ) : item.itemType === "Bearing" ? (
+                                <>
+                                  {item.item.engine?.engine_name}{" "}
+                                  {item.item.sizes} {item.item.material}
+                                  {item.item.vendor?.vendor_name}{" "}
+                                  {item.itemType}
+                                  <Chip
+                                    color="primary"
+                                    className="ml-4"
+                                    variant="bordered"
+                                  >
+                                    {item.item.brand}
+                                  </Chip>
+                                </>
                               ) : null}
                             </TableCell>
                             <TableCell>{item.delivery_quantity}</TableCell>

@@ -1,8 +1,11 @@
 import CashBill from "../models/CashBill.js";
 import CashBillItem from "../models/CashBillItem.js";
+import { deleteCashBillItem } from "./cash_bill_item_controller.js";
+
+//Import item models
 import Gasket from "../models/Gasket.js";
 import Ring from "../models/Ring.js";
-import { deleteCashBillItem } from "./cash_bill_item_controller.js";
+import Bearing from "../models/Bearing.js";
 
 // Controller to create a new CashBill (without items initially)
 export const createCashBill = async (req, res) => {
@@ -114,6 +117,10 @@ export const getLatestPendingCashBill = async (req, res) => {
               .populate("engine");
           } else if (cashBillItem.stock.itemModel === "Ring") {
             populatedItem = await Ring.findById(cashBillItem.stock.item)
+              .populate("vendor")
+              .populate("engine");
+          } else if (cashBillItem.stock.itemModel === "Bearing") {
+            populatedItem = await Bearing.findById(cashBillItem.stock.item)
               .populate("vendor")
               .populate("engine");
           }

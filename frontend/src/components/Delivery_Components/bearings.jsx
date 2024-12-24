@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { fetchRings } from "../../services/inventoryServices";
+import { fetchBearings } from "../../services/inventoryServices"; // Adjusted service import
 
 // Controller for API ENDPOINT
 import axiosInstance from "@/config/axiosInstance";
@@ -10,15 +10,14 @@ import { Input } from "@nextui-org/react";
 
 // Util
 import emitter from "../../../util/emitter.js";
-///
 
-const RingsList = ({}) => {
+const BearingsList = ({}) => {
   // State variables
-  const [rings, setRings] = useState([]);
+  const [bearings, setBearings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredRings, setFilteredRings] = useState([]);
+  const [filteredBearings, setFilteredBearings] = useState([]);
   const [delivery, setDelivery] = useState(null);
   const [senderBranch, setSenderBranch] = useState(""); // New state for sender branch
 
@@ -30,8 +29,8 @@ const RingsList = ({}) => {
   const items = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
-    return Array.isArray(filteredRings) ? filteredRings.slice(start, end) : [];
-  }, [page, filteredRings]);
+    return Array.isArray(filteredBearings) ? filteredBearings.slice(start, end) : [];
+  }, [page, filteredBearings]);
 
   // Fetch the latest pending delivery
   useEffect(() => {
@@ -56,20 +55,20 @@ const RingsList = ({}) => {
       }
     };
 
-    // Fetch rings
-    const getRings = async () => {
+    // Fetch bearings
+    const getBearings = async () => {
       try {
-        const data = await fetchRings();
-        setRings(data);
-        setFilteredRings(data);
+        const data = await fetchBearings(); // Fetch bearings instead of rings
+        setBearings(data);
+        setFilteredBearings(data);
         setLoading(false);
       } catch (error) {
-        setError("Failed to fetch rings");
+        setError("Failed to fetch bearings");
         setLoading(false);
       }
     };
 
-    getRings();
+    getBearings();
 
     // Fetch the delivery initially
     fetchLatestDelivery();
@@ -77,20 +76,20 @@ const RingsList = ({}) => {
     // Delivery created event handler
     const handleDeliveryCreated = () => {
       console.log(
-        "Delivery created event received! Fetching latest delivery in rings...."
+        "Delivery created event received! Fetching latest delivery in bearings...."
       );
       fetchLatestDelivery();
-      getRings();
+      getBearings();
     };
 
     // Delivery removed event handler
     const handleDeliveryRemoved = () => {
       console.log(
-        "Delivery removed event received! Fetching latest delivery in rings... "
+        "Delivery removed event received! Fetching latest delivery in bearings... "
       );
       setDelivery(null);
       fetchLatestDelivery();
-      getRings();
+      getBearings();
     };
 
     // Subscribe to both events
@@ -114,33 +113,33 @@ const RingsList = ({}) => {
     };
   }, []);
 
-  // Search logic to filter rings based on the search term
+  // Search logic to filter bearings based on the search term
   useEffect(() => {
-    const filterRings = () => {
+    const filterBearings = () => {
       // Apply branch filtering first
-      let branchFilteredRings = rings;
+      let branchFilteredBearings = bearings;
 
       if (senderBranch) {
-        branchFilteredRings = rings
-          .map((ring) => ({
-            ...ring,
-            stock: ring.stock.filter(
+        branchFilteredBearings = bearings
+          .map((bearing) => ({
+            ...bearing,
+            stock: bearing.stock.filter(
               (stock) => stock.branch?.name === senderBranch
             ),
           }))
-          .filter((ring) => ring.stock.length > 0); // Keep only rings with stock in the selected branch
+          .filter((bearing) => bearing.stock.length > 0); // Keep only bearings with stock in the selected branch
       }
 
-      // Apply search filtering on the branch-filtered rings
+      // Apply search filtering on the branch-filtered bearings
       if (searchTerm.trim()) {
         const searchWords = searchTerm.toLowerCase().split(/\s+/); // Split by spaces and convert to lowercase
 
-        const searchFilteredRings = branchFilteredRings.filter((ring) => {
+        const searchFilteredBearings = branchFilteredBearings.filter((bearing) => {
           const itemContent = [
-            ring.engine?.engine_name,
-            ring.sizes,
-            ring.brand,
-            ring.vendor?.vendor_name,
+            bearing.engine?.engine_name,
+            bearing.sizes,
+            bearing.brand,
+            bearing.vendor?.vendor_name,
           ]
             .filter(Boolean) // Remove null or undefined values
             .join(" ")
@@ -149,29 +148,29 @@ const RingsList = ({}) => {
           return searchWords.every((word) => itemContent.includes(word));
         });
 
-        setFilteredRings(searchFilteredRings);
+        setFilteredBearings(searchFilteredBearings);
       } else {
-        setFilteredRings(branchFilteredRings); // If no search term, show only branch-filtered rings
+        setFilteredBearings(branchFilteredBearings); // If no search term, show only branch-filtered bearings
       }
     };
 
-    filterRings();
-  }, [searchTerm, senderBranch, rings]);
+    filterBearings();
+  }, [searchTerm, senderBranch, bearings]);
 
-  // Filter rings by sender branch
+  // Filter bearings by sender branch
   useEffect(() => {
     if (senderBranch) {
-      const filteredByBranch = rings.map((ring) => ({
-        ...ring,
-        stock: ring.stock.filter(
+      const filteredByBranch = bearings.map((bearing) => ({
+        ...bearing,
+        stock: bearing.stock.filter(
           (stock) => stock.branch?.name === senderBranch
         ),
       }));
-      setFilteredRings(filteredByBranch);
+      setFilteredBearings(filteredByBranch);
     } else {
-      setFilteredRings(rings); // Show all rings if no sender branch is selected
+      setFilteredBearings(bearings); // Show all bearings if no sender branch is selected
     }
-  }, [senderBranch, rings]);
+  }, [senderBranch, bearings]);
 
   // Handle search
   const handleSearch = (e) => {
@@ -199,10 +198,10 @@ const RingsList = ({}) => {
       {delivery ? (
         <>
           <div className="mb-6">
-            <h2 className="text-sm font-f1 mb-2 w-[300px]">Search Rings</h2>
+            <h2 className="text-sm font-f1 mb-2 w-[300px]">Search Bearings</h2>
             <Input
               type="text"
-              placeholder="Search rings"
+              placeholder="Search bearings"
               value={searchTerm}
               onChange={handleSearch}
               variant="bordered"
@@ -234,34 +233,34 @@ const RingsList = ({}) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {items.map((ring, index) => (
-                    <tr key={ring._id} className="border border-gray-300">
+                  {items.map((bearing, index) => (
+                    <tr key={bearing._id} className="border border-gray-300">
                       {/* Part Number */}
                       <td className="border border-gray-300 px-4 py-2">
-                        {ring.part_number}
+                        {bearing.part_number}
                       </td>
 
                       {/* Description */}
                       <td className="border border-gray-300 px-4 py-2">
-                        {ring.engine?.engine_name || "N/A"}{" "}
-                        {ring.sizes || "N/A"}{" "}
+                        {bearing.engine?.engine_name || "N/A"}{" "}
+                        {bearing.sizes || "N/A"}{" "}
                         <Chip
                           className="ml-8"
                           variant="bordered"
                           color="primary"
                         >
-                          {ring.vendor?.vendor_name || "N/A"}
+                          {bearing.vendor?.vendor_name || "N/A"}
                         </Chip>
                       </td>
 
                       {/* Brand */}
                       <td className="border border-gray-300 px-4 py-2">
-                        {ring.brand || "N/A"}
+                        {bearing.brand || "N/A"}
                       </td>
 
                       {/* Branch */}
                       <td className="border border-gray-300 px-4 py-2">
-                        {ring.stock.map((stock) => (
+                        {bearing.stock.map((stock) => (
                           <div key={stock._id} className="py-1">
                             {stock.branch?.name || "N/A"}
                           </div>
@@ -270,7 +269,7 @@ const RingsList = ({}) => {
 
                       {/* Quantity */}
                       <td className="border border-gray-300 px-4 py-2">
-                        {ring.stock.reduce(
+                        {bearing.stock.reduce(
                           (total, stock) => total + stock.quantity,
                           0
                         )}
@@ -279,10 +278,10 @@ const RingsList = ({}) => {
                       {/* Actions */}
                       <td className="border border-gray-300 px-4 py-2">
                         <ItemAddToDeliveryButton
-                          item_id={ring._id}
+                          item_id={bearing._id}
                           delivery_id={delivery._id}
-                          item_description={ring.part_number}
-                          stockId={ring.stock[0]._id} // Assuming one stock is selected for simplicity
+                          item_description={bearing.part_number}
+                          stockId={bearing.stock[0]?._id}
                         />
                       </td>
                     </tr>
@@ -293,10 +292,14 @@ const RingsList = ({}) => {
           </div>
         </>
       ) : (
-        <div className="text-center">No delivery in progress.</div>
+        <div className="py-4 text-center font-f1">
+          <div className="text-gray-500 text-lg">
+            No pending deliveries found.
+          </div>
+        </div>
       )}
     </div>
   );
 };
 
-export default RingsList;
+export default BearingsList;

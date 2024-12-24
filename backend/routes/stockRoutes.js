@@ -5,7 +5,8 @@ import {
   decreaseStockQuantity,
   getAllStocks,
   getAllStocksForGasket,
-  getAllStocksForRing
+  getAllStocksForRing ,
+  getAllStocksForBearing
 } from "../controllers/stockController.js";
 
 const router = express.Router();
@@ -24,6 +25,9 @@ router.get("/getAllStocksForGasket", getAllStocksForGasket);
 
 //Get all stocks for ring
 router.get("/getAllStocksForRing", getAllStocksForRing);
+
+//Get all stocks for bearing
+router.get("/getAllStocksForBearing", getAllStocksForBearing);
 
 //Get all stocks
 router.get("/getAllStocks", getAllStocks);

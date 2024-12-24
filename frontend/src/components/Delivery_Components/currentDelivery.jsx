@@ -5,7 +5,7 @@ import axiosInstance from "@/config/axiosInstance";
 
 import { useState, useEffect } from "react";
 import { removeDelivery } from "@/services/deliveryServices";
-import { Button, Checkbox, Chip, Divider, Progress } from "@nextui-org/react";
+import { Button, Checkbox, Divider, Progress } from "@nextui-org/react";
 import { toast } from "react-toastify";
 
 //Components
@@ -275,8 +275,13 @@ const CurrentDelivery = () => {
                         ) : item.itemType === "Ring" ? (
                           <>
                             {item.item.engine?.engine_name} {item.item.sizes}{" "}
-                            {item.item.material} {item.item.vendor?.vendor_name} {" "}
+                            {item.item.material} {item.item.vendor?.vendor_name}{" "}
                             {item.itemType}
+                          </>
+                        ) : item.itemType === "Bearing" ? (
+                          <>
+                            {item.item.engine?.engine_name} {item.item.material}{" "}
+                            {item.item.vendor?.vendor_name} {item.itemType}
                           </>
                         ) : null}
                       </td>
@@ -289,8 +294,10 @@ const CurrentDelivery = () => {
                             : item.itemType === "Ring"
                             ? item.item.brand // Render material type for ring items
                             : item.itemType === "piston"
-                            ? item.item.engine?.engine_name // Render engine name for piston items
-                            : "No item data available" // Default message if itemType is unknown
+                            ? item.item.brand // Render material type for piston items
+                            : item.itemType === "Bearing"
+                            ? item.item.brand // Render material type for bearing items
+                            : null
                         }
                       </td>
 

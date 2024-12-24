@@ -24,7 +24,9 @@ import emitter from "../../../../util/emitter.js";
 
 //Buttons
 import CompleteDeliveryBtn from "./completeDeliveryBtn.jsx";
-import axios from "axios";
+
+//Controller for API ENDPOINT
+import axiosInstance from "@/config/axiosInstance";
 
 const ReceiveBtn = ({ deliveryId }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -37,8 +39,8 @@ const ReceiveBtn = ({ deliveryId }) => {
   // Fetch Delivery Items function
   const fetchDeliveryItems = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:8098/api/deliveryItems/getDeliveryItemsByDeliveryId/${deliveryId}`
+      const response = await axiosInstance.get(
+        `/api/deliveryItems/getDeliveryItemsByDeliveryId/${deliveryId}`
       );
       setDeliveryItems(response.data.data);
       setError(null);
@@ -51,7 +53,7 @@ const ReceiveBtn = ({ deliveryId }) => {
   // Delivery Item Received Event Handler
   const handleDeliveryItemReceived = () => {
     console.log(
-      "DeliveryItem Received event received! Fetching Delivery Items..."
+      "DeliveryItem Processed event received! Fetching Delivery Items..."
     );
     fetchDeliveryItems();
   };
@@ -63,11 +65,11 @@ const ReceiveBtn = ({ deliveryId }) => {
     }
 
     // Subscribe to the 'deliveryItemReceived' event
-    emitter.on("deliveryItemReceived", handleDeliveryItemReceived);
+    emitter.on("deliveryItemProcessed", handleDeliveryItemReceived);
 
     // Cleanup listener on component unmount
     return () => {
-      emitter.off("deliveryItemReceived", handleDeliveryItemReceived);
+      emitter.off("deliveryItemProcessed", handleDeliveryItemReceived);
     };
   }, [isOpen, deliveryId]);
 
@@ -100,12 +102,12 @@ const ReceiveBtn = ({ deliveryId }) => {
   return (
     <>
       <Button onPress={onOpen} color="default" variant="ghost">
-        Receive Items
+        Receive
       </Button>
       <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
-        size="5xl"
+        size="full"
         className="font-f1"
       >
         <ModalContent>
@@ -169,18 +171,30 @@ const ReceiveBtn = ({ deliveryId }) => {
                       className="font-f1"
                     >
                       <TableHeader>
-                        <TableColumn>Item</TableColumn>
+                        <TableColumn>Item </TableColumn>
                         <TableColumn>Item Type</TableColumn>
-                        <TableColumn>Quantity</TableColumn>
+                        <TableColumn>Delivered Quantity</TableColumn>
+                        <TableColumn>Received Quantity</TableColumn>
+                        <TableColumn>Returned Quantity</TableColumn>
+                        <TableColumn>Sender</TableColumn>
+                        <TableColumn>Receiver</TableColumn>
                         <TableColumn>Checking Status</TableColumn>
                         <TableColumn>Mark As Received</TableColumn>
                       </TableHeader>
                       <TableBody>
                         {filteredItems.map((item) => (
                           <TableRow key={item._id}>
-                            <TableCell>{item.item.description}</TableCell>
+                            <TableCell>{item.item.part_number}</TableCell>
                             <TableCell>{item.itemType}</TableCell>
-                            <TableCell>{item.quantity}</TableCell>
+                            <TableCell>{item.delivery_quantity}</TableCell>
+                            <TableCell>{item.received_quantity}</TableCell>
+                            <TableCell>{item.returned_quantity}</TableCell>
+                            <TableCell>
+                              {item.deliveryId.senderBranch}
+                            </TableCell>
+                            <TableCell>
+                              {item.deliveryId.receiverBranch}
+                            </TableCell>
                             <TableCell>
                               {item.status === "Received" ? (
                                 <Chip className="font-f1 bg-black text-white">
@@ -198,10 +212,15 @@ const ReceiveBtn = ({ deliveryId }) => {
                               ) : (
                                 <MarkAsReceive
                                   deliveryItemId={item._id}
-                                  Item={item.item.description}
-                                  quantity={item.quantity}
+                                  Item={item.item.part_number}
+                                  quantity={item.delivery_quantity}
                                   itemId={item.item._id}
                                   itemType={item.itemType}
+                                  SenderStock={item.stock._id}
+                                  receivingBranch={
+                                    item.deliveryId.receiverBranch
+                                  }
+                                  deliveryId={item.deliveryId._id}
                                 />
                               )}
                             </TableCell>

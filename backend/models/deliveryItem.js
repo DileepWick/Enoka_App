@@ -6,18 +6,31 @@ const deliveryItemSchema = new mongoose.Schema({
     required: true, 
     refPath: 'itemType' // Dynamically references different schemas based on 'itemType'
   },
+  stock: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Stock',
+    required: true
+  },
   itemType: { 
     type: String, 
     required: true 
   },
-  quantity: { 
+  delivery_quantity: { 
     type: Number, 
     required: true, 
     min: 1 
   },
+  received_quantity: { 
+    type: Number, 
+    default: 0 
+  },
+  returned_quantity: { 
+    type: Number, 
+    default: 0 
+  },
   status: { 
     type: String, 
-    enum: ['Pending', 'Received', 'Count mismatch'], 
+    enum: ['Pending', 'Received', 'Count mismatch','Returned'], 
     default: 'Pending', 
     required: true 
   },

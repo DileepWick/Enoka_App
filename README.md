@@ -7,18 +7,22 @@ This is a commercial web application designed to provide a comprehensive solutio
 ## Features
 
 *   **User Authentication and Authorization:** Secure login and registration for users with different roles (admin and regular users).
+  
 *   **Role-Based Access Control:** Different levels of access and functionality based on user roles.
+  
 *   **Inventory Management:**
     *   Add new inventory items (rings and gaskets).
     *   Delete existing inventory items.
     *   Update stock levels and item details.
     *   View and search inventory.
+      
 *   **Delivery Management:**
     *   Create new deliveries.
     *   Track deliveries in progress.
     *   Mark deliveries as received.
     *   Complete delivery processes.
     *   View delivery history.
+      
 *   **Cash Bill Management:**
     *   Create new cash bills.
     *   Add and remove items from cash bills.
@@ -30,16 +34,9 @@ This is a commercial web application designed to provide a comprehensive solutio
 
 *   **Backend:** Node.js, Express.js
 *   **Frontend:** React
-*   **Database:** [Specify your database, e.g., MongoDB, PostgreSQL, MySQL]
-*   **Authentication:** [Specify your authentication method, e.g., JWT, Firebase Auth]
-*   **Other:** [List any other significant libraries or frameworks used, e.g., Mongoose, Sequelize, Redux, React Router, Axios, Tailwind CSS]
+*   **Database:** MongoDB
+*   **Authentication:** JWT, Firebase Auth
 
-## Installation
-
-**Prerequisites:**
-
-*   Node.js installed
-*   [Your database] installed and running
 
 **Backend Setup:**
 
@@ -58,14 +55,6 @@ This is a commercial web application designed to provide a comprehensive solutio
 4.  Start the frontend development server: `npm start`
 
 The application should now be running and accessible in your browser.
-
-## Usage
-
-[Provide a brief explanation of how to use the application, e.g., how to log in, navigate to different sections, and perform key actions.]
-
-## API Documentation
-
-[Provide a brief mention of API documentation if available. You can link to a separate documentation file or use tools like Swagger/OpenAPI. If no formal documentation exists, you can state that the API endpoints are defined in the backend routes.]
 
 ## Contributing
 
